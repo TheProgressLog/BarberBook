@@ -671,6 +671,8 @@ function clearErrors() {
 // ============================================================
 // INIT — cek session saat load
 // ============================================================
+let _initHandled = false;  // pastikan proses redirect cuma jalan sekali
+
 async function init() {
   // Timeout pengaman: kalau proses cek session lebih dari 8 detik
   // (misal koneksi internet lambat/putus), jangan macet selamanya —
@@ -686,12 +688,14 @@ async function init() {
     ]);
     if (session?.user) {
       STATE.user = session.user;
-      await afterLogin();
+      if (!_initHandled) { _initHandled = true; await afterLogin(); }
     } else {
-      showPage('page-auth');
+      if (!_initHandled) { _initHandled = true; showPage('page-auth'); }
     }
   } catch (e) {
     console.error('Init error:', e);
+    if (_initHandled) return; // listener lain sudah menangani, jangan timpa
+    _initHandled = true;
     if (e.message === 'TIMEOUT') {
       showToast('Koneksi lambat. Cek internet kamu dan coba lagi.', 'warn');
     } else {
@@ -1380,7 +1384,20 @@ async function saveStep4() {
 // AUTH STATE LISTENER
 // ============================================================
 sb.auth.onAuthStateChange(async (event, session) => {
-  if (event === 'SIGNED_IN' && session) {
+  console.log('Auth event:', event);
+
+  if (event === 'INITIAL_SESSION') {
+    // Event ini dipicu Supabase sekali di awal load, dengan info session
+    // yang sudah final (lebih dapat diandalkan daripada getSession() manual).
+    if (_initHandled) return; // init() sudah lebih dulu menangani, skip
+    _initHandled = true;
+    if (session?.user) {
+      STATE.user = session.user;
+      await afterLogin();
+    } else {
+      showPage('page-auth');
+    }
+  } else if (event === 'SIGNED_IN' && session) {
     STATE.user = session.user;
   } else if (event === 'SIGNED_OUT') {
     STATE.user = null;
