@@ -672,8 +672,18 @@ function clearErrors() {
 // INIT — cek session saat load
 // ============================================================
 async function init() {
+  // Timeout pengaman: kalau proses cek session lebih dari 8 detik
+  // (misal koneksi internet lambat/putus), jangan macet selamanya —
+  // tampilkan halaman login dan beri tahu user.
+  const timeoutPromise = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error('TIMEOUT')), 8000)
+  );
+
   try {
-    const { data: { session } } = await sb.auth.getSession();
+    const { data: { session } } = await Promise.race([
+      sb.auth.getSession(),
+      timeoutPromise,
+    ]);
     if (session?.user) {
       STATE.user = session.user;
       await afterLogin();
@@ -682,32 +692,115 @@ async function init() {
     }
   } catch (e) {
     console.error('Init error:', e);
+    if (e.message === 'TIMEOUT') {
+      showToast('Koneksi lambat. Cek internet kamu dan coba lagi.', 'warn');
+    } else {
+      showToast('Gagal memuat. Cek koneksi internet kamu.', 'err');
+    }
     showPage('page-auth');
   }
 }
 
 // Setelah login: cek apakah sudah punya toko
 async function afterLogin() {
-  try {
-    const { data: store, error } = await sb
-      .from('stores')
-      .select('*')
-      .eq('owner_id', STATE.user.id)
-      .single();
+  const timeoutPromise = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error('TIMEOUT')), 8000)
+  );
 
-    if (error || !store) {
-      // Belum punya toko → Setup
+  try {
+    const { data: store, error } = await Promise.race([
+      sb.from('stores').select('*').eq('owner_id', STATE.user.id).maybeSingle(),
+      timeoutPromise,
+    ]);
+
+    if (error) {
+      console.error('Gagal cek toko:', error);
+      showToast('Gagal memuat data toko. Coba refresh halaman.', 'err');
+      showPage('page-auth');
+      return;
+    }
+
+    if (!store) {
+      // Belum punya toko sama sekali → mulai Setup dari awal
       STATE.store = null;
+      STATE.setupStoreId = null;
       initSetupForm();
       showPage('page-setup');
     } else {
       STATE.store = store;
-      // Redirect ke dashboard (file terpisah)
-      window.location.href = 'dashboard.html';
+      STATE.setupStoreId = store.id;
+      // Cek apakah setup toko sudah lengkap (punya barberman & paket)
+      const isComplete = await checkSetupComplete(store.id);
+      if (isComplete) {
+        window.location.href = 'dashboard.html';
+      } else {
+        // Toko ada tapi setup belum selesai → lanjutkan dari step yang sesuai
+        initSetupForm();
+        prefillSetupFromStore(store);
+        await resumeSetupProgress(store.id);
+        showPage('page-setup');
+      }
     }
   } catch (e) {
     console.error('afterLogin error:', e);
+    showToast('Koneksi gagal. Cek internet kamu dan coba lagi.', 'err');
     showPage('page-auth');
+  }
+}
+
+// Cek apakah toko sudah punya minimal 1 barberman dan 1 paket (artinya setup selesai)
+async function checkSetupComplete(storeId) {
+  try {
+    const [{ count: barberCount }, { count: pkgCount }] = await Promise.all([
+      sb.from('barbers').select('id', { count: 'exact', head: true }).eq('store_id', storeId),
+      sb.from('packages').select('id', { count: 'exact', head: true }).eq('store_id', storeId),
+    ]);
+    return (barberCount > 0) && (pkgCount > 0);
+  } catch (e) {
+    console.error('checkSetupComplete error:', e);
+    return false;
+  }
+}
+
+// Isi ulang form step 1 dengan data toko yang sudah ada (kalau user kembali setelah setup terputus)
+function prefillSetupFromStore(store) {
+  const fields = {
+    s1Name: store.name, s1City: store.city, s1Tag: store.tagline,
+    s1Addr: store.address, s1Desc: store.description, s1WA: store.phone_wa,
+    s1IG: store.instagram, s1Slug: store.slug,
+    s1DP: store.dp_percent, s1Cancel: store.cancel_hours,
+  };
+  Object.entries(fields).forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if (el && val !== null && val !== undefined) el.value = val;
+  });
+  const walkinEl = document.getElementById('s1Walkin');
+  const notifEl  = document.getElementById('s1WaNotif');
+  if (walkinEl) walkinEl.checked = !!store.accept_walkin;
+  if (notifEl)  notifEl.checked  = !!store.wa_notif;
+}
+
+// Lanjutkan ke step setup yang sesuai berdasarkan progress yang sudah tersimpan
+async function resumeSetupProgress(storeId) {
+  try {
+    const { count: barberCount } = await sb.from('barbers')
+      .select('id', { count: 'exact', head: true }).eq('store_id', storeId);
+    if (barberCount > 0) {
+      goSetupStep(4);
+      return;
+    }
+    const { data: hours } = await sb.from('store_hours')
+      .select('id').eq('store_id', storeId).limit(1);
+    if (hours && hours.length > 0) {
+      await loadJamFromDB();
+      goSetupStep(3);
+      return;
+    }
+    await loadJamFromDB();
+    goSetupStep(2);
+  } catch (e) {
+    console.error('resumeSetupProgress error:', e);
+    goSetupStep(1);
   }
 }
 
