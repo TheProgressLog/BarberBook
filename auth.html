@@ -1144,7 +1144,7 @@ function addPkg() {
   if (!dur)    { validateField('fpDur', false, 'Masukkan durasi yang valid'); valid = false; }
   if (!valid) return;
 
-  STATE.setupPkgs.push({ name, desc, price, duration_min: dur, buffer_min: buf, is_featured: feat, sort_order: STATE.setupPkgs.length });
+  STATE.setupPkgs.push({ name, description: desc, price, duration_min: dur, buffer_min: buf, is_featured: feat, sort_order: STATE.setupPkgs.length });
 
   // Reset form
   document.getElementById('ipName').value = '';
