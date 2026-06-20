@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BarberBook — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+/* ===== RESET & BASE (sama seperti auth.html, biar konsisten) ===== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:#0E0E0E;color:#F5F5F0;min-height:100vh;}
+button,input,select,textarea{font-family:'Inter',sans-serif;}
+
+:root{
+  --gold:#C9A84C; --gold-l:#e0bc5a;
+  --gold-d:rgba(201,168,76,0.12); --gold-b:rgba(201,168,76,0.28);
+  --bg:#0E0E0E; --bg2:#141414; --bg3:#1A1A1A; --bg4:#222;
+  --t:#F5F5F0; --t2:rgba(245,245,240,0.6); --t3:rgba(245,245,240,0.35); --t4:rgba(245,245,240,0.14);
+  --b:rgba(245,245,240,0.07); --b2:rgba(245,245,240,0.12);
+  --gr:#4ade80; --grd:rgba(74,222,128,0.1);
+  --rd:#f87171; --rdd:rgba(248,113,113,0.1);
+  --bl:#60a5fa; --bld:rgba(96,165,250,0.1);
+  --pr:#c084fc; --prd:rgba(192,132,252,0.1);
+  --or:#fb923c; --ord:rgba(251,146,60,0.1);
+  --r:8px; --rl:12px; --rxl:18px;
+}
+
+.hidden{display:none!important;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px;}
+
+.btn{display:inline-flex;align-items:center;gap:7px;border:none;border-radius:var(--r);cursor:pointer;font-weight:500;transition:all .18s;letter-spacing:.04em;font-size:13px;}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+.btn-g{background:var(--gold);color:#111;padding:10px 18px;font-weight:600;}
+.btn-g:hover:not(:disabled){background:var(--gold-l);}
+.btn-o{background:transparent;color:var(--t2);border:.5px solid var(--b2);padding:9px 16px;}
+.btn-o:hover:not(:disabled){border-color:var(--gold-b);color:var(--gold);}
+.btn-gh{background:transparent;color:var(--t3);border:none;padding:8px 12px;}
+.btn-gh:hover:not(:disabled){background:var(--bg3);color:var(--t);}
+.btn-sm{padding:6px 12px;font-size:11px;}
+
+/* ===== NAV ===== */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:.5px solid var(--b);background:var(--bg);position:sticky;top:0;z-index:100;}
+.nav-logo{font-family:'Playfair Display',serif;font-size:18px;color:var(--gold);display:flex;align-items:center;gap:8px;}
+.nav-logo span{color:var(--t);}
+.nav-logo-ic{width:30px;height:30px;background:var(--gold-d);border:.5px solid var(--gold-b);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--gold);}
+.store-pill{font-size:11px;color:var(--t3);background:var(--bg3);padding:5px 12px;border-radius:20px;border:.5px solid var(--b);}
+
+/* ===== LAYOUT ===== */
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 57px);}
+.side{background:var(--bg2);border-right:.5px solid var(--b);padding:18px 0;}
+.snav{display:flex;align-items:center;gap:10px;padding:11px 20px;font-size:13px;color:var(--t3);cursor:pointer;border-left:2px solid transparent;transition:all .15s;}
+.snav:hover{color:var(--t2);background:rgba(245,245,240,.02);}
+.snav.active{color:var(--gold);border-left-color:var(--gold);background:rgba(201,168,76,.04);}
+.snav i{font-size:16px;width:18px;}
+.ssec{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--t4);padding:16px 20px 8px;}
+.content{padding:24px 28px;}
+
+/* ===== STATS ===== */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;}
+.stat{background:var(--bg3);border:.5px solid var(--b);border-radius:var(--rl);padding:14px 16px;}
+.stat-lbl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:7px;}
+.stat-val{font-size:24px;font-weight:500;line-height:1;}
+.stat-sub{font-size:11px;color:var(--t3);margin-top:5px;}
+
+/* ===== CARD ===== */
+.card{background:var(--bg3);border:.5px solid var(--b);border-radius:var(--rl);padding:18px 20px;}
+
+/* ===== TABS (filter status) ===== */
+.filter-row{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.fchip{padding:7px 14px;border-radius:20px;font-size:12px;border:.5px solid var(--b2);color:var(--t3);cursor:pointer;transition:all .15s;background:var(--bg3);}
+.fchip:hover{border-color:var(--gold-b);color:var(--gold);}
+.fchip.active{background:var(--gold-d);border-color:var(--gold-b);color:var(--gold);}
+.search-box{flex:1;min-width:200px;position:relative;}
+.search-box input{width:100%;background:var(--bg3);border:.5px solid var(--b2);color:var(--t);padding:9px 14px 9px 36px;border-radius:20px;font-size:13px;outline:none;}
+.search-box input:focus{border-color:var(--gold-b);}
+.search-box i{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--t3);font-size:14px;}
+
+/* ===== BOOKING TABLE ===== */
+.bk-table{width:100%;border-collapse:collapse;}
+.bk-table th{text-align:left;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);padding:10px 14px;border-bottom:.5px solid var(--b);font-weight:500;}
+.bk-table td{padding:13px 14px;border-bottom:.5px solid rgba(245,245,240,.04);font-size:13px;vertical-align:middle;}
+.bk-table tr:hover td{background:rgba(245,245,240,.015);}
+.bk-table tr:last-child td{border-bottom:none;}
+
+.av{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;flex-shrink:0;}
+.av-s{width:30px;height:30px;font-size:11px;}
+
+.badge{font-size:10px;padding:3px 9px;border-radius:20px;font-weight:500;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;}
+.bg{background:var(--gold-d);color:var(--gold);border:.5px solid var(--gold-b);}
+.bgr{background:var(--grd);color:var(--gr);}
+.brd{background:var(--rdd);color:var(--rd);}
+.bbl{background:var(--bld);color:var(--bl);}
+.bpr{background:var(--prd);color:var(--pr);}
+.bor{background:var(--ord);color:var(--or);}
+.bgy{background:rgba(245,245,240,.05);color:var(--t3);}
+
+.code-pill{font-family:'Playfair Display',serif;font-size:12px;color:var(--gold);letter-spacing:.05em;}
+
+/* ===== ROW ACTIONS ===== */
+.row-actions{display:flex;gap:6px;}
+.act-btn{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;border:.5px solid var(--b2);background:transparent;color:var(--t3);cursor:pointer;transition:all .15s;}
+.act-btn:hover{border-color:var(--gold-b);color:var(--gold);background:var(--gold-d);}
+.act-btn.danger:hover{border-color:rgba(248,113,113,.3);color:var(--rd);background:var(--rdd);}
+
+/* ===== EMPTY / LOADING STATE ===== */
+.empty-state{text-align:center;padding:60px 20px;}
+.empty-icon{font-size:40px;color:var(--t4);margin-bottom:14px;}
+.empty-title{font-size:15px;color:var(--t2);margin-bottom:6px;}
+.empty-sub{font-size:12px;color:var(--t3);}
+.skel{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 37%,var(--bg3) 63%);background-size:400% 100%;animation:skel 1.4s ease infinite;border-radius:6px;}
+@keyframes skel{0%{background-position:100% 50%;}100%{background-position:0 50%;}}
+
+/* ===== MODAL ===== */
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:500;align-items:center;justify-content:center;padding:20px;}
+.ov.open{display:flex;}
+.mbox{background:var(--bg3);border:.5px solid var(--b2);border-radius:var(--rxl);width:100%;max-width:460px;max-height:90vh;overflow-y:auto;}
+.mhd{display:flex;align-items:center;justify-content:space-between;padding:17px 20px;border-bottom:.5px solid var(--b);position:sticky;top:0;background:var(--bg3);}
+.mtitle{font-family:'Playfair Display',serif;font-size:17px;}
+.mclose{background:none;border:none;color:var(--t3);font-size:20px;cursor:pointer;}
+.mclose:hover{color:var(--t);}
+.mbody{padding:20px;}
+.mfoot{padding:14px 20px;border-top:.5px solid var(--b);display:flex;gap:10px;justify-content:flex-end;}
+
+.detail-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:.5px solid rgba(245,245,240,.04);font-size:13px;}
+.detail-row:last-child{border-bottom:none;}
+.detail-k{color:var(--t3);}
+.detail-v{color:var(--t);font-weight:500;text-align:right;}
+
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:6px;}
+.field select,.field input{width:100%;background:var(--bg2);border:.5px solid var(--b2);color:var(--t);padding:10px 12px;border-radius:var(--r);font-size:13px;outline:none;}
+.field select:focus,.field input:focus{border-color:var(--gold-b);}
+.field input::placeholder{color:var(--t4);}
+.field.error input{border-color:rgba(248,113,113,.5);}
+.field-err{font-size:11px;color:var(--rd);margin-top:4px;display:none;}
+.field.error .field-err{display:block;}
+
+/* ===== TOAST ===== */
+#TB{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+.toast{background:var(--bg3);border:.5px solid var(--b2);border-radius:var(--r);padding:12px 16px;font-size:13px;display:flex;align-items:center;gap:9px;min-width:230px;max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,.4);animation:tIn .25s ease;}
+.tok{border-color:rgba(74,222,128,.3);} .tok i{color:var(--gr);}
+.twarn{border-color:rgba(251,191,36,.3);} .twarn i{color:#fbbf24;}
+.terr{border-color:rgba(248,113,113,.3);} .terr i{color:var(--rd);}
+@keyframes tIn{from{opacity:0;transform:translateX(14px);}to{opacity:1;transform:translateX(0);}}
+
+/* ===== PAGINATION ===== */
+.pagination{display:flex;align-items:center;justify-content:space-between;padding-top:16px;margin-top:6px;border-top:.5px solid var(--b);}
+
+/* ===== VIEW PANELS ===== */
+.view-panel.hidden{display:none;}
+
+/* ===== LIST ITEM (barberman / paket) ===== */
+.list-item{display:flex;align-items:center;gap:14px;padding:14px;background:var(--bg2);border:.5px solid var(--b);border-radius:var(--r);margin-bottom:10px;}
+.list-item-info{flex:1;min-width:0;}
+.list-item-name{font-size:14px;font-weight:500;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.list-item-sub{font-size:12px;color:var(--t3);margin-top:3px;}
+.list-item-meta{font-size:11px;color:var(--t3);margin-top:5px;display:flex;gap:10px;flex-wrap:wrap;}
+.list-item-actions{display:flex;gap:6px;flex-shrink:0;}
+
+.dayoff-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;}
+.dayoff-tag{font-size:10px;background:var(--rdd);color:var(--rd);padding:2px 8px;border-radius:10px;}
+
+/* ===== DAY PICKER (modal) ===== */
+.day-picker{display:flex;gap:6px;flex-wrap:wrap;}
+.day-btn{padding:7px 12px;border:.5px solid var(--b2);border-radius:6px;font-size:11px;color:var(--t3);cursor:pointer;transition:all .15s;user-select:none;background:var(--bg2);}
+.day-btn:hover{border-color:var(--gold-b);color:var(--gold);}
+.day-btn.off{background:var(--rdd);border-color:rgba(248,113,113,.3);color:var(--rd);}
+
+/* ===== SWITCH ===== */
+.sw{position:relative;width:38px;height:21px;flex-shrink:0;}
+.sw input{opacity:0;width:0;height:0;position:absolute;}
+.sw-t{position:absolute;inset:0;background:rgba(245,245,240,.1);border-radius:21px;cursor:pointer;transition:.2s;}
+.sw-t:before{content:'';position:absolute;width:15px;height:15px;left:3px;top:3px;background:var(--t3);border-radius:50%;transition:.2s;}
+.sw input:checked+.sw-t{background:var(--gold);}
+.sw input:checked+.sw-t:before{transform:translateX(17px);background:#111;}
+
+/* ===== EMPTY STATE (reuse from booking) ===== */
+.loading-row{text-align:center;padding:30px;color:var(--t3);font-size:13px;}
+.page-info{font-size:12px;color:var(--t3);}
+.page-btns{display:flex;gap:6px;}
+
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr;}
+  .side{display:none;}
+  .stat-grid{grid-template-columns:1fr 1fr;}
+  .bk-table{display:block;overflow-x:auto;white-space:nowrap;}
+}
+</style>
+</head>
+<body>
+<div id="TB"></div>
+
+<!-- ===================================================
+     GUARD: belum login → redirect
+     =================================================== -->
+<div id="loadingGuard" style="display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:14px;">
+  <div style="font-family:'Playfair Display',serif;font-size:24px;color:var(--gold);">BARBER<span style="color:var(--t);">BOOK</span></div>
+  <div style="width:22px;height:22px;border:2px solid rgba(201,168,76,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .6s linear infinite;"></div>
+</div>
+<style>@keyframes spin{to{transform:rotate(360deg);}}</style>
+
+<!-- ===================================================
+     MAIN APP (hidden until auth check passes)
+     =================================================== -->
+<div id="app" class="hidden">
+
+<nav class="nav">
+  <div class="nav-logo">
+    <div class="nav-logo-ic"><i class="ti ti-scissors"></i></div>
+    BARBER<span>BOOK</span>
+  </div>
+  <div class="store-pill" id="storeNamePill">Memuat toko...</div>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <button class="btn btn-o" onclick="openPage('booking-link')"><i class="ti ti-link" style="font-size:14px;"></i>Link Booking</button>
+    <button class="btn btn-gh" onclick="doLogout()"><i class="ti ti-logout" style="font-size:15px;"></i></button>
+  </div>
+</nav>
+
+<div class="layout">
+  <div class="side">
+    <div class="ssec">Menu Utama</div>
+    <div class="snav" onclick="goRingkasan()"><i class="ti ti-layout-dashboard"></i>Ringkasan</div>
+    <div class="snav active" id="navBooking" onclick="switchView('booking')"><i class="ti ti-calendar"></i>Kelola Booking</div>
+    <div class="snav" id="navBarbers" onclick="switchView('barbers')"><i class="ti ti-users"></i>Barberman</div>
+    <div class="snav" id="navPackages" onclick="switchView('packages')"><i class="ti ti-package"></i>Paket & Harga</div>
+    <div class="ssec">Pengaturan</div>
+    <div class="snav" onclick="showToast('Fitur Profil Toko segera hadir','warn')"><i class="ti ti-building-store"></i>Profil Toko</div>
+  </div>
+
+  <div class="content">
+
+    <!-- ===== RINGKASAN MINI (selalu tampil di atas) ===== -->
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;">
+      <div>
+        <h2 style="font-family:'Playfair Display',serif;font-size:22px;" id="greetText">Selamat datang, Owner</h2>
+        <p style="font-size:13px;color:var(--t3);margin-top:4px;" id="dateText">Memuat tanggal...</p>
+      </div>
+      <button class="btn btn-g" id="refreshBtn" onclick="refreshCurrentView()"><i class="ti ti-refresh" style="font-size:14px;"></i>Refresh</button>
+    </div>
+
+    <div class="stat-grid" id="statGrid">
+      <div class="stat"><div class="stat-lbl">Booking Hari Ini</div><div class="stat-val skel" style="width:40px;height:24px;">&nbsp;</div></div>
+      <div class="stat"><div class="stat-lbl">Menunggu Konfirmasi</div><div class="stat-val skel" style="width:40px;height:24px;">&nbsp;</div></div>
+      <div class="stat"><div class="stat-lbl">Selesai Bulan Ini</div><div class="stat-val skel" style="width:40px;height:24px;">&nbsp;</div></div>
+      <div class="stat"><div class="stat-lbl">Pendapatan Bulan Ini</div><div class="stat-val skel" style="width:80px;height:24px;">&nbsp;</div></div>
+    </div>
+
+    <!-- ===== VIEW: KELOLA BOOKING ===== -->
+    <div class="view-panel" id="view-booking">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+        <div style="font-size:16px;font-weight:500;font-family:'Playfair Display',serif;">Semua Booking</div>
+        <div style="font-size:12px;color:var(--t3);" id="bkCountText">Memuat...</div>
+      </div>
+
+      <div class="filter-row">
+        <div class="fchip active" data-status="all" onclick="setFilter('all',this)">Semua</div>
+        <div class="fchip" data-status="pending" onclick="setFilter('pending',this)">Menunggu</div>
+        <div class="fchip" data-status="confirmed" onclick="setFilter('confirmed',this)">Terkonfirmasi</div>
+        <div class="fchip" data-status="active" onclick="setFilter('active',this)">Berlangsung</div>
+        <div class="fchip" data-status="done" onclick="setFilter('done',this)">Selesai</div>
+        <div class="fchip" data-status="cancelled" onclick="setFilter('cancelled',this)">Dibatalkan</div>
+        <div class="fchip" data-status="noshow" onclick="setFilter('noshow',this)">No-Show</div>
+        <div class="search-box">
+          <i class="ti ti-search"></i>
+          <input type="text" id="searchInput" placeholder="Cari nama atau kode booking..." oninput="onSearch()">
+        </div>
+      </div>
+
+      <div id="bkTableWrap">
+        <table class="bk-table">
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Barberman</th>
+              <th>Paket</th>
+              <th>Tanggal & Waktu</th>
+              <th>Tipe</th>
+              <th>Harga</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="bkTableBody">
+            <!-- diisi oleh JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination" id="paginationBar" style="display:none;">
+        <div class="page-info" id="pageInfo">—</div>
+        <div class="page-btns">
+          <button class="btn btn-o btn-sm" id="prevBtn" onclick="changePage(-1)"><i class="ti ti-chevron-left" style="font-size:13px;"></i></button>
+          <button class="btn btn-o btn-sm" id="nextBtn" onclick="changePage(1)"><i class="ti ti-chevron-right" style="font-size:13px;"></i></button>
+        </div>
+      </div>
+    </div>
+    </div><!-- end view-booking -->
+
+    <!-- ===== VIEW: BARBERMAN ===== -->
+    <div class="view-panel hidden" id="view-barbers">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <div style="font-size:16px;font-weight:500;font-family:'Playfair Display',serif;">Barberman</div>
+          <button class="btn btn-g" onclick="openBarberModal()"><i class="ti ti-plus" style="font-size:14px;"></i>Tambah Barberman</button>
+        </div>
+        <div id="barberListWrap"></div>
+      </div>
+    </div>
+
+    <!-- ===== VIEW: PAKET & HARGA ===== -->
+    <div class="view-panel hidden" id="view-packages">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <div style="font-size:16px;font-weight:500;font-family:'Playfair Display',serif;">Paket & Harga</div>
+          <button class="btn btn-g" onclick="openPkgModal()"><i class="ti ti-plus" style="font-size:14px;"></i>Tambah Paket</button>
+        </div>
+        <div id="pkgListWrap"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div><!-- end #app -->
+
+
+<!-- ===================================================
+     MODAL: Detail Booking
+     =================================================== -->
+<div class="ov" id="mDetail">
+  <div class="mbox">
+    <div class="mhd">
+      <div class="mtitle">Detail Booking</div>
+      <button class="mclose" onclick="closeM('mDetail')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="mbody" id="detailBody">
+      <!-- diisi oleh JS -->
+    </div>
+    <div class="mfoot" id="detailFoot">
+      <!-- diisi oleh JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ===================================================
+     MODAL: Ubah Status
+     =================================================== -->
+<div class="ov" id="mStatus">
+  <div class="mbox" style="max-width:380px;">
+    <div class="mhd">
+      <div class="mtitle">Ubah Status Booking</div>
+      <button class="mclose" onclick="closeM('mStatus')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="mbody">
+      <div style="font-size:13px;color:var(--t2);margin-bottom:16px;" id="statusBookingInfo">—</div>
+      <div class="field">
+        <label>Status Baru</label>
+        <select id="newStatusSelect">
+          <option value="pending">Menunggu Konfirmasi</option>
+          <option value="confirmed">Terkonfirmasi</option>
+          <option value="active">Sedang Berlangsung</option>
+          <option value="done">Selesai</option>
+          <option value="cancelled">Dibatalkan</option>
+          <option value="noshow">No-Show (Tidak Datang)</option>
+        </select>
+      </div>
+      <div id="noshowWarning" class="hidden" style="background:rgba(248,113,113,.06);border:.5px solid rgba(248,113,113,.2);border-radius:var(--r);padding:10px 12px;font-size:12px;color:rgba(248,113,113,.85);">
+        <i class="ti ti-alert-triangle" style="font-size:13px;vertical-align:-2px;margin-right:5px;"></i>DP customer akan dianggap hangus untuk status No-Show.
+      </div>
+    </div>
+    <div class="mfoot">
+      <button class="btn btn-gh" onclick="closeM('mStatus')">Batal</button>
+      <button class="btn btn-g" onclick="confirmStatusChange()"><i class="ti ti-check" style="font-size:14px;"></i>Simpan Perubahan</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===================================================
+     MODAL: Tambah/Edit Barberman
+     =================================================== -->
+<div class="ov" id="mBarber">
+  <div class="mbox">
+    <div class="mhd">
+      <div class="mtitle" id="barberModalTitle">Tambah Barberman</div>
+      <button class="mclose" onclick="closeM('mBarber')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="mbody">
+      <div class="field" id="fBName"><label>Nama</label><input type="text" id="bName" placeholder="Nama barberman"><div class="field-err">Nama wajib diisi</div></div>
+      <div class="field"><label>Spesialisasi</label><input type="text" id="bSpec" placeholder="cth: Fade & Pompadour"></div>
+      <div class="field"><label>No. WhatsApp <span style="color:var(--t4);font-size:10px;">(opsional)</span></label><input type="text" id="bWA" placeholder="08xxxxxxxxxx"></div>
+      <div class="field">
+        <label>Hari Libur Mingguan</label>
+        <div class="day-picker" id="bDays">
+          <div class="day-btn" data-day="1" onclick="toggleDayBtn(this)">Senin</div>
+          <div class="day-btn" data-day="2" onclick="toggleDayBtn(this)">Selasa</div>
+          <div class="day-btn" data-day="3" onclick="toggleDayBtn(this)">Rabu</div>
+          <div class="day-btn" data-day="4" onclick="toggleDayBtn(this)">Kamis</div>
+          <div class="day-btn" data-day="5" onclick="toggleDayBtn(this)">Jumat</div>
+          <div class="day-btn" data-day="6" onclick="toggleDayBtn(this)">Sabtu</div>
+          <div class="day-btn" data-day="0" onclick="toggleDayBtn(this)">Minggu</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0 0;border-top:.5px solid var(--b);margin-top:6px;">
+        <div style="font-size:13px;">Aktif menerima booking</div>
+        <label class="sw"><input type="checkbox" id="bActive" checked><span class="sw-t"></span></label>
+      </div>
+    </div>
+    <div class="mfoot">
+      <button class="btn btn-gh" onclick="closeM('mBarber')">Batal</button>
+      <button class="btn btn-g" id="btnSaveBarber" onclick="saveBarber()"><i class="ti ti-check" style="font-size:14px;"></i>Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================================================
+     MODAL: Tambah/Edit Paket
+     =================================================== -->
+<div class="ov" id="mPkg">
+  <div class="mbox">
+    <div class="mhd">
+      <div class="mtitle" id="pkgModalTitle">Tambah Paket</div>
+      <button class="mclose" onclick="closeM('mPkg')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="mbody">
+      <div class="field" id="fPName"><label>Nama Paket</label><input type="text" id="pName" placeholder="cth: Potong Reguler"><div class="field-err">Nama wajib diisi</div></div>
+      <div class="field"><label>Deskripsi <span style="color:var(--t4);font-size:10px;">(opsional)</span></label><input type="text" id="pDesc" placeholder="Deskripsi singkat paket"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+        <div class="field" id="fPPrice"><label>Harga (Rp)</label><input type="number" id="pPrice" placeholder="35000" min="0"><div class="field-err">Wajib diisi</div></div>
+        <div class="field" id="fPDur"><label>Durasi (mnt)</label><input type="number" id="pDur" placeholder="30" min="5"><div class="field-err">Wajib diisi</div></div>
+        <div class="field"><label>Buffer (mnt)</label><input type="number" id="pBuf" value="15" min="0"></div>
+      </div>
+      <div id="pkgPreviewBox" style="background:rgba(201,168,76,.05);border:.5px solid var(--gold-b);border-radius:var(--r);padding:10px 12px;font-size:12px;color:var(--gold);margin-bottom:14px;display:none;"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:.5px solid var(--b);">
+        <div style="font-size:13px;">Tampilkan sebagai "Terpopuler"</div>
+        <label class="sw"><input type="checkbox" id="pFeatured"><span class="sw-t"></span></label>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;">
+        <div style="font-size:13px;">Aktif (tampil di halaman booking)</div>
+        <label class="sw"><input type="checkbox" id="pActive" checked><span class="sw-t"></span></label>
+      </div>
+    </div>
+    <div class="mfoot">
+      <button class="btn btn-gh" onclick="closeM('mPkg')">Batal</button>
+      <button class="btn btn-g" id="btnSavePkg" onclick="savePkg()"><i class="ti ti-check" style="font-size:14px;"></i>Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================================================
+     MODAL: Konfirmasi Hapus
+     =================================================== -->
+<div class="ov" id="mConfirmDelete">
+  <div class="mbox" style="max-width:380px;">
+    <div class="mhd">
+      <div class="mtitle">Konfirmasi Hapus</div>
+      <button class="mclose" onclick="closeM('mConfirmDelete')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="mbody">
+      <div style="font-size:13px;color:var(--t2);line-height:1.6;" id="deleteConfirmText">Apakah kamu yakin ingin menghapus data ini?</div>
+    </div>
+    <div class="mfoot">
+      <button class="btn btn-gh" onclick="closeM('mConfirmDelete')">Batal</button>
+      <button class="btn" style="background:var(--rdd);color:var(--rd);border:.5px solid rgba(248,113,113,.3);padding:10px 18px;" id="btnConfirmDelete" onclick="executeDelete()"><i class="ti ti-trash" style="font-size:14px;"></i>Ya, Hapus</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ============================================================
+// KONFIGURASI SUPABASE — samakan persis dengan auth.html
+// ============================================================
+const SUPABASE_URL = 'https://GANTI_DENGAN_URL_SUPABASE_KAMU.supabase.co';
+const SUPABASE_ANON_KEY = 'GANTI_DENGAN_ANON_KEY_SUPABASE_KAMU';
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ============================================================
+// STATE
+// ============================================================
+let STATE = {
+  user: null,
+  store: null,
+  bookings: [],       // semua booking dari server (1 store)
+  filtered: [],        // hasil filter+search yang sedang tampil
+  statusFilter: 'all',
+  searchTerm: '',
+  page: 1,
+  pageSize: 10,
+  statusTarget: null,  // booking id yang sedang diubah statusnya
+};
+
+const STATUS_LABEL = {
+  pending:   { label: 'Menunggu',      cls: 'bgy' },
+  confirmed: { label: 'Terkonfirmasi', cls: 'bbl' },
+  active:    { label: 'Berlangsung',   cls: 'bg'  },
+  done:      { label: 'Selesai',       cls: 'bgr' },
+  cancelled: { label: 'Dibatalkan',    cls: 'brd' },
+  noshow:    { label: 'No-Show',       cls: 'brd' },
+};
+
+const TYPE_LABEL = {
+  online: { label: 'Booking', cls: 'bbl' },
+  walkin: { label: 'Walk-in', cls: 'bpr' },
+};
+
+const AVATAR_COLORS = ['#C9A84C','#60a5fa','#4ade80','#c084fc','#f87171','#fb923c'];
+
+// ============================================================
+// UTILS
+// ============================================================
+function fmtRp(n) {
+  return 'Rp ' + Math.round(n || 0).toLocaleString('id-ID');
+}
+
+function fmtDate(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function fmtTime(t) {
+  if (!t) return '—';
+  return t.slice(0, 5);
+}
+
+function showToast(msg, type = 'ok') {
+  const icons = { ok: 'ti-check', warn: 'ti-alert-triangle', err: 'ti-x' };
+  const cls = { ok: 'tok', warn: 'twarn', err: 'terr' };
+  const el = document.createElement('div');
+  el.className = `toast ${cls[type]}`;
+  el.innerHTML = `<i class="ti ${icons[type]}" style="font-size:15px;flex-shrink:0;"></i><span>${msg}</span>`;
+  document.getElementById('TB').appendChild(el);
+  setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transition = 'opacity .3s';
+    setTimeout(() => el.remove(), 300);
+  }, 3500);
+}
+
+function openM(id) { document.getElementById(id).classList.add('open'); }
+function closeM(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.ov').forEach(o => {
+  o.addEventListener('click', (e) => { if (e.target === o) o.classList.remove('open'); });
+});
+
+function avatarColorFor(str) {
+  let hash = 0;
+  for (let i = 0; i < (str || '').length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+}
+
+// ============================================================
+// AUTH GUARD — pastikan sudah login & punya toko sebelum render apa pun
+// ============================================================
+async function initGuard() {
+  const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 8000));
+  try {
+    const { data: { session } } = await Promise.race([sb.auth.getSession(), timeoutPromise]);
+    if (!session?.user) {
+      window.location.href = 'auth.html';
+      return;
+    }
+    STATE.user = session.user;
+
+    const { data: store, error } = await Promise.race([
+      sb.from('stores').select('*').eq('owner_id', STATE.user.id).maybeSingle(),
+      timeoutPromise,
+    ]);
+
+    if (error || !store) {
+      // Belum setup toko → balik ke auth.html untuk lanjutkan setup
+      window.location.href = 'auth.html';
+      return;
+    }
+
+    STATE.store = store;
+    document.getElementById('loadingGuard').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+    initApp();
+  } catch (e) {
+    console.error('Guard error:', e);
+    showToast('Gagal memuat. Mengarahkan ke halaman login...', 'err');
+    setTimeout(() => { window.location.href = 'auth.html'; }, 1500);
+  }
+}
+
+async function doLogout() {
+  await sb.auth.signOut();
+  window.location.href = 'auth.html';
+}
+
+// ============================================================
+// INIT APP
+// ============================================================
+function initApp() {
+  document.getElementById('storeNamePill').innerHTML =
+    `<i class="ti ti-building-store" style="font-size:12px;vertical-align:-1px;margin-right:5px;"></i>${STATE.store.name}`;
+
+  const now = new Date();
+  document.getElementById('greetText').textContent = greetingByHour(now) + ', Owner';
+  document.getElementById('dateText').textContent = now.toLocaleDateString('id-ID', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  });
+
+  loadBookings();
+}
+
+function greetingByHour(d) {
+  const h = d.getHours();
+  if (h < 11) return 'Selamat pagi';
+  if (h < 15) return 'Selamat siang';
+  if (h < 18) return 'Selamat sore';
+  return 'Selamat malam';
+}
+
+function goRingkasan() {
+  showToast('Halaman ringkasan lengkap segera hadir', 'warn');
+}
+
+// ============================================================
+// VIEW SWITCHING (Booking / Barberman / Paket)
+// ============================================================
+STATE.currentView = 'booking';
+STATE.barbers = [];
+STATE.packages = [];
+STATE.deleteTarget = null; // { type: 'barber'|'package', id: '...' }
+
+function switchView(view) {
+  STATE.currentView = view;
+  document.querySelectorAll('.view-panel').forEach(p => p.classList.add('hidden'));
+  document.getElementById('view-' + view).classList.remove('hidden');
+
+  document.querySelectorAll('.snav').forEach(n => n.classList.remove('active'));
+  const navMap = { booking: 'navBooking', barbers: 'navBarbers', packages: 'navPackages' };
+  document.getElementById(navMap[view])?.classList.add('active');
+
+  if (view === 'barbers' && STATE.barbers.length === 0) loadBarbers();
+  if (view === 'packages' && STATE.packages.length === 0) loadPackages();
+}
+
+function refreshCurrentView() {
+  if (STATE.currentView === 'booking') loadBookings();
+  if (STATE.currentView === 'barbers') loadBarbers();
+  if (STATE.currentView === 'packages') loadPackages();
+}
+
+function goBooking() { switchView('booking'); }
+
+function openPage(name) {
+  if (name === 'booking-link') {
+    const url = window.location.origin + '/booking.html?store=' + (STATE.store?.slug || '');
+    navigator.clipboard?.writeText(url).then(() => {
+      showToast('Link booking disalin: ' + url, 'ok');
+    }).catch(() => {
+      showToast('Link booking: ' + url, 'ok');
+    });
+  }
+}
+
+function validateField(fieldId, valid) {
+  const f = document.getElementById(fieldId);
+  if (f) f.classList.toggle('error', !valid);
+}
+function clearFieldErrors(ids) {
+  ids.forEach(id => document.getElementById(id)?.classList.remove('error'));
+}
+
+// ============================================================
+// BARBERMAN — LOAD
+// ============================================================
+async function loadBarbers() {
+  const wrap = document.getElementById('barberListWrap');
+  wrap.innerHTML = '<div class="loading-row">Memuat data barberman...</div>';
+
+  try {
+    const [barbersRes, daysOffRes] = await Promise.all([
+      sb.from('barbers').select('*').eq('store_id', STATE.store.id).order('sort_order'),
+      sb.from('barber_days_off').select('barber_id, day_of_week'),
+    ]);
+
+    if (barbersRes.error) throw barbersRes.error;
+
+    STATE.barbers = barbersRes.data || [];
+    const daysOffMap = {};
+    (daysOffRes.data || []).forEach(d => {
+      if (!daysOffMap[d.barber_id]) daysOffMap[d.barber_id] = [];
+      daysOffMap[d.barber_id].push(d.day_of_week);
+    });
+    STATE.barberDaysOff = daysOffMap;
+
+    renderBarberList();
+  } catch (e) {
+    console.error('loadBarbers error:', e);
+    wrap.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="ti ti-wifi-off"></i></div><div class="empty-title">Gagal memuat data</div><div class="empty-sub">Cek koneksi internet, lalu klik Refresh</div></div>`;
+  }
+}
+
+const DAY_NAMES_FULL = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+
+function renderBarberList() {
+  const wrap = document.getElementById('barberListWrap');
+  if (STATE.barbers.length === 0) {
+    wrap.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="ti ti-users"></i></div><div class="empty-title">Belum ada barberman</div><div class="empty-sub">Tambah barberman pertama kamu</div></div>`;
+    return;
+  }
+
+  wrap.innerHTML = STATE.barbers.map(b => {
+    const color = b.avatar_color || '#C9A84C';
+    const offDays = STATE.barberDaysOff[b.id] || [];
+    return `
+    <div class="list-item">
+      <div class="av av-l" style="background:${color}22;color:${color};">${b.name[0]}</div>
+      <div class="list-item-info">
+        <div class="list-item-name">
+          ${escapeHtml(b.name)}
+          ${b.is_active ? '<span class="badge bgr">Aktif</span>' : '<span class="badge brd">Nonaktif</span>'}
+        </div>
+        <div class="list-item-sub">${escapeHtml(b.specialty || 'Belum ada spesialisasi')} ${b.phone_wa ? '· ' + escapeHtml(b.phone_wa) : ''}</div>
+        <div class="list-item-meta">
+          <span><i class="ti ti-star-filled" style="font-size:11px;color:var(--gold);"></i> ${b.rating || 5.0} (${b.review_count || 0} ulasan)</span>
+        </div>
+        ${offDays.length ? `<div class="dayoff-tags">${offDays.map(d => `<span class="dayoff-tag">Libur ${DAY_NAMES_FULL[d]}</span>`).join('')}</div>` : ''}
+      </div>
+      <div class="list-item-actions">
+        <button class="act-btn" title="Edit" onclick="openBarberModal('${b.id}')"><i class="ti ti-edit" style="font-size:14px;"></i></button>
+        <button class="act-btn danger" title="Hapus" onclick="askDeleteBarber('${b.id}')"><i class="ti ti-trash" style="font-size:14px;"></i></button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// BARBERMAN — ADD / EDIT MODAL
+// ============================================================
+function openBarberModal(id) {
+  clearFieldErrors(['fBName']);
+  document.getElementById('bName').value = '';
+  document.getElementById('bSpec').value = '';
+  document.getElementById('bWA').value = '';
+  document.getElementById('bActive').checked = true;
+  document.querySelectorAll('#bDays .day-btn').forEach(d => d.classList.remove('off'));
+
+  if (id) {
+    const b = STATE.barbers.find(x => x.id === id);
+    if (!b) return;
+    document.getElementById('barberModalTitle').textContent = 'Edit Barberman';
+    document.getElementById('bName').value = b.name;
+    document.getElementById('bSpec').value = b.specialty || '';
+    document.getElementById('bWA').value = b.phone_wa || '';
+    document.getElementById('bActive').checked = b.is_active;
+    const offDays = STATE.barberDaysOff[b.id] || [];
+    document.querySelectorAll('#bDays .day-btn').forEach(d => {
+      if (offDays.includes(parseInt(d.dataset.day))) d.classList.add('off');
+    });
+    document.getElementById('btnSaveBarber').dataset.editId = id;
+  } else {
+    document.getElementById('barberModalTitle').textContent = 'Tambah Barberman';
+    delete document.getElementById('btnSaveBarber').dataset.editId;
+  }
+  openM('mBarber');
+}
+
+function toggleDayBtn(el) { el.classList.toggle('off'); }
+
+async function saveBarber() {
+  clearFieldErrors(['fBName']);
+  const name = document.getElementById('bName').value.trim();
+  const spec = document.getElementById('bSpec').value.trim();
+  const wa = document.getElementById('bWA').value.trim();
+  const isActive = document.getElementById('bActive').checked;
+  const editId = document.getElementById('btnSaveBarber').dataset.editId;
+
+  if (!name) { validateField('fBName', false); return; }
+
+  const daysOff = [...document.querySelectorAll('#bDays .day-btn.off')].map(d => parseInt(d.dataset.day));
+
+  const btn = document.getElementById('btnSaveBarber');
+  btn.disabled = true;
+  const origHtml = btn.innerHTML;
+  btn.innerHTML = '<div style="width:13px;height:13px;border:2px solid rgba(17,17,17,.3);border-top-color:#111;border-radius:50%;animation:spin .6s linear infinite;"></div>Menyimpan...';
+
+  try {
+    let barberId = editId;
+
+    if (editId) {
+      const { error } = await sb.from('barbers').update({
+        name, specialty: spec || null, phone_wa: wa || null, is_active: isActive
+      }).eq('id', editId);
+      if (error) throw error;
+    } else {
+      const colors = ['#C9A84C','#60a5fa','#4ade80','#c084fc','#f87171','#fb923c'];
+      const color = colors[STATE.barbers.length % colors.length];
+      const { data, error } = await sb.from('barbers').insert({
+        store_id: STATE.store.id, name, specialty: spec || null, phone_wa: wa || null,
+        avatar_color: color, is_active: isActive, sort_order: STATE.barbers.length,
+      }).select().single();
+      if (error) throw error;
+      barberId = data.id;
+    }
+
+    // Sinkronkan hari libur: hapus yang lama, insert yang baru
+    await sb.from('barber_days_off').delete().eq('barber_id', barberId);
+    if (daysOff.length > 0) {
+      await sb.from('barber_days_off').insert(daysOff.map(day => ({ barber_id: barberId, day_of_week: day })));
+    }
+
+    closeM('mBarber');
+    showToast(editId ? 'Barberman berhasil diperbarui' : 'Barberman berhasil ditambahkan', 'ok');
+    await loadBarbers();
+  } catch (e) {
+    console.error('saveBarber error:', e);
+    showToast('Gagal menyimpan. Coba lagi.', 'err');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = origHtml;
+  }
+}
+
+function askDeleteBarber(id) {
+  const b = STATE.barbers.find(x => x.id === id);
+  if (!b) return;
+  STATE.deleteTarget = { type: 'barber', id };
+  document.getElementById('deleteConfirmText').innerHTML =
+    `Hapus barberman <strong>${escapeHtml(b.name)}</strong>? Riwayat booking yang sudah ada tidak akan terhapus, tapi barberman ini tidak bisa dipilih lagi untuk booking baru.`;
+  openM('mConfirmDelete');
+}
+
+// ============================================================
+// PAKET — LOAD
+// ============================================================
+async function loadPackages() {
+  const wrap = document.getElementById('pkgListWrap');
+  wrap.innerHTML = '<div class="loading-row">Memuat data paket...</div>';
+
+  try {
+    const { data, error } = await sb.from('packages').select('*').eq('store_id', STATE.store.id).order('sort_order');
+    if (error) throw error;
+    STATE.packages = data || [];
+    renderPkgList();
+  } catch (e) {
+    console.error('loadPackages error:', e);
+    wrap.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="ti ti-wifi-off"></i></div><div class="empty-title">Gagal memuat data</div><div class="empty-sub">Cek koneksi internet, lalu klik Refresh</div></div>`;
+  }
+}
+
+function renderPkgList() {
+  const wrap = document.getElementById('pkgListWrap');
+  if (STATE.packages.length === 0) {
+    wrap.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="ti ti-package"></i></div><div class="empty-title">Belum ada paket</div><div class="empty-sub">Tambah paket layanan pertama kamu</div></div>`;
+    return;
+  }
+
+  wrap.innerHTML = STATE.packages.map(p => `
+    <div class="list-item">
+      <div style="flex:1;min-width:0;">
+        <div class="list-item-name">
+          ${escapeHtml(p.name)}
+          ${p.is_featured ? '<span class="badge bg">Terpopuler</span>' : ''}
+          ${p.is_active ? '' : '<span class="badge brd">Nonaktif</span>'}
+        </div>
+        <div class="list-item-sub">${escapeHtml(p.description || 'Tanpa deskripsi')}</div>
+        <div class="list-item-meta">
+          <span style="color:var(--gold);font-weight:500;font-size:13px;">${fmtRp(p.price)}</span>
+          <span><i class="ti ti-clock" style="font-size:11px;"></i> ${p.duration_min} mnt kerja + ${p.buffer_min} mnt buffer</span>
+        </div>
+      </div>
+      <div class="list-item-actions">
+        <button class="act-btn" title="Edit" onclick="openPkgModal('${p.id}')"><i class="ti ti-edit" style="font-size:14px;"></i></button>
+        <button class="act-btn danger" title="Hapus" onclick="askDeletePkg('${p.id}')"><i class="ti ti-trash" style="font-size:14px;"></i></button>
+      </div>
+    </div>`).join('');
+}
+
+// ============================================================
+// PAKET — ADD / EDIT MODAL
+// ============================================================
+function openPkgModal(id) {
+  clearFieldErrors(['fPName', 'fPPrice', 'fPDur']);
+  document.getElementById('pName').value = '';
+  document.getElementById('pDesc').value = '';
+  document.getElementById('pPrice').value = '';
+  document.getElementById('pDur').value = '';
+  document.getElementById('pBuf').value = '15';
+  document.getElementById('pFeatured').checked = false;
+  document.getElementById('pActive').checked = true;
+  document.getElementById('pkgPreviewBox').style.display = 'none';
+
+  if (id) {
+    const p = STATE.packages.find(x => x.id === id);
+    if (!p) return;
+    document.getElementById('pkgModalTitle').textContent = 'Edit Paket';
+    document.getElementById('pName').value = p.name;
+    document.getElementById('pDesc').value = p.description || '';
+    document.getElementById('pPrice').value = p.price;
+    document.getElementById('pDur').value = p.duration_min;
+    document.getElementById('pBuf').value = p.buffer_min;
+    document.getElementById('pFeatured').checked = p.is_featured;
+    document.getElementById('pActive').checked = p.is_active;
+    document.getElementById('btnSavePkg').dataset.editId = id;
+    updatePkgPreviewBox();
+  } else {
+    document.getElementById('pkgModalTitle').textContent = 'Tambah Paket';
+    delete document.getElementById('btnSavePkg').dataset.editId;
+  }
+  openM('mPkg');
+}
+
+function updatePkgPreviewBox() {
+  const dur = parseInt(document.getElementById('pDur').value) || 0;
+  const buf = parseInt(document.getElementById('pBuf').value) || 0;
+  const box = document.getElementById('pkgPreviewBox');
+  if (dur > 0) {
+    box.style.display = 'block';
+    box.innerHTML = `<i class="ti ti-info-circle" style="font-size:13px;vertical-align:-2px;margin-right:5px;"></i>Total waktu diblokir per booking: <strong>${dur + buf} menit</strong>`;
+  } else {
+    box.style.display = 'none';
+  }
+}
+document.getElementById('pDur')?.addEventListener('input', updatePkgPreviewBox);
+document.getElementById('pBuf')?.addEventListener('input', updatePkgPreviewBox);
+
+async function savePkg() {
+  clearFieldErrors(['fPName', 'fPPrice', 'fPDur']);
+  const name = document.getElementById('pName').value.trim();
+  const desc = document.getElementById('pDesc').value.trim();
+  const price = parseInt(document.getElementById('pPrice').value) || 0;
+  const dur = parseInt(document.getElementById('pDur').value) || 0;
+  const buf = parseInt(document.getElementById('pBuf').value) || 0;
+  const featured = document.getElementById('pFeatured').checked;
+  const isActive = document.getElementById('pActive').checked;
+  const editId = document.getElementById('btnSavePkg').dataset.editId;
+
+  let valid = true;
+  if (!name) { validateField('fPName', false); valid = false; }
+  if (!price) { validateField('fPPrice', false); valid = false; }
+  if (!dur) { validateField('fPDur', false); valid = false; }
+  if (!valid) return;
+
+  const btn = document.getElementById('btnSavePkg');
+  btn.disabled = true;
+  const origHtml = btn.innerHTML;
+  btn.innerHTML = '<div style="width:13px;height:13px;border:2px solid rgba(17,17,17,.3);border-top-color:#111;border-radius:50%;animation:spin .6s linear infinite;"></div>Menyimpan...';
+
+  try {
+    const payload = {
+      name, description: desc || null, price, duration_min: dur, buffer_min: buf,
+      is_featured: featured, is_active: isActive,
+    };
+
+    if (editId) {
+      const { error } = await sb.from('packages').update(payload).eq('id', editId);
+      if (error) throw error;
+    } else {
+      const { error } = await sb.from('packages').insert({
+        ...payload, store_id: STATE.store.id, sort_order: STATE.packages.length,
+      });
+      if (error) throw error;
+    }
+
+    closeM('mPkg');
+    showToast(editId ? 'Paket berhasil diperbarui' : 'Paket berhasil ditambahkan', 'ok');
+    await loadPackages();
+  } catch (e) {
+    console.error('savePkg error:', e);
+    showToast('Gagal menyimpan. Coba lagi.', 'err');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = origHtml;
+  }
+}
+
+function askDeletePkg(id) {
+  const p = STATE.packages.find(x => x.id === id);
+  if (!p) return;
+  STATE.deleteTarget = { type: 'package', id };
+  document.getElementById('deleteConfirmText').innerHTML =
+    `Hapus paket <strong>${escapeHtml(p.name)}</strong>? Paket ini tidak akan bisa dipilih lagi untuk booking baru.`;
+  openM('mConfirmDelete');
+}
+
+// ============================================================
+// EKSEKUSI HAPUS (dipakai bersama Barberman & Paket)
+// ============================================================
+async function executeDelete() {
+  const target = STATE.deleteTarget;
+  if (!target) return;
+
+  const btn = document.getElementById('btnConfirmDelete');
+  btn.disabled = true;
+  btn.innerHTML = '<div style="width:13px;height:13px;border:2px solid rgba(248,113,113,.3);border-top-color:var(--rd);border-radius:50%;animation:spin .6s linear infinite;"></div>Menghapus...';
+
+  try {
+    const table = target.type === 'barber' ? 'barbers' : 'packages';
+    const { error } = await sb.from(table).delete().eq('id', target.id);
+    if (error) throw error;
+
+    closeM('mConfirmDelete');
+    showToast('Berhasil dihapus', 'ok');
+
+    if (target.type === 'barber') await loadBarbers();
+    else await loadPackages();
+  } catch (e) {
+    console.error('executeDelete error:', e);
+    showToast('Gagal menghapus. Mungkin data ini masih dipakai di booking aktif.', 'err');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ti ti-trash" style="font-size:14px;"></i>Ya, Hapus';
+    STATE.deleteTarget = null;
+  }
+}
+
+// ============================================================
+// LOAD BOOKINGS DARI SUPABASE
+// ============================================================
+async function loadBookings() {
+  const tbody = document.getElementById('bkTableBody');
+  tbody.innerHTML = renderSkeletonRows(5);
+
+  try {
+    const { data, error } = await sb
+      .from('bookings')
+      .select(`
+        id, booking_code, type, status, customer_name, customer_phone,
+        booking_date, start_time, end_time, total_price, dp_amount, dp_status,
+        created_at,
+        barbers ( name, avatar_color ),
+        packages ( name, duration_min )
+      `)
+      .eq('store_id', STATE.store.id)
+      .order('booking_date', { ascending: false })
+      .order('start_time', { ascending: false })
+      .limit(500);
+
+    if (error) throw error;
+
+    STATE.bookings = data || [];
+    updateStats();
+    applyFilters();
+  } catch (e) {
+    console.error('loadBookings error:', e);
+    showToast('Gagal memuat data booking. Cek koneksi internet.', 'err');
+    tbody.innerHTML = `
+      <tr><td colspan="8">
+        <div class="empty-state">
+          <div class="empty-icon"><i class="ti ti-wifi-off"></i></div>
+          <div class="empty-title">Gagal memuat data</div>
+          <div class="empty-sub">Cek koneksi internet kamu, lalu klik Refresh</div>
+        </div>
+      </td></tr>`;
+  }
+}
+
+function renderSkeletonRows(n) {
+  let html = '';
+  for (let i = 0; i < n; i++) {
+    html += `<tr>
+      <td colspan="8"><div class="skel" style="height:38px;width:100%;"></div></td>
+    </tr>`;
+  }
+  return html;
+}
+
+// ============================================================
+// STATS
+// ============================================================
+function updateStats() {
+  const today = new Date().toISOString().slice(0, 10);
+  const thisMonth = new Date().toISOString().slice(0, 7);
+
+  const todayCount = STATE.bookings.filter(b => b.booking_date === today).length;
+  const pendingCount = STATE.bookings.filter(b => b.status === 'pending').length;
+  const doneThisMonth = STATE.bookings.filter(b =>
+    b.status === 'done' && b.booking_date?.startsWith(thisMonth)
+  );
+  const revenueThisMonth = doneThisMonth.reduce((sum, b) => sum + (b.total_price || 0), 0);
+
+  const grid = document.getElementById('statGrid');
+  grid.innerHTML = `
+    <div class="stat"><div class="stat-lbl">Booking Hari Ini</div><div class="stat-val">${todayCount}</div></div>
+    <div class="stat"><div class="stat-lbl">Menunggu Konfirmasi</div><div class="stat-val" style="color:${pendingCount > 0 ? 'var(--or)' : 'var(--t)'};">${pendingCount}</div></div>
+    <div class="stat"><div class="stat-lbl">Selesai Bulan Ini</div><div class="stat-val" style="color:var(--gr);">${doneThisMonth.length}</div></div>
+    <div class="stat"><div class="stat-lbl">Pendapatan Bulan Ini</div><div class="stat-val" style="color:var(--gold);font-size:20px;">${fmtRp(revenueThisMonth)}</div></div>
+  `;
+}
+
+// ============================================================
+// FILTER & SEARCH
+// ============================================================
+function setFilter(status, el) {
+  STATE.statusFilter = status;
+  STATE.page = 1;
+  document.querySelectorAll('.fchip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  applyFilters();
+}
+
+let searchDebounce;
+function onSearch() {
+  clearTimeout(searchDebounce);
+  searchDebounce = setTimeout(() => {
+    STATE.searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+    STATE.page = 1;
+    applyFilters();
+  }, 250);
+}
+
+function applyFilters() {
+  let result = STATE.bookings;
+
+  if (STATE.statusFilter !== 'all') {
+    result = result.filter(b => b.status === STATE.statusFilter);
+  }
+  if (STATE.searchTerm) {
+    result = result.filter(b =>
+      (b.customer_name || '').toLowerCase().includes(STATE.searchTerm) ||
+      (b.booking_code || '').toLowerCase().includes(STATE.searchTerm)
+    );
+  }
+
+  STATE.filtered = result;
+  renderTable();
+}
+
+// ============================================================
+// RENDER TABLE
+// ============================================================
+function renderTable() {
+  const tbody = document.getElementById('bkTableBody');
+  const countText = document.getElementById('bkCountText');
+  const total = STATE.filtered.length;
+
+  countText.textContent = `${total} booking ditemukan`;
+
+  if (total === 0) {
+    tbody.innerHTML = `
+      <tr><td colspan="8">
+        <div class="empty-state">
+          <div class="empty-icon"><i class="ti ti-calendar-off"></i></div>
+          <div class="empty-title">Belum ada booking</div>
+          <div class="empty-sub">${STATE.bookings.length === 0 ? 'Bagikan link booking ke customer untuk mulai menerima booking' : 'Coba ubah filter atau kata kunci pencarian'}</div>
+        </div>
+      </td></tr>`;
+    document.getElementById('paginationBar').style.display = 'none';
+    return;
+  }
+
+  const start = (STATE.page - 1) * STATE.pageSize;
+  const pageItems = STATE.filtered.slice(start, start + STATE.pageSize);
+
+  tbody.innerHTML = pageItems.map(b => {
+    const st = STATUS_LABEL[b.status] || STATUS_LABEL.pending;
+    const tp = TYPE_LABEL[b.type] || TYPE_LABEL.online;
+    const barberName = b.barbers?.name || '—';
+    const barberColor = b.barbers?.avatar_color || avatarColorFor(barberName);
+    const pkgName = b.packages?.name || '—';
+    const initial = (b.customer_name || '?')[0].toUpperCase();
+
+    return `
+      <tr>
+        <td>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="av av-s" style="background:${avatarColorFor(b.customer_name)}22;color:${avatarColorFor(b.customer_name)};">${initial}</div>
+            <div>
+              <div style="font-weight:500;">${escapeHtml(b.customer_name || 'Tanpa nama')}</div>
+              <div class="code-pill">${b.booking_code || '—'}</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="av av-s" style="background:${barberColor}22;color:${barberColor};font-size:10px;">${barberName[0] || '?'}</div>
+            ${escapeHtml(barberName)}
+          </div>
+        </td>
+        <td>${escapeHtml(pkgName)}</td>
+        <td>
+          <div>${fmtDate(b.booking_date)}</div>
+          <div style="font-size:11px;color:var(--t3);margin-top:2px;">${fmtTime(b.start_time)} – ${fmtTime(b.end_time)}</div>
+        </td>
+        <td><span class="badge ${tp.cls}">${tp.label}</span></td>
+        <td>
+          <div style="color:var(--gold);font-weight:500;">${fmtRp(b.total_price)}</div>
+          ${b.dp_amount ? `<div style="font-size:11px;color:var(--t3);margin-top:2px;">DP: ${b.dp_status === 'paid' ? '<span style="color:var(--gr);">✓ ' + fmtRp(b.dp_amount) + '</span>' : fmtRp(b.dp_amount)}</div>` : ''}
+        </td>
+        <td><span class="badge ${st.cls}">${st.label}</span></td>
+        <td>
+          <div class="row-actions">
+            <button class="act-btn" title="Lihat detail" onclick="showDetail('${b.id}')"><i class="ti ti-eye" style="font-size:14px;"></i></button>
+            <button class="act-btn" title="Ubah status" onclick="openStatusModal('${b.id}')"><i class="ti ti-edit" style="font-size:14px;"></i></button>
+          </div>
+        </td>
+      </tr>`;
+  }).join('');
+
+  renderPagination(total);
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str ?? '';
+  return div.innerHTML;
+}
+
+function renderPagination(total) {
+  const bar = document.getElementById('paginationBar');
+  const totalPages = Math.ceil(total / STATE.pageSize);
+
+  if (totalPages <= 1) { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+
+  const start = (STATE.page - 1) * STATE.pageSize + 1;
+  const end = Math.min(STATE.page * STATE.pageSize, total);
+  document.getElementById('pageInfo').textContent = `Menampilkan ${start}–${end} dari ${total}`;
+
+  document.getElementById('prevBtn').disabled = STATE.page <= 1;
+  document.getElementById('nextBtn').disabled = STATE.page >= totalPages;
+}
+
+function changePage(delta) {
+  STATE.page += delta;
+  renderTable();
+  document.getElementById('bkTableWrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ============================================================
+// DETAIL MODAL
+// ============================================================
+function showDetail(id) {
+  const b = STATE.bookings.find(x => x.id === id);
+  if (!b) return;
+
+  const st = STATUS_LABEL[b.status] || STATUS_LABEL.pending;
+  const tp = TYPE_LABEL[b.type] || TYPE_LABEL.online;
+
+  document.getElementById('detailBody').innerHTML = `
+    <div style="text-align:center;margin-bottom:18px;">
+      <div class="code-pill" style="font-size:20px;">${b.booking_code}</div>
+      <div style="margin-top:8px;"><span class="badge ${st.cls}">${st.label}</span> <span class="badge ${tp.cls}">${tp.label}</span></div>
+    </div>
+    <div class="detail-row"><span class="detail-k">Nama Customer</span><span class="detail-v">${escapeHtml(b.customer_name || '—')}</span></div>
+    <div class="detail-row"><span class="detail-k">No. WhatsApp</span><span class="detail-v">${escapeHtml(b.customer_phone || '—')}</span></div>
+    <div class="detail-row"><span class="detail-k">Barberman</span><span class="detail-v">${escapeHtml(b.barbers?.name || '—')}</span></div>
+    <div class="detail-row"><span class="detail-k">Paket</span><span class="detail-v">${escapeHtml(b.packages?.name || '—')} (${b.packages?.duration_min || 0} mnt)</span></div>
+    <div class="detail-row"><span class="detail-k">Tanggal</span><span class="detail-v">${fmtDate(b.booking_date)}</span></div>
+    <div class="detail-row"><span class="detail-k">Waktu</span><span class="detail-v">${fmtTime(b.start_time)} – ${fmtTime(b.end_time)}</span></div>
+    <div class="detail-row"><span class="detail-k">Total Harga</span><span class="detail-v" style="color:var(--gold);">${fmtRp(b.total_price)}</span></div>
+    ${b.dp_amount ? `<div class="detail-row"><span class="detail-k">DP</span><span class="detail-v">${fmtRp(b.dp_amount)} · ${b.dp_status === 'paid' ? '<span style="color:var(--gr);">Lunas</span>' : 'Belum bayar'}</span></div>` : ''}
+    <div class="detail-row"><span class="detail-k">Dibuat</span><span class="detail-v">${new Date(b.created_at).toLocaleString('id-ID')}</span></div>
+  `;
+
+  document.getElementById('detailFoot').innerHTML = `
+    <button class="btn btn-gh" onclick="closeM('mDetail')">Tutup</button>
+    <button class="btn btn-g" onclick="closeM('mDetail');openStatusModal('${b.id}')"><i class="ti ti-edit" style="font-size:14px;"></i>Ubah Status</button>
+  `;
+
+  openM('mDetail');
+}
+
+// ============================================================
+// UBAH STATUS
+// ============================================================
+function openStatusModal(id) {
+  const b = STATE.bookings.find(x => x.id === id);
+  if (!b) return;
+
+  STATE.statusTarget = id;
+  document.getElementById('statusBookingInfo').innerHTML =
+    `<strong>${escapeHtml(b.customer_name)}</strong> · ${b.booking_code} · ${fmtDate(b.booking_date)}`;
+  document.getElementById('newStatusSelect').value = b.status;
+  toggleNoshowWarning();
+  openM('mStatus');
+}
+
+document.getElementById('newStatusSelect')?.addEventListener('change', toggleNoshowWarning);
+function toggleNoshowWarning() {
+  const val = document.getElementById('newStatusSelect').value;
+  document.getElementById('noshowWarning').classList.toggle('hidden', val !== 'noshow');
+}
+
+async function confirmStatusChange() {
+  const id = STATE.statusTarget;
+  const newStatus = document.getElementById('newStatusSelect').value;
+  if (!id) return;
+
+  try {
+    const updatePayload = { status: newStatus };
+    if (newStatus === 'done') updatePayload.done_at = new Date().toISOString();
+    if (newStatus === 'cancelled') updatePayload.cancelled_at = new Date().toISOString();
+
+    const { error } = await sb.from('bookings').update(updatePayload).eq('id', id);
+    if (error) throw error;
+
+    const idx = STATE.bookings.findIndex(x => x.id === id);
+    if (idx > -1) STATE.bookings[idx].status = newStatus;
+
+    updateStats();
+    applyFilters();
+    closeM('mStatus');
+    showToast('Status booking berhasil diubah', 'ok');
+  } catch (e) {
+    console.error('confirmStatusChange error:', e);
+    showToast('Gagal mengubah status. Coba lagi.', 'err');
+  }
+}
+
+// ============================================================
+// REALTIME — auto refresh kalau ada booking baru masuk
+// ============================================================
+function setupRealtime() {
+  if (!STATE.store) return;
+  sb.channel('bookings-changes')
+    .on('postgres_changes',
+      { event: '*', schema: 'public', table: 'bookings', filter: `store_id=eq.${STATE.store.id}` },
+      (payload) => {
+        showToast('Ada perubahan booking baru, memperbarui data...', 'ok');
+        loadBookings();
+      }
+    )
+    .subscribe();
+}
+
+// ============================================================
+// START
+// ============================================================
+initGuard().then(() => {
+  if (STATE.store) setupRealtime();
+});
+</script>
+</body>
+</html>
