@@ -293,7 +293,10 @@ button,input,select,textarea{font-family:'Inter',sans-serif;}
         </div>
         <div id="vcMsg" style="font-size:11px;margin-top:5px;"></div>
       </div>
-      <button class="btn btn-gh" onclick="goStep(3)"><i class="ti ti-arrow-left"></i>Kembali</button>
+      <div style="display:flex;gap:10px;margin-top:6px;">
+        <button class="btn btn-gh" onclick="goStep(3)"><i class="ti ti-arrow-left"></i>Kembali</button>
+        <button class="btn btn-g" style="flex:1;padding:13px;justify-content:center;" onclick="goToPayment()">Lanjut ke Pembayaran<i class="ti ti-arrow-right"></i></button>
+      </div>
     </div>
 
     <!-- STEP 5: BAYAR DP -->
@@ -761,10 +764,25 @@ function validateStep4() {
   return valid;
 }
 
+function goToPayment() {
+  if (!validateStep4()) {
+    showToast('Nama dan nomor WhatsApp wajib diisi', 'err');
+    return;
+  }
+  STATE.name = document.getElementById('cName').value.trim();
+  STATE.phone = document.getElementById('cPhone').value.trim();
+  STATE.note = document.getElementById('cNote').value.trim();
+  goStep(5);
+}
+
 async function applyVoucher() {
   const code = document.getElementById('vcIn').value.trim().toUpperCase();
   const msgEl = document.getElementById('vcMsg');
-  if (!code) return;
+  if (!code) {
+    msgEl.textContent = 'Masukkan kode voucher dulu sebelum klik Terapkan.';
+    msgEl.style.color = 'var(--t3)';
+    return;
+  }
 
   try {
     const { data: v, error } = await sb
@@ -898,9 +916,18 @@ async function confirmBooking() {
   btn.innerHTML = '<div style="width:14px;height:14px;border:2px solid rgba(17,17,17,.3);border-top-color:#111;border-radius:50%;animation:spin .6s linear infinite;"></div>Memproses...';
 
   try {
-    const name = document.getElementById('cName').value.trim();
-    const phone = document.getElementById('cPhone').value.trim();
-    const note = document.getElementById('cNote').value.trim();
+    // Ambil dari STATE (lebih aman karena form step 4 sudah hidden saat ini)
+    const name = STATE.name || document.getElementById('cName').value.trim();
+    const phone = STATE.phone || document.getElementById('cPhone').value.trim();
+    const note = STATE.note || document.getElementById('cNote').value.trim();
+
+    if (!name || !phone) {
+      showToast('Data diri tidak lengkap. Kembali ke step 4.', 'err');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="ti ti-check"></i>Konfirmasi Booking';
+      goStep(4);
+      return;
+    }
 
     const price = STATE.pkg.price - (STATE.discount || 0);
     const dpPercent = STATE.store.dp_percent ?? 30;
