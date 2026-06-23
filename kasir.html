@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kasir — BarberBook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:#0E0E0E;color:#F5F5F0;min-height:100vh;}
+button,input,select,textarea{font-family:'Inter',sans-serif;}
+:root{
+  --gold:#C9A84C;--gold-l:#e0bc5a;--gold-d:rgba(201,168,76,0.12);--gold-b:rgba(201,168,76,0.28);
+  --bg:#0E0E0E;--bg2:#141414;--bg3:#1A1A1A;--bg4:#222;
+  --t:#F5F5F0;--t2:rgba(245,245,240,0.6);--t3:rgba(245,245,240,0.35);--t4:rgba(245,245,240,0.14);
+  --b:rgba(245,245,240,0.07);--b2:rgba(245,245,240,0.12);
+  --gr:#4ade80;--grd:rgba(74,222,128,0.1);
+  --rd:#f87171;--rdd:rgba(248,113,113,0.1);
+  --bl:#60a5fa;--bld:rgba(96,165,250,0.1);
+  --pr:#c084fc;--prd:rgba(192,132,252,0.1);
+  --or:#fb923c;--ord:rgba(251,146,60,0.1);
+  --r:8px;--rl:12px;--rxl:18px;
+}
+.hidden{display:none!important;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+@keyframes tIn{from{opacity:0;transform:translateX(14px);}to{opacity:1;transform:translateX(0);}}
+
+/* ===== BUTTONS ===== */
+.btn{display:inline-flex;align-items:center;gap:7px;border:none;border-radius:var(--r);cursor:pointer;font-weight:500;transition:all .18s;letter-spacing:.04em;font-size:13px;}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+.btn-g{background:var(--gold);color:#111;padding:10px 18px;font-weight:600;}
+.btn-g:hover:not(:disabled){background:var(--gold-l);}
+.btn-o{background:transparent;color:var(--t2);border:.5px solid var(--b2);padding:9px 16px;}
+.btn-o:hover:not(:disabled){border-color:var(--gold-b);color:var(--gold);}
+.btn-gh{background:transparent;color:var(--t3);border:none;padding:8px 12px;}
+.btn-gh:hover:not(:disabled){background:var(--bg3);color:var(--t);}
+.btn-sm{padding:5px 10px;font-size:11px;}
+.btn-gr{background:var(--grd);color:var(--gr);border:.5px solid rgba(74,222,128,.25);padding:5px 10px;font-size:11px;}
+.btn-rd{background:var(--rdd);color:var(--rd);border:.5px solid rgba(248,113,113,.25);padding:5px 10px;font-size:11px;}
+
+/* ===== NAV ===== */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:13px 22px;border-bottom:.5px solid var(--b);background:var(--bg);position:sticky;top:0;z-index:100;}
+.nav-logo{font-family:'Playfair Display',serif;font-size:18px;color:var(--gold);display:flex;align-items:center;gap:8px;}
+.nav-logo span{color:var(--t);}
+.nav-logo-ic{width:30px;height:30px;background:var(--gold-d);border:.5px solid var(--gold-b);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--gold);}
+.live{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--gr);}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--gr);animation:pulse 2s infinite;}
+
+/* ===== TABS ===== */
+.tabs{display:flex;border-bottom:.5px solid var(--b);background:var(--bg2);padding:0 20px;}
+.tbtn{padding:12px 16px;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--t3);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;transition:all .2s;display:flex;align-items:center;gap:6px;white-space:nowrap;}
+.tbtn.active{color:var(--gold);border-bottom-color:var(--gold);}
+.tbtn:hover:not(.active){color:var(--t2);}
+.tpan{display:none;padding:18px 22px;}
+.tpan.active{display:block;}
+
+/* ===== BADGE ===== */
+.badge{font-size:10px;padding:3px 8px;border-radius:20px;font-weight:500;display:inline-flex;align-items:center;gap:4px;}
+.bg{background:var(--gold-d);color:var(--gold);border:.5px solid var(--gold-b);}
+.bgr{background:var(--grd);color:var(--gr);}
+.brd{background:var(--rdd);color:var(--rd);}
+.bbl{background:var(--bld);color:var(--bl);}
+.bpr{background:var(--prd);color:var(--pr);}
+.bor{background:var(--ord);color:var(--or);}
+.bgy{background:rgba(245,245,240,.05);color:var(--t3);}
+
+/* ===== STATS ===== */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;}
+.stat{background:var(--bg3);border:.5px solid var(--b);border-radius:var(--rl);padding:13px 16px;}
+.stat-lbl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:6px;}
+.stat-val{font-size:24px;font-weight:500;line-height:1;}
+.stat-sub{font-size:11px;color:var(--t3);margin-top:4px;}
+
+/* ===== ANTRIAN GRID ===== */
+.kgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.kcol{background:var(--bg3);border:.5px solid var(--b);border-radius:var(--rl);overflow:hidden;}
+.kcol-head{padding:12px 14px;border-bottom:.5px solid var(--b);display:flex;align-items:center;gap:10px;}
+.kcol-body{padding:10px 12px;min-height:80px;}
+.kcol-footer{background:var(--bg2);border-top:.5px solid var(--b);padding:8px 12px;font-size:11px;color:var(--t3);display:flex;align-items:center;gap:6px;}
+.kcol-add{width:calc(100% - 24px);margin:8px 12px 10px;padding:9px;background:transparent;border:.5px dashed rgba(201,168,76,.22);color:rgba(201,168,76,.55);border-radius:var(--r);font-size:11px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.kcol-add:hover{border-color:var(--gold-b);color:var(--gold);background:rgba(201,168,76,.03);}
+
+/* ===== ANTRIAN ITEM ===== */
+.qi{display:flex;align-items:flex-start;gap:8px;padding:9px 0;border-bottom:.5px solid rgba(245,245,240,.04);}
+.qi:last-child{border-bottom:none;}
+.qi-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;margin-top:2px;}
+.qi-act{background:var(--gold-d);color:var(--gold);border:.5px solid var(--gold-b);}
+.qi-wait{background:rgba(245,245,240,.05);color:var(--t3);}
+.qi-info{flex:1;min-width:0;}
+.qi-name{font-size:13px;font-weight:500;}
+.qi-pkg{font-size:11px;color:var(--t3);margin-top:2px;}
+.qi-note{font-size:10px;color:var(--pr);margin-top:2px;display:flex;align-items:center;gap:3px;}
+.qi-time{font-size:11px;color:var(--t3);white-space:nowrap;}
+.qi-actions{display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex-shrink:0;}
+
+/* ===== RIWAYAT TABLE ===== */
+.rtable{width:100%;border-collapse:collapse;}
+.rtable th{text-align:left;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);padding:10px 12px;border-bottom:.5px solid var(--b);font-weight:500;}
+.rtable td{padding:12px 12px;border-bottom:.5px solid rgba(245,245,240,.04);font-size:13px;}
+.rtable tr:last-child td{border-bottom:none;}
+
+/* ===== AVATAR ===== */
+.av{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;flex-shrink:0;}
+.av-s{width:30px;height:30px;font-size:11px;}
+.av-m{width:40px;height:40px;font-size:15px;}
+
+/* ===== MODAL ===== */
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:500;align-items:center;justify-content:center;padding:20px;}
+.ov.open{display:flex;}
+.mbox{background:var(--bg3);border:.5px solid var(--b2);border-radius:var(--rxl);width:100%;max-width:460px;max-height:90vh;overflow-y:auto;animation:mIn .2s ease;}
+@keyframes mIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.mhd{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:.5px solid var(--b);position:sticky;top:0;background:var(--bg3);}
+.mtitle{font-family:'Playfair Display',serif;font-size:17px;}
+.mclose{background:none;border:none;color:var(--t3);font-size:20px;cursor:pointer;}
+.mclose:hover{color:var(--t);}
+.mbody{padding:20px;}
+.mfoot{padding:14px 20px;border-top:.5px solid var(--b);display:flex;gap:10px;justify-content:flex-end;}
+
+/* ===== FORM ===== */
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:6px;}
+.field input,.field select,.field textarea{width:100%;background:var(--bg2);border:.5px solid var(--b2);color:var(--t);padding:10px 12px;border-radius:var(--r);font-size:13px;outline:none;transition:border-color .2s;}
+.field input:focus,.field select:focus{border-color:var(--gold-b);}
+.field input::placeholder{color:var(--t4);}
+.field.error input,.field.error select{border-color:rgba(248,113,113,.5);}
+.field-err{font-size:11px;color:var(--rd);margin-top:4px;display:none;}
+.field.error .field-err{display:block;}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+/* ===== TYPE SELECTOR ===== */
+.type-sel{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
+.type-card{background:var(--bg2);border:.5px solid var(--b2);border-radius:var(--r);padding:12px;cursor:pointer;text-align:center;transition:all .15s;}
+.type-card:hover{border-color:var(--gold-b);}
+.type-card.sel-walkin{border-color:var(--pr);background:var(--prd);}
+.type-card.sel-booking{border-color:var(--bl);background:var(--bld);}
+.type-card i{font-size:20px;margin-bottom:5px;display:block;}
+.type-card span{font-size:12px;color:var(--t2);}
+
+/* ===== ETA BOX ===== */
+.eta-box{background:rgba(201,168,76,.04);border:.5px solid var(--gold-b);border-radius:var(--r);padding:12px 14px;margin-top:4px;}
+.eta-lbl{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:5px;}
+.eta-val{font-size:15px;color:var(--gold);font-weight:500;}
+.eta-sub{font-size:11px;color:var(--t3);margin-top:2px;}
+
+/* ===== WARNING ===== */
+.warn-box{background:rgba(251,191,36,.05);border:.5px solid rgba(251,191,36,.25);border-radius:var(--r);padding:10px 12px;font-size:12px;color:rgba(251,191,36,.85);margin-bottom:12px;}
+
+/* ===== EXTEND OPTS ===== */
+.ext-opts{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px;}
+.ext-opt{padding:10px 4px;border:.5px solid var(--b2);border-radius:6px;text-align:center;font-size:12px;color:var(--t3);cursor:pointer;transition:all .15s;}
+.ext-opt:hover,.ext-opt.sel{border-color:var(--gold-b);color:var(--gold);background:var(--gold-d);}
+
+/* ===== EMPTY STATE ===== */
+.empty-q{text-align:center;padding:20px 10px;font-size:12px;color:var(--t4);}
+
+/* ===== TOAST ===== */
+#TB{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+.toast{background:var(--bg3);border:.5px solid var(--b2);border-radius:var(--r);padding:12px 16px;font-size:13px;display:flex;align-items:center;gap:9px;min-width:230px;max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,.4);animation:tIn .25s ease;}
+.tok{border-color:rgba(74,222,128,.3);}.tok i{color:var(--gr);}
+.twarn{border-color:rgba(251,191,36,.3);}.twarn i{color:#fbbf24;}
+.terr{border-color:rgba(248,113,113,.3);}.terr i{color:var(--rd);}
+
+@media(max-width:768px){
+  .kgrid{grid-template-columns:1fr;}
+  .stat-grid{grid-template-columns:1fr 1fr;}
+  .fr{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div id="TB"></div>
+
+<!-- LOADING GUARD -->
+<div id="guard" style="display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:14px;">
+  <div style="font-family:'Playfair Display',serif;font-size:24px;color:var(--gold);">BARBER<span style="color:var(--t);">BOOK</span></div>
+  <div style="width:22px;height:22px;border:2px solid rgba(201,168,76,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .6s linear infinite;"></div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" class="hidden">
+
+<nav class="nav">
+  <div class="nav-logo">
+    <div class="nav-logo-ic"><i class="ti ti-scissors"></i></div>
+    <span id="navStore">BARBERBOOK</span>
+    <span style="font-size:11px;color:var(--t3);font-weight:400;">Kasir</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <span class="live"><span class="live-dot"></span>Live</span>
+    <span style="font-size:12px;color:var(--t3);" id="clockEl">--:--</span>
+    <a href="dashboard.html" class="btn btn-gh" style="font-size:12px;text-decoration:none;"><i class="ti ti-layout-dashboard" style="font-size:14px;"></i>Dashboard</a>
+  </div>
+</nav>
+
+<div class="tabs">
+  <button class="tbtn active" onclick="kTab('antrian',this)"><i class="ti ti-layout-list"></i>Antrian <span id="badgeQ" class="badge bg" style="padding:1px 6px;">0</span></button>
+  <button class="tbtn" onclick="kTab('riwayat',this)"><i class="ti ti-history"></i>Riwayat Hari Ini</button>
+  <button class="tbtn" onclick="kTab('notif',this)"><i class="ti ti-bell"></i>Notifikasi <span id="badgeN" class="badge brd" style="display:none;padding:1px 6px;">!</span></button>
+</div>
+
+<!-- TAB: ANTRIAN -->
+<div class="tpan active" id="tab-antrian">
+  <div class="stat-grid">
+    <div class="stat"><div class="stat-lbl">Total Antrian</div><div class="stat-val" style="color:var(--gold);" id="kTotal">0</div></div>
+    <div class="stat"><div class="stat-lbl">Sedang Dilayani</div><div class="stat-val" id="kBusy">0</div></div>
+    <div class="stat"><div class="stat-lbl">Barberman Bebas</div><div class="stat-val" style="color:var(--gr);" id="kFree">0</div></div>
+    <div class="stat"><div class="stat-lbl">Est. Tunggu Maks</div><div class="stat-val" id="kWait" style="font-size:18px;">— mnt</div></div>
+  </div>
+  <div class="kgrid" id="kasirGrid"></div>
+</div>
+
+<!-- TAB: RIWAYAT -->
+<div class="tpan" id="tab-riwayat">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+    <div>
+      <h2 style="font-family:'Playfair Display',serif;font-size:20px;">Riwayat Hari Ini</h2>
+      <div style="font-size:12px;color:var(--t3);margin-top:3px;" id="riwSub">Memuat...</div>
+    </div>
+    <div style="font-size:20px;font-weight:500;color:var(--gold);" id="riwTotal"></div>
+  </div>
+  <table class="rtable">
+    <thead><tr>
+      <th>Customer</th><th>Barberman</th><th>Paket</th>
+      <th>Tipe</th><th>Harga</th><th>Selesai</th>
+    </tr></thead>
+    <tbody id="riwBody"></tbody>
+  </table>
+  <div id="riwEmpty" class="hidden" style="text-align:center;padding:40px;font-size:13px;color:var(--t4);">Belum ada yang selesai hari ini</div>
+</div>
+
+<!-- TAB: NOTIFIKASI -->
+<div class="tpan" id="tab-notif">
+  <h2 style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:4px;">Notifikasi</h2>
+  <p style="font-size:12px;color:var(--t3);margin-bottom:16px;">Perubahan jadwal & peringatan antrian</p>
+  <div id="notifList"></div>
+</div>
+
+</div><!-- end #app -->
+
+
+<!-- MODAL: Tambah Walk-in / Booking -->
+<div class="ov" id="mWalkin">
+  <div class="mbox">
+    <div class="mhd">
+      <div class="mtitle">Tambah ke Antrian</div>
+      <button class="mclose" onclick="closeM('mWalkin')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="mbody">
+      <div class="type-sel">
+        <div class="type-card sel-walkin" id="typeWalkin" onclick="setType('walkin')">
+          <i class="ti ti-walk" style="color:var(--pr);"></i>
+          <span>Walk-in</span>
+        </div>
+        <div class="type-card" id="typeBooking" onclick="setType('booking')">
+          <i class="ti ti-calendar-check" style="color:var(--bl);"></i>
+          <span>Booking Online</span>
+        </div>
+      </div>
+      <div class="field" id="fWName"><label>Nama Customer</label><input type="text" id="wName" placeholder="Nama pelanggan"><div class="field-err">Nama wajib diisi</div></div>
+      <div class="field"><label>No. WhatsApp <span style="color:var(--t4);font-size:10px;">(opsional)</span></label><input type="text" id="wPhone" placeholder="08xxxxxxxxxx"></div>
+      <div class="fr">
+        <div class="field" id="fWBarber"><label>Barberman</label><select id="wBarber" onchange="calcEta()"></select><div class="field-err">Pilih barberman</div></div>
+        <div class="field" id="fWPkg"><label>Paket</label><select id="wPkg" onchange="calcEta()"></select><div class="field-err">Pilih paket</div></div>
+      </div>
+      <div class="field"><label>Catatan <span style="color:var(--t4);font-size:10px;">(anak-anak / orang tua / dll)</span></label><input type="text" id="wNote" placeholder="cth: anak 5 tahun, butuh waktu ekstra"></div>
+      <div id="wWarn" class="warn-box hidden"></div>
+      <div class="eta-box">
+        <div class="eta-lbl"><i class="ti ti-clock" style="font-size:12px;vertical-align:-1px;margin-right:4px;"></i>Estimasi mulai dilayani</div>
+        <div class="eta-val" id="wEtaMain">Langsung dilayani</div>
+        <div class="eta-sub" id="wEtaSub"></div>
+      </div>
+    </div>
+    <div class="mfoot">
+      <button class="btn btn-gh" onclick="closeM('mWalkin')">Batal</button>
+      <button class="btn btn-g" id="btnWalkin" onclick="confirmWalkin()"><i class="ti ti-plus"></i>Masukkan Antrian</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Tambah Waktu -->
+<div class="ov" id="mExtend">
+  <div class="mbox" style="max-width:360px;">
+    <div class="mhd">
+      <div class="mtitle">Tambah Waktu Sesi</div>
+      <button class="mclose" onclick="closeM('mExtend')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="mbody">
+      <div style="font-size:13px;color:var(--t2);margin-bottom:14px;" id="extInfo">Sesi sedang berjalan</div>
+      <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:8px;">Tambah berapa menit?</div>
+      <div class="ext-opts">
+        <div class="ext-opt" onclick="selExt(this,10)">+10</div>
+        <div class="ext-opt" onclick="selExt(this,15)">+15</div>
+        <div class="ext-opt" onclick="selExt(this,20)">+20</div>
+        <div class="ext-opt" onclick="selExt(this,30)">+30</div>
+      </div>
+      <div class="field"><label>Alasan</label><input type="text" id="extReason" placeholder="cth: anak rewel, tambah styling..."></div>
+    </div>
+    <div class="mfoot">
+      <button class="btn btn-gh" onclick="closeM('mExtend')">Batal</button>
+      <button class="btn btn-g" onclick="confirmExtend()"><i class="ti ti-clock-plus"></i>Tambahkan</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ============================================================
+// KONFIGURASI SUPABASE — samakan persis dengan file lain
+// ============================================================
+const SUPABASE_URL = 'https://rdhytutkjzgizluyvrus.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_FGCxIQUPfWUKtdGI52oFKw_XCmRWFWh';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ============================================================
+// STATE
+// ============================================================
+let STATE = {
+  user: null,
+  store: null,
+  barbers: [],
+  packages: [],
+  // Antrian per barberman — disimpan di memory, bukan database (real-time dari dalam toko)
+  // Format: { [barberId]: [ {id, name, phone, pkgId, type, note, startAt, extMin, status} ] }
+  queues: {},
+  history: [],       // sesi yang sudah selesai hari ini
+  notifs: [],
+  walkinType: 'walkin',
+  extTarget: null,   // { barberId, idx }
+  extMins: 0,
+  curBarberForModal: null,
+  qCounter: 1,
+};
+
+const AVATAR_COLORS = ['#C9A84C','#60a5fa','#4ade80','#c084fc','#f87171','#fb923c'];
+
+// ============================================================
+// UTILS
+// ============================================================
+function fmtRp(n){ return 'Rp '+Math.round(n||0).toLocaleString('id-ID'); }
+function pad(n){ return n<10?'0'+n:''+n; }
+function fmtT(d){ return pad(d.getHours())+':'+pad(d.getMinutes()); }
+function addMin(d,m){ return new Date(d.getTime()+m*60000); }
+function avatarColor(str){
+  let h=0; for(let i=0;i<(str||'').length;i++) h=str.charCodeAt(i)+((h<<5)-h);
+  return AVATAR_COLORS[Math.abs(h)%AVATAR_COLORS.length];
+}
+function escHtml(s){ const d=document.createElement('div'); d.textContent=s??''; return d.innerHTML; }
+
+function showToast(msg,type='ok'){
+  const icons={ok:'ti-check',warn:'ti-alert-triangle',err:'ti-x'};
+  const cls={ok:'tok',warn:'twarn',err:'terr'};
+  const el=document.createElement('div');
+  el.className=`toast ${cls[type]}`;
+  el.innerHTML=`<i class="ti ${icons[type]}" style="font-size:15px;flex-shrink:0;"></i><span>${msg}</span>`;
+  document.getElementById('TB').appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(()=>el.remove(),300); },3500);
+}
+function openM(id){ document.getElementById(id).classList.add('open'); }
+function closeM(id){ document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.ov').forEach(o=>{
+  o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('open'); });
+});
+function clearErr(...ids){ ids.forEach(id=>document.getElementById(id)?.classList.remove('error')); }
+function setErr(id){ document.getElementById(id)?.classList.add('error'); }
+
+// ============================================================
+// CLOCK
+// ============================================================
+function startClock(){
+  function tick(){
+    const now=new Date();
+    const el=document.getElementById('clockEl');
+    if(el) el.textContent=fmtT(now)+' · '+now.toLocaleDateString('id-ID',{weekday:'short',day:'numeric',month:'short'});
+  }
+  tick(); setInterval(tick,30000);
+}
+
+// ============================================================
+// AUTH GUARD
+// ============================================================
+async function initGuard(){
+  const timeout=new Promise((_,r)=>setTimeout(()=>r(new Error('TIMEOUT')),8000));
+  try {
+    const { data:{session} } = await Promise.race([sb.auth.getSession(),timeout]);
+    if(!session?.user){ window.location.href='auth.html'; return; }
+    STATE.user=session.user;
+
+    const { data:store,error } = await sb.from('stores').select('*').eq('owner_id',STATE.user.id).maybeSingle();
+    if(error||!store){ window.location.href='auth.html'; return; }
+    STATE.store=store;
+
+    await loadStoreData();
+    document.getElementById('guard').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+    document.getElementById('navStore').innerHTML=
+      `<span style="color:var(--t);">${escHtml(store.name)}</span>`;
+    startClock();
+    initQueues();
+  } catch(e){
+    console.error('Guard error:',e);
+    window.location.href='auth.html';
+  }
+}
+
+// ============================================================
+// LOAD DATA DARI SUPABASE
+// ============================================================
+async function loadStoreData(){
+  const [barbersRes,pkgsRes] = await Promise.all([
+    sb.from('barbers').select('*').eq('store_id',STATE.store.id).eq('is_active',true).order('sort_order'),
+    sb.from('packages').select('*').eq('store_id',STATE.store.id).eq('is_active',true).order('sort_order'),
+  ]);
+  STATE.barbers = barbersRes.data||[];
+  STATE.packages = pkgsRes.data||[];
+
+  // Inisialisasi antrian kosong per barberman
+  STATE.barbers.forEach(b=>{ if(!STATE.queues[b.id]) STATE.queues[b.id]=[]; });
+
+  // Populate select options di modal
+  const bSel=document.getElementById('wBarber');
+  const pSel=document.getElementById('wPkg');
+  bSel.innerHTML='';
+  pSel.innerHTML='';
+  STATE.barbers.forEach(b=>{
+    const o=new Option(b.name,b.id);
+    bSel.add(o);
+  });
+  STATE.packages.forEach(p=>{
+    const o=new Option(`${p.name} (${p.duration_min} mnt)`,p.id);
+    pSel.add(o);
+  });
+}
+
+// ============================================================
+// INIT ANTRIAN — cek booking aktif hari ini dari Supabase
+// ============================================================
+async function initQueues(){
+  const today = new Date().toISOString().slice(0,10);
+  try {
+    const { data,error } = await sb.from('bookings')
+      .select('id,booking_code,customer_name,customer_phone,customer_note,start_time,end_time,status,barber_id,package_id,total_price,type')
+      .eq('store_id',STATE.store.id)
+      .eq('booking_date',today)
+      .in('status',['confirmed','active'])
+      .order('start_time');
+
+    if(error) throw error;
+
+    // Masukkan booking online yang sudah confirmed ke antrian masing-masing barberman
+    (data||[]).forEach(bk=>{
+      const pkg=STATE.packages.find(p=>p.id===bk.package_id);
+      if(!pkg) return;
+      const queue=STATE.queues[bk.barber_id];
+      if(!queue) return;
+      const startAt=new Date(today+'T'+bk.start_time);
+      queue.push({
+        id:STATE.qCounter++,
+        bookingId:bk.id,
+        name:bk.customer_name,
+        phone:bk.customer_phone||'',
+        pkgId:bk.package_id,
+        type:bk.type||'online',
+        note:bk.customer_note||'',
+        startAt,
+        extMin:0,
+        status:bk.status==='active'?'active':'waiting',
+        price:bk.total_price,
+      });
+    });
+
+    renderGrid();
+    loadRiwayat();
+  } catch(e){
+    console.error('initQueues error:',e);
+    showToast('Gagal memuat antrian dari server','err');
+    renderGrid();
+  }
+}
+
+// ============================================================
+// ETA HELPER
+// ============================================================
+function getEta(barberId){
+  const q=STATE.queues[barberId]||[];
+  if(!q.length) return {wait:0,start:new Date(),len:0};
+  const last=q[q.length-1];
+  const pkg=STATE.packages.find(p=>p.id===last.pkgId);
+  const totalMin=(pkg?.duration_min||30)+(pkg?.buffer_min||15)+last.extMin;
+  const end=addMin(last.startAt,totalMin);
+  const now=new Date();
+  const wait=Math.max(0,Math.round((end-now)/60000));
+  return {wait,start:end,len:q.length};
+}
+
+// ============================================================
+// RENDER ANTRIAN GRID
+// ============================================================
+function renderGrid(){
+  let totalQ=0,busyC=0,freeC=0,maxW=0;
+  let html='';
+
+  STATE.barbers.forEach(b=>{
+    const q=STATE.queues[b.id]||[];
+    const hasActive=q.some(x=>x.status==='active');
+    const eta=getEta(b.id);
+    totalQ+=q.length;
+    if(hasActive) busyC++; else freeC++;
+    if(eta.wait>maxW) maxW=eta.wait;
+    const color=b.avatar_color||avatarColor(b.name);
+
+    html+=`<div class="kcol">
+      <div class="kcol-head">
+        <div class="av av-m" style="background:${color}22;color:${color};">${b.name[0]}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:500;">${escHtml(b.name)}</div>
+          <div style="font-size:11px;color:var(--t3);">${escHtml(b.specialty||'Barberman')}</div>
+        </div>
+        <span class="badge ${hasActive?'bg':'bgr'}">${hasActive?'Melayani':'Bebas'}</span>
+      </div>
+      <div class="kcol-body">`;
+
+    if(!q.length){
+      html+=`<div class="empty-q"><i class="ti ti-users" style="font-size:20px;display:block;margin-bottom:6px;"></i>Antrian kosong</div>`;
+    } else {
+      q.forEach((item,idx)=>{
+        const pkg=STATE.packages.find(p=>p.id===item.pkgId);
+        const isAct=item.status==='active';
+        const endAt=addMin(item.startAt,(pkg?.duration_min||30)+item.extMin);
+        html+=`<div class="qi">
+          <div class="qi-num ${isAct?'qi-act':'qi-wait'}">${idx+1}</div>
+          <div class="qi-info">
+            <div class="qi-name">${escHtml(item.name)}</div>
+            <div class="qi-pkg">${escHtml(pkg?.name||'—')} · ${(pkg?.duration_min||30)+item.extMin} mnt
+              <span class="badge ${item.type==='walkin'?'bpr':'bbl'}" style="margin-left:4px;">${item.type==='walkin'?'Walk-in':'Booking'}</span>
+            </div>
+            ${item.note?`<div class="qi-note"><i class="ti ti-info-circle" style="font-size:11px;"></i>${escHtml(item.note)}</div>`:''}
+          </div>
+          <div class="qi-actions">
+            <div class="qi-time">${isAct?fmtT(item.startAt)+'–'+fmtT(endAt):'Est. '+fmtT(item.startAt)}</div>
+            ${isAct?`
+              <button class="btn btn-sm" style="background:var(--gold-d);color:var(--gold);border:.5px solid var(--gold-b);" onclick="openExtend('${b.id}',${idx})">
+                <i class="ti ti-clock-plus" style="font-size:11px;"></i>+Waktu
+              </button>
+              <button class="btn btn-gr btn-sm" onclick="markDone('${b.id}',${idx})">
+                <i class="ti ti-check" style="font-size:11px;"></i>Selesai
+              </button>`:''}
+          </div>
+        </div>`;
+      });
+    }
+
+    html+=`</div>
+      <button class="kcol-add" onclick="openWalkin('${b.id}')">
+        <i class="ti ti-plus" style="font-size:13px;vertical-align:-2px;margin-right:4px;"></i>Walk-in / Booking
+      </button>
+      <div class="kcol-footer">`;
+
+    if(eta.wait>0){
+      html+=`<i class="ti ti-clock" style="font-size:12px;"></i>Bebas ~<span style="color:var(--gold);margin-left:4px;">${eta.wait} mnt lagi</span>`;
+    } else {
+      html+=`<i class="ti ti-check" style="font-size:12px;color:var(--gr);"></i><span style="color:var(--gr);margin-left:4px;">Siap melayani sekarang</span>`;
+    }
+    html+=`</div></div>`;
+  });
+
+  document.getElementById('kasirGrid').innerHTML=html;
+  document.getElementById('kTotal').textContent=totalQ;
+  document.getElementById('kBusy').textContent=busyC;
+  document.getElementById('kFree').textContent=freeC;
+  document.getElementById('kWait').textContent=maxW>0?maxW+' mnt':'0 mnt';
+  document.getElementById('badgeQ').textContent=totalQ;
+}
+
+// ============================================================
+// TAMBAH KE ANTRIAN (WALK-IN / BOOKING DATANG)
+// ============================================================
+function openWalkin(barberId){
+  STATE.curBarberForModal=barberId;
+  clearErr('fWName','fWBarber','fWPkg');
+  document.getElementById('wName').value='';
+  document.getElementById('wPhone').value='';
+  document.getElementById('wNote').value='';
+  document.getElementById('wBarber').value=barberId;
+  document.getElementById('wWarn').classList.add('hidden');
+  setType('walkin');
+  calcEta();
+  openM('mWalkin');
+}
+
+function setType(t){
+  STATE.walkinType=t;
+  const w=document.getElementById('typeWalkin');
+  const b=document.getElementById('typeBooking');
+  w.className=`type-card${t==='walkin'?' sel-walkin':''}`;
+  b.className=`type-card${t==='booking'?' sel-booking':''}`;
+  w.querySelector('i').style.color=t==='walkin'?'var(--pr)':'var(--t3)';
+  b.querySelector('i').style.color=t==='booking'?'var(--bl)':'var(--t3)';
+}
+
+function calcEta(){
+  const barberId=document.getElementById('wBarber').value;
+  if(!barberId) return;
+  const eta=getEta(barberId);
+  const warn=document.getElementById('wWarn');
+  document.getElementById('wEtaMain').textContent=
+    eta.wait===0?'Langsung dilayani sekarang':'~'+eta.wait+' menit lagi';
+  document.getElementById('wEtaSub').textContent=
+    eta.wait===0?'Barberman sedang bebas':
+    'Mulai ±'+fmtT(eta.start)+' · '+eta.len+' antrian sebelumnya';
+  if(eta.wait>30){
+    warn.classList.remove('hidden');
+    warn.innerHTML='<i class="ti ti-alert-triangle" style="font-size:13px;vertical-align:-2px;margin-right:5px;"></i>Estimasi tunggu lama. Pertimbangkan barberman lain.';
+  } else {
+    warn.classList.add('hidden');
+  }
+}
+
+async function confirmWalkin(){
+  clearErr('fWName','fWBarber','fWPkg');
+  const name=document.getElementById('wName').value.trim();
+  const phone=document.getElementById('wPhone').value.trim();
+  const note=document.getElementById('wNote').value.trim();
+  const barberId=document.getElementById('wBarber').value;
+  const pkgId=document.getElementById('wPkg').value;
+  let valid=true;
+  if(!name){ setErr('fWName'); valid=false; }
+  if(!barberId){ setErr('fWBarber'); valid=false; }
+  if(!pkgId){ setErr('fWPkg'); valid=false; }
+  if(!valid) return;
+
+  const btn=document.getElementById('btnWalkin');
+  btn.disabled=true;
+  const orig=btn.innerHTML;
+  btn.innerHTML='<div style="width:13px;height:13px;border:2px solid rgba(17,17,17,.3);border-top-color:#111;border-radius:50%;animation:spin .6s linear infinite;"></div>Menyimpan...';
+
+  try {
+    const pkg=STATE.packages.find(p=>p.id===pkgId);
+    const eta=getEta(barberId);
+    const startAt=eta.wait===0?new Date():eta.start;
+    const status=eta.wait===0?'active':'waiting';
+    const today=new Date().toISOString().slice(0,10);
+    const endTime=addMin(startAt,pkg?.duration_min||30);
+
+    // Simpan ke Supabase sebagai booking dengan tipe walkin
+    const { data:inserted,error } = await sb.from('bookings').insert({
+      store_id:STATE.store.id,
+      barber_id:barberId,
+      package_id:pkgId,
+      type:STATE.walkinType,
+      status:status,
+      customer_name:name,
+      customer_phone:phone||null,
+      customer_note:note||null,
+      booking_date:today,
+      start_time:fmtT(startAt)+':00',
+      end_time:fmtT(endTime)+':00',
+      total_price:pkg?.price||0,
+      dp_amount:0,
+      dp_status:'paid',
+      remaining_price:pkg?.price||0,
+    }).select().single();
+
+    if(error) throw error;
+
+    // Tambah ke antrian lokal
+    if(!STATE.queues[barberId]) STATE.queues[barberId]=[];
+    STATE.queues[barberId].push({
+      id:STATE.qCounter++,
+      bookingId:inserted.id,
+      name,phone,pkgId,
+      type:STATE.walkinType,
+      note,startAt,extMin:0,status,
+      price:pkg?.price||0,
+    });
+
+    // Kalau walk-in masuk ke antrian yang sudah ada, tambah notif
+    if(STATE.walkinType==='walkin'&&eta.wait>0){
+      const barber=STATE.barbers.find(b=>b.id===barberId);
+      addNotif(`${name} (walk-in) masuk antrian ${barber?.name||''}. Booking berikutnya mungkin mundur ~${pkg?.duration_min||30} mnt.`);
+    }
+
+    closeM('mWalkin');
+    renderGrid();
+    showToast(`${name} berhasil masuk antrian`,'ok');
+  } catch(e){
+    console.error('confirmWalkin error:',e);
+    showToast('Gagal menambah antrian. Coba lagi.','err');
+  } finally {
+    btn.disabled=false;
+    btn.innerHTML=orig;
+  }
+}
+
+// ============================================================
+// SELESAI & EXTEND
+// ============================================================
+async function markDone(barberId,idx){
+  const q=STATE.queues[barberId];
+  if(!q||!q[idx]) return;
+  const item=q[idx];
+  const pkg=STATE.packages.find(p=>p.id===item.pkgId);
+
+  try {
+    // Update status di Supabase
+    await sb.from('bookings').update({status:'done',done_at:new Date().toISOString()}).eq('id',item.bookingId);
+
+    // Simpan ke riwayat lokal
+    STATE.history.unshift({
+      name:item.name,
+      barber:STATE.barbers.find(b=>b.id===barberId)?.name||'—',
+      pkg:pkg?.name||'—',
+      type:item.type,
+      price:item.price||0,
+      doneAt:fmtT(new Date()),
+    });
+
+    // Hapus dari antrian, naikkan yang berikutnya
+    q.splice(idx,1);
+    if(q.length>0&&q[0].status==='waiting'){
+      q[0].status='active';
+      q[0].startAt=addMin(new Date(),(pkg?.buffer_min||15)+item.extMin);
+    }
+
+    renderGrid();
+    renderRiwayat();
+    showToast(`${item.name} selesai · ${fmtRp(item.price||0)}`,'ok');
+  } catch(e){
+    console.error('markDone error:',e);
+    showToast('Gagal update status. Coba lagi.','err');
+  }
+}
+
+function openExtend(barberId,idx){
+  STATE.extTarget={barberId,idx};
+  STATE.extMins=0;
+  document.querySelectorAll('.ext-opt').forEach(o=>o.classList.remove('sel'));
+  document.getElementById('extReason').value='';
+  const item=STATE.queues[barberId]?.[idx];
+  const pkg=STATE.packages.find(p=>p.id===item?.pkgId);
+  document.getElementById('extInfo').textContent=
+    `${item?.name||'—'} · ${pkg?.name||'—'}`;
+  openM('mExtend');
+}
+
+function selExt(el,m){
+  document.querySelectorAll('.ext-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  STATE.extMins=m;
+}
+
+function confirmExtend(){
+  if(!STATE.extTarget||STATE.extMins===0){
+    showToast('Pilih tambahan waktu dulu','warn');
+    return;
+  }
+  const {barberId,idx}=STATE.extTarget;
+  const item=STATE.queues[barberId]?.[idx];
+  if(!item) return;
+  item.extMin+=STATE.extMins;
+
+  const barber=STATE.barbers.find(b=>b.id===barberId);
+  addNotif(`${item.name} diperpanjang +${STATE.extMins} mnt (${barber?.name||''}). Antrian berikutnya mundur otomatis.`);
+
+  closeM('mExtend');
+  renderGrid();
+  showToast(`Waktu diperpanjang +${STATE.extMins} menit`,'ok');
+}
+
+// ============================================================
+// RIWAYAT
+// ============================================================
+async function loadRiwayat(){
+  const today=new Date().toISOString().slice(0,10);
+  try {
+    const { data } = await sb.from('bookings')
+      .select('customer_name,total_price,type,done_at,barbers(name),packages(name)')
+      .eq('store_id',STATE.store.id)
+      .eq('booking_date',today)
+      .eq('status','done')
+      .order('done_at',{ascending:false});
+
+    STATE.history = (data||[]).map(d=>({
+      name:d.customer_name,
+      barber:d.barbers?.name||'—',
+      pkg:d.packages?.name||'—',
+      type:d.type,
+      price:d.total_price||0,
+      doneAt:d.done_at?fmtT(new Date(d.done_at)):'—',
+    }));
+    renderRiwayat();
+  } catch(e){
+    console.error('loadRiwayat error:',e);
+  }
+}
+
+function renderRiwayat(){
+  const total=STATE.history.reduce((a,h)=>a+h.price,0);
+  const sub=document.getElementById('riwSub');
+  const tot=document.getElementById('riwTotal');
+  const body=document.getElementById('riwBody');
+  const empty=document.getElementById('riwEmpty');
+
+  if(sub) sub.textContent=STATE.history.length+' customer selesai hari ini';
+  if(tot) tot.textContent=STATE.history.length>0?fmtRp(total):'';
+
+  if(!STATE.history.length){
+    body.innerHTML='';
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+  body.innerHTML=STATE.history.map((h,i)=>`
+    <tr>
+      <td><div style="display:flex;align-items:center;gap:8px;">
+        <div class="av av-s" style="background:${avatarColor(h.name)}22;color:${avatarColor(h.name)};">${(h.name||'?')[0]}</div>
+        ${escHtml(h.name)}
+      </div></td>
+      <td>${escHtml(h.barber)}</td>
+      <td>${escHtml(h.pkg)}</td>
+      <td><span class="badge ${h.type==='walkin'?'bpr':'bbl'}">${h.type==='walkin'?'Walk-in':'Booking'}</span></td>
+      <td style="color:var(--gold);font-weight:500;">${fmtRp(h.price)}</td>
+      <td style="color:var(--t3);">${h.doneAt}</td>
+    </tr>`).join('');
+}
+
+// ============================================================
+// NOTIFIKASI
+// ============================================================
+function addNotif(msg){
+  STATE.notifs.unshift({msg,time:fmtT(new Date()),read:false});
+  document.getElementById('badgeN').style.display='inline-flex';
+}
+
+function renderNotif(){
+  STATE.notifs.forEach(n=>n.read=true);
+  document.getElementById('badgeN').style.display='none';
+  const el=document.getElementById('notifList');
+  if(!STATE.notifs.length){
+    el.innerHTML='<div style="text-align:center;padding:32px;font-size:13px;color:var(--t4);">Tidak ada notifikasi</div>';
+    return;
+  }
+  el.innerHTML=STATE.notifs.map(n=>`
+    <div style="display:flex;gap:10px;padding:12px 0;border-bottom:.5px solid rgba(245,245,240,.04);">
+      <div style="width:28px;height:28px;border-radius:50%;background:rgba(251,191,36,.07);border:.5px solid rgba(251,191,36,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <i class="ti ti-bell" style="font-size:13px;color:#fbbf24;"></i>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--t);line-height:1.5;">${escHtml(n.msg)}</div>
+        <div style="font-size:11px;color:var(--t3);margin-top:3px;">${n.time}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ============================================================
+// TABS
+// ============================================================
+function kTab(id,el){
+  document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tpan').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
+  if(id==='riwayat') loadRiwayat();
+  if(id==='notif') renderNotif();
+}
+
+// ============================================================
+// REALTIME — auto-refresh kalau ada booking baru masuk dari booking.html
+// ============================================================
+function setupRealtime(){
+  if(!STATE.store) return;
+  sb.channel('kasir-bookings')
+    .on('postgres_changes',
+      {event:'INSERT',schema:'public',table:'bookings',filter:`store_id=eq.${STATE.store.id}`},
+      (payload)=>{
+        const bk=payload.new;
+        // Kalau booking online baru masuk untuk hari ini & barberman ada di antrian kita, kasih tahu
+        const today=new Date().toISOString().slice(0,10);
+        if(bk.booking_date===today&&bk.type==='online'){
+          const barber=STATE.barbers.find(b=>b.id===bk.barber_id);
+          const pkg=STATE.packages.find(p=>p.id===bk.package_id);
+          addNotif(`Booking baru masuk: ${bk.customer_name} · ${barber?.name||'—'} · ${pkg?.name||'—'} · ${(bk.start_time||'').slice(0,5)}`);
+          showToast(`Booking baru: ${bk.customer_name}`,'ok');
+        }
+      }
+    )
+    .subscribe();
+}
+
+// ============================================================
+// START
+// ============================================================
+initGuard().then(()=>{
+  if(STATE.store) setupRealtime();
+});
+</script>
+</body>
+</html>
