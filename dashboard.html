@@ -10,7 +10,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-/* ===== RESET & BASE (sama seperti auth.html, biar konsisten) ===== */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Inter',sans-serif;background:#0E0E0E;color:#F5F5F0;min-height:100vh;}
 button,input,select,textarea{font-family:'Inter',sans-serif;}
@@ -32,7 +31,10 @@ button,input,select,textarea{font-family:'Inter',sans-serif;}
 .hidden{display:none!important;}
 ::-webkit-scrollbar{width:5px;}
 ::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+@keyframes tIn{from{opacity:0;transform:translateX(14px);}to{opacity:1;transform:translateX(0);}}
 
+/* ===== BUTTONS ===== */
 .btn{display:inline-flex;align-items:center;gap:7px;border:none;border-radius:var(--r);cursor:pointer;font-weight:500;transition:all .18s;letter-spacing:.04em;font-size:13px;}
 .btn:disabled{opacity:.4;cursor:not-allowed;}
 .btn-g{background:var(--gold);color:#111;padding:10px 18px;font-weight:600;}
@@ -89,6 +91,8 @@ button,input,select,textarea{font-family:'Inter',sans-serif;}
 
 .av{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;flex-shrink:0;}
 .av-s{width:30px;height:30px;font-size:11px;}
+.av-m{width:42px;height:42px;font-size:16px;}
+.av-l{width:56px;height:56px;font-size:20px;}
 
 .badge{font-size:10px;padding:3px 9px;border-radius:20px;font-weight:500;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;}
 .bg{background:var(--gold-d);color:var(--gold);border:.5px solid var(--gold-b);}
@@ -101,19 +105,19 @@ button,input,select,textarea{font-family:'Inter',sans-serif;}
 
 .code-pill{font-family:'Playfair Display',serif;font-size:12px;color:var(--gold);letter-spacing:.05em;}
 
-/* ===== ROW ACTIONS ===== */
 .row-actions{display:flex;gap:6px;}
 .act-btn{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;border:.5px solid var(--b2);background:transparent;color:var(--t3);cursor:pointer;transition:all .15s;}
 .act-btn:hover{border-color:var(--gold-b);color:var(--gold);background:var(--gold-d);}
 .act-btn.danger:hover{border-color:rgba(248,113,113,.3);color:var(--rd);background:var(--rdd);}
 
-/* ===== EMPTY / LOADING STATE ===== */
+/* ===== EMPTY / LOADING ===== */
 .empty-state{text-align:center;padding:60px 20px;}
 .empty-icon{font-size:40px;color:var(--t4);margin-bottom:14px;}
 .empty-title{font-size:15px;color:var(--t2);margin-bottom:6px;}
 .empty-sub{font-size:12px;color:var(--t3);}
 .skel{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 37%,var(--bg3) 63%);background-size:400% 100%;animation:skel 1.4s ease infinite;border-radius:6px;}
 @keyframes skel{0%{background-position:100% 50%;}100%{background-position:0 50%;}}
+.loading-row{text-align:center;padding:30px;color:var(--t3);font-size:13px;}
 
 /* ===== MODAL ===== */
 .ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:500;align-items:center;justify-content:center;padding:20px;}
@@ -139,6 +143,7 @@ button,input,select,textarea{font-family:'Inter',sans-serif;}
 .field.error input{border-color:rgba(248,113,113,.5);}
 .field-err{font-size:11px;color:var(--rd);margin-top:4px;display:none;}
 .field.error .field-err{display:block;}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 
 /* ===== TOAST ===== */
 #TB{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
@@ -146,10 +151,11 @@ button,input,select,textarea{font-family:'Inter',sans-serif;}
 .tok{border-color:rgba(74,222,128,.3);} .tok i{color:var(--gr);}
 .twarn{border-color:rgba(251,191,36,.3);} .twarn i{color:#fbbf24;}
 .terr{border-color:rgba(248,113,113,.3);} .terr i{color:var(--rd);}
-@keyframes tIn{from{opacity:0;transform:translateX(14px);}to{opacity:1;transform:translateX(0);}}
 
 /* ===== PAGINATION ===== */
 .pagination{display:flex;align-items:center;justify-content:space-between;padding-top:16px;margin-top:6px;border-top:.5px solid var(--b);}
+.page-info{font-size:12px;color:var(--t3);}
+.page-btns{display:flex;gap:6px;}
 
 /* ===== VIEW PANELS ===== */
 .view-panel.hidden{display:none;}
@@ -179,16 +185,27 @@ button,input,select,textarea{font-family:'Inter',sans-serif;}
 .sw input:checked+.sw-t{background:var(--gold);}
 .sw input:checked+.sw-t:before{transform:translateX(17px);background:#111;}
 
-/* ===== EMPTY STATE (reuse from booking) ===== */
-.loading-row{text-align:center;padding:30px;color:var(--t3);font-size:13px;}
-.page-info{font-size:12px;color:var(--t3);}
-.page-btns{display:flex;gap:6px;}
+/* ===== CHART ===== */
+.cwrap{display:flex;align-items:flex-end;gap:6px;height:130px;padding-top:10px;}
+.ccol{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;}
+.cbar{background:var(--gold-d);border:.5px solid var(--gold-b);border-radius:3px 3px 0 0;width:100%;transition:height .5s;min-height:4px;}
+.cbar.today{background:rgba(201,168,76,.28);border-color:var(--gold);}
+.clbl{font-size:10px;color:var(--t3);}
+.cval{font-size:10px;color:var(--gold);}
+
+/* ===== LI generic ===== */
+.li{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:.5px solid rgba(245,245,240,.04);}
+.li:last-child{border-bottom:none;}
+.li-i{flex:1;min-width:0;}
+.li-n{font-size:13px;font-weight:500;}
+.li-s{font-size:11px;color:var(--t3);margin-top:2px;}
 
 @media(max-width:900px){
   .layout{grid-template-columns:1fr;}
   .side{display:none;}
   .stat-grid{grid-template-columns:1fr 1fr;}
   .bk-table{display:block;overflow-x:auto;white-space:nowrap;}
+  .fr{grid-template-columns:1fr;}
 }
 </style>
 </head>
@@ -196,16 +213,15 @@ button,input,select,textarea{font-family:'Inter',sans-serif;}
 <div id="TB"></div>
 
 <!-- ===================================================
-     GUARD: belum login → redirect
+     GUARD
      =================================================== -->
 <div id="loadingGuard" style="display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:14px;">
   <div style="font-family:'Playfair Display',serif;font-size:24px;color:var(--gold);">BARBER<span style="color:var(--t);">BOOK</span></div>
   <div style="width:22px;height:22px;border:2px solid rgba(201,168,76,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .6s linear infinite;"></div>
 </div>
-<style>@keyframes spin{to{transform:rotate(360deg);}}</style>
 
 <!-- ===================================================
-     MAIN APP (hidden until auth check passes)
+     MAIN APP
      =================================================== -->
 <div id="app" class="hidden">
 
@@ -217,6 +233,7 @@ button,input,select,textarea{font-family:'Inter',sans-serif;}
   <div class="store-pill" id="storeNamePill">Memuat toko...</div>
   <div style="display:flex;gap:8px;align-items:center;">
     <button class="btn btn-o" onclick="openPage('booking-link')"><i class="ti ti-link" style="font-size:14px;"></i>Link Booking</button>
+    <a href="kasir.html" class="btn btn-g" style="text-decoration:none;"><i class="ti ti-armchair" style="font-size:14px;"></i>Buka Kasir</a>
     <button class="btn btn-gh" onclick="doLogout()"><i class="ti ti-logout" style="font-size:15px;"></i></button>
   </div>
 </nav>
@@ -229,12 +246,12 @@ button,input,select,textarea{font-family:'Inter',sans-serif;}
     <div class="snav" id="navBarbers" onclick="switchView('barbers')"><i class="ti ti-users"></i>Barberman</div>
     <div class="snav" id="navPackages" onclick="switchView('packages')"><i class="ti ti-package"></i>Paket & Harga</div>
     <div class="ssec">Pengaturan</div>
-    <div class="snav" onclick="showToast('Fitur Profil Toko segera hadir','warn')"><i class="ti ti-building-store"></i>Profil Toko</div>
+    <div class="snav" onclick="window.location.href='profil.html'"><i class="ti ti-building-store"></i>Profil Toko</div>
   </div>
 
   <div class="content">
 
-    <!-- ===== RINGKASAN MINI (selalu tampil di atas) ===== -->
+    <!-- ===== RINGKASAN MINI ===== -->
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;">
       <div>
         <h2 style="font-family:'Playfair Display',serif;font-size:22px;" id="greetText">Selamat datang, Owner</h2>
@@ -286,9 +303,7 @@ button,input,select,textarea{font-family:'Inter',sans-serif;}
               <th></th>
             </tr>
           </thead>
-          <tbody id="bkTableBody">
-            <!-- diisi oleh JS -->
-          </tbody>
+          <tbody id="bkTableBody"></tbody>
         </table>
       </div>
 
@@ -338,12 +353,8 @@ button,input,select,textarea{font-family:'Inter',sans-serif;}
       <div class="mtitle">Detail Booking</div>
       <button class="mclose" onclick="closeM('mDetail')"><i class="ti ti-x"></i></button>
     </div>
-    <div class="mbody" id="detailBody">
-      <!-- diisi oleh JS -->
-    </div>
-    <div class="mfoot" id="detailFoot">
-      <!-- diisi oleh JS -->
-    </div>
+    <div class="mbody" id="detailBody"></div>
+    <div class="mfoot" id="detailFoot"></div>
   </div>
 </div>
 
@@ -379,7 +390,6 @@ button,input,select,textarea{font-family:'Inter',sans-serif;}
     </div>
   </div>
 </div>
-
 
 <!-- ===================================================
      MODAL: Tambah/Edit Barberman
@@ -474,11 +484,10 @@ button,input,select,textarea{font-family:'Inter',sans-serif;}
 
 <script>
 // ============================================================
-// KONFIGURASI SUPABASE — samakan persis dengan auth.html
+// KONFIGURASI SUPABASE — samakan persis dengan file lain
 // ============================================================
-const SUPABASE_URL = 'https://GANTI_DENGAN_URL_SUPABASE_KAMU.supabase.co';
-const SUPABASE_ANON_KEY = 'GANTI_DENGAN_ANON_KEY_SUPABASE_KAMU';
-
+const SUPABASE_URL = 'https://rdhytutkjzgizluyvrus.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_FGCxIQUPfWUKtdGI52oFKw_XCmRWFWh';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ============================================================
@@ -487,13 +496,17 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let STATE = {
   user: null,
   store: null,
-  bookings: [],       // semua booking dari server (1 store)
-  filtered: [],        // hasil filter+search yang sedang tampil
+  bookings: [],
+  filtered: [],
   statusFilter: 'all',
   searchTerm: '',
   page: 1,
   pageSize: 10,
-  statusTarget: null,  // booking id yang sedang diubah statusnya
+  currentView: 'booking',
+  barbers: [],
+  packages: [],
+  barberDaysOff: {},
+  deleteTarget: null,
 };
 
 const STATUS_LABEL = {
@@ -504,32 +517,29 @@ const STATUS_LABEL = {
   cancelled: { label: 'Dibatalkan',    cls: 'brd' },
   noshow:    { label: 'No-Show',       cls: 'brd' },
 };
-
 const TYPE_LABEL = {
   online: { label: 'Booking', cls: 'bbl' },
   walkin: { label: 'Walk-in', cls: 'bpr' },
 };
-
 const AVATAR_COLORS = ['#C9A84C','#60a5fa','#4ade80','#c084fc','#f87171','#fb923c'];
+const DAY_NAMES_FULL = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
 
 // ============================================================
 // UTILS
 // ============================================================
-function fmtRp(n) {
-  return 'Rp ' + Math.round(n || 0).toLocaleString('id-ID');
-}
-
+function fmtRp(n) { return 'Rp ' + Math.round(n || 0).toLocaleString('id-ID'); }
 function fmtDate(dateStr) {
   if (!dateStr) return '—';
   const d = new Date(dateStr + 'T00:00:00');
   return d.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
 }
-
-function fmtTime(t) {
-  if (!t) return '—';
-  return t.slice(0, 5);
+function fmtTime(t) { if (!t) return '—'; return t.slice(0, 5); }
+function escapeHtml(str) { const div = document.createElement('div'); div.textContent = str ?? ''; return div.innerHTML; }
+function avatarColorFor(str) {
+  let hash = 0;
+  for (let i = 0; i < (str || '').length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
-
 function showToast(msg, type = 'ok') {
   const icons = { ok: 'ti-check', warn: 'ti-alert-triangle', err: 'ti-x' };
   const cls = { ok: 'tok', warn: 'twarn', err: 'terr' };
@@ -537,48 +547,31 @@ function showToast(msg, type = 'ok') {
   el.className = `toast ${cls[type]}`;
   el.innerHTML = `<i class="ti ${icons[type]}" style="font-size:15px;flex-shrink:0;"></i><span>${msg}</span>`;
   document.getElementById('TB').appendChild(el);
-  setTimeout(() => {
-    el.style.opacity = '0';
-    el.style.transition = 'opacity .3s';
-    setTimeout(() => el.remove(), 300);
-  }, 3500);
+  setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity .3s'; setTimeout(() => el.remove(), 300); }, 3500);
 }
-
 function openM(id) { document.getElementById(id).classList.add('open'); }
 function closeM(id) { document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('.ov').forEach(o => {
   o.addEventListener('click', (e) => { if (e.target === o) o.classList.remove('open'); });
 });
-
-function avatarColorFor(str) {
-  let hash = 0;
-  for (let i = 0; i < (str || '').length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
-}
+function validateField(fieldId, valid) { const f = document.getElementById(fieldId); if (f) f.classList.toggle('error', !valid); }
+function clearFieldErrors(ids) { ids.forEach(id => document.getElementById(id)?.classList.remove('error')); }
 
 // ============================================================
-// AUTH GUARD — pastikan sudah login & punya toko sebelum render apa pun
+// AUTH GUARD
 // ============================================================
 async function initGuard() {
   const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 8000));
   try {
     const { data: { session } } = await Promise.race([sb.auth.getSession(), timeoutPromise]);
-    if (!session?.user) {
-      window.location.href = 'auth.html';
-      return;
-    }
+    if (!session?.user) { window.location.href = 'auth.html'; return; }
     STATE.user = session.user;
 
     const { data: store, error } = await Promise.race([
       sb.from('stores').select('*').eq('owner_id', STATE.user.id).maybeSingle(),
       timeoutPromise,
     ]);
-
-    if (error || !store) {
-      // Belum setup toko → balik ke auth.html untuk lanjutkan setup
-      window.location.href = 'auth.html';
-      return;
-    }
+    if (error || !store) { window.location.href = 'auth.html'; return; }
 
     STATE.store = store;
     document.getElementById('loadingGuard').classList.add('hidden');
@@ -601,7 +594,7 @@ async function doLogout() {
 // ============================================================
 function initApp() {
   document.getElementById('storeNamePill').innerHTML =
-    `<i class="ti ti-building-store" style="font-size:12px;vertical-align:-1px;margin-right:5px;"></i>${STATE.store.name}`;
+    `<i class="ti ti-building-store" style="font-size:12px;vertical-align:-1px;margin-right:5px;"></i>${escapeHtml(STATE.store.name)}`;
 
   const now = new Date();
   document.getElementById('greetText').textContent = greetingByHour(now) + ', Owner';
@@ -620,18 +613,11 @@ function greetingByHour(d) {
   return 'Selamat malam';
 }
 
-function goRingkasan() {
-  showToast('Halaman ringkasan lengkap segera hadir', 'warn');
-}
+function goRingkasan() { showToast('Halaman ringkasan lengkap segera hadir', 'warn'); }
 
 // ============================================================
-// VIEW SWITCHING (Booking / Barberman / Paket)
+// VIEW SWITCHING
 // ============================================================
-STATE.currentView = 'booking';
-STATE.barbers = [];
-STATE.packages = [];
-STATE.deleteTarget = null; // { type: 'barber'|'package', id: '...' }
-
 function switchView(view) {
   STATE.currentView = view;
   document.querySelectorAll('.view-panel').forEach(p => p.classList.add('hidden'));
@@ -651,373 +637,17 @@ function refreshCurrentView() {
   if (STATE.currentView === 'packages') loadPackages();
 }
 
-function goBooking() { switchView('booking'); }
-
 function openPage(name) {
   if (name === 'booking-link') {
     const url = window.location.origin + '/booking.html?store=' + (STATE.store?.slug || '');
     navigator.clipboard?.writeText(url).then(() => {
       showToast('Link booking disalin: ' + url, 'ok');
-    }).catch(() => {
-      showToast('Link booking: ' + url, 'ok');
-    });
-  }
-}
-
-function validateField(fieldId, valid) {
-  const f = document.getElementById(fieldId);
-  if (f) f.classList.toggle('error', !valid);
-}
-function clearFieldErrors(ids) {
-  ids.forEach(id => document.getElementById(id)?.classList.remove('error'));
-}
-
-// ============================================================
-// BARBERMAN — LOAD
-// ============================================================
-async function loadBarbers() {
-  const wrap = document.getElementById('barberListWrap');
-  wrap.innerHTML = '<div class="loading-row">Memuat data barberman...</div>';
-
-  try {
-    const [barbersRes, daysOffRes] = await Promise.all([
-      sb.from('barbers').select('*').eq('store_id', STATE.store.id).order('sort_order'),
-      sb.from('barber_days_off').select('barber_id, day_of_week'),
-    ]);
-
-    if (barbersRes.error) throw barbersRes.error;
-
-    STATE.barbers = barbersRes.data || [];
-    const daysOffMap = {};
-    (daysOffRes.data || []).forEach(d => {
-      if (!daysOffMap[d.barber_id]) daysOffMap[d.barber_id] = [];
-      daysOffMap[d.barber_id].push(d.day_of_week);
-    });
-    STATE.barberDaysOff = daysOffMap;
-
-    renderBarberList();
-  } catch (e) {
-    console.error('loadBarbers error:', e);
-    wrap.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="ti ti-wifi-off"></i></div><div class="empty-title">Gagal memuat data</div><div class="empty-sub">Cek koneksi internet, lalu klik Refresh</div></div>`;
-  }
-}
-
-const DAY_NAMES_FULL = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
-
-function renderBarberList() {
-  const wrap = document.getElementById('barberListWrap');
-  if (STATE.barbers.length === 0) {
-    wrap.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="ti ti-users"></i></div><div class="empty-title">Belum ada barberman</div><div class="empty-sub">Tambah barberman pertama kamu</div></div>`;
-    return;
-  }
-
-  wrap.innerHTML = STATE.barbers.map(b => {
-    const color = b.avatar_color || '#C9A84C';
-    const offDays = STATE.barberDaysOff[b.id] || [];
-    return `
-    <div class="list-item">
-      <div class="av av-l" style="background:${color}22;color:${color};">${b.name[0]}</div>
-      <div class="list-item-info">
-        <div class="list-item-name">
-          ${escapeHtml(b.name)}
-          ${b.is_active ? '<span class="badge bgr">Aktif</span>' : '<span class="badge brd">Nonaktif</span>'}
-        </div>
-        <div class="list-item-sub">${escapeHtml(b.specialty || 'Belum ada spesialisasi')} ${b.phone_wa ? '· ' + escapeHtml(b.phone_wa) : ''}</div>
-        <div class="list-item-meta">
-          <span><i class="ti ti-star-filled" style="font-size:11px;color:var(--gold);"></i> ${b.rating || 5.0} (${b.review_count || 0} ulasan)</span>
-        </div>
-        ${offDays.length ? `<div class="dayoff-tags">${offDays.map(d => `<span class="dayoff-tag">Libur ${DAY_NAMES_FULL[d]}</span>`).join('')}</div>` : ''}
-      </div>
-      <div class="list-item-actions">
-        <button class="act-btn" title="Edit" onclick="openBarberModal('${b.id}')"><i class="ti ti-edit" style="font-size:14px;"></i></button>
-        <button class="act-btn danger" title="Hapus" onclick="askDeleteBarber('${b.id}')"><i class="ti ti-trash" style="font-size:14px;"></i></button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ============================================================
-// BARBERMAN — ADD / EDIT MODAL
-// ============================================================
-function openBarberModal(id) {
-  clearFieldErrors(['fBName']);
-  document.getElementById('bName').value = '';
-  document.getElementById('bSpec').value = '';
-  document.getElementById('bWA').value = '';
-  document.getElementById('bActive').checked = true;
-  document.querySelectorAll('#bDays .day-btn').forEach(d => d.classList.remove('off'));
-
-  if (id) {
-    const b = STATE.barbers.find(x => x.id === id);
-    if (!b) return;
-    document.getElementById('barberModalTitle').textContent = 'Edit Barberman';
-    document.getElementById('bName').value = b.name;
-    document.getElementById('bSpec').value = b.specialty || '';
-    document.getElementById('bWA').value = b.phone_wa || '';
-    document.getElementById('bActive').checked = b.is_active;
-    const offDays = STATE.barberDaysOff[b.id] || [];
-    document.querySelectorAll('#bDays .day-btn').forEach(d => {
-      if (offDays.includes(parseInt(d.dataset.day))) d.classList.add('off');
-    });
-    document.getElementById('btnSaveBarber').dataset.editId = id;
-  } else {
-    document.getElementById('barberModalTitle').textContent = 'Tambah Barberman';
-    delete document.getElementById('btnSaveBarber').dataset.editId;
-  }
-  openM('mBarber');
-}
-
-function toggleDayBtn(el) { el.classList.toggle('off'); }
-
-async function saveBarber() {
-  clearFieldErrors(['fBName']);
-  const name = document.getElementById('bName').value.trim();
-  const spec = document.getElementById('bSpec').value.trim();
-  const wa = document.getElementById('bWA').value.trim();
-  const isActive = document.getElementById('bActive').checked;
-  const editId = document.getElementById('btnSaveBarber').dataset.editId;
-
-  if (!name) { validateField('fBName', false); return; }
-
-  const daysOff = [...document.querySelectorAll('#bDays .day-btn.off')].map(d => parseInt(d.dataset.day));
-
-  const btn = document.getElementById('btnSaveBarber');
-  btn.disabled = true;
-  const origHtml = btn.innerHTML;
-  btn.innerHTML = '<div style="width:13px;height:13px;border:2px solid rgba(17,17,17,.3);border-top-color:#111;border-radius:50%;animation:spin .6s linear infinite;"></div>Menyimpan...';
-
-  try {
-    let barberId = editId;
-
-    if (editId) {
-      const { error } = await sb.from('barbers').update({
-        name, specialty: spec || null, phone_wa: wa || null, is_active: isActive
-      }).eq('id', editId);
-      if (error) throw error;
-    } else {
-      const colors = ['#C9A84C','#60a5fa','#4ade80','#c084fc','#f87171','#fb923c'];
-      const color = colors[STATE.barbers.length % colors.length];
-      const { data, error } = await sb.from('barbers').insert({
-        store_id: STATE.store.id, name, specialty: spec || null, phone_wa: wa || null,
-        avatar_color: color, is_active: isActive, sort_order: STATE.barbers.length,
-      }).select().single();
-      if (error) throw error;
-      barberId = data.id;
-    }
-
-    // Sinkronkan hari libur: hapus yang lama, insert yang baru
-    await sb.from('barber_days_off').delete().eq('barber_id', barberId);
-    if (daysOff.length > 0) {
-      await sb.from('barber_days_off').insert(daysOff.map(day => ({ barber_id: barberId, day_of_week: day })));
-    }
-
-    closeM('mBarber');
-    showToast(editId ? 'Barberman berhasil diperbarui' : 'Barberman berhasil ditambahkan', 'ok');
-    await loadBarbers();
-  } catch (e) {
-    console.error('saveBarber error:', e);
-    showToast('Gagal menyimpan. Coba lagi.', 'err');
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = origHtml;
-  }
-}
-
-function askDeleteBarber(id) {
-  const b = STATE.barbers.find(x => x.id === id);
-  if (!b) return;
-  STATE.deleteTarget = { type: 'barber', id };
-  document.getElementById('deleteConfirmText').innerHTML =
-    `Hapus barberman <strong>${escapeHtml(b.name)}</strong>? Riwayat booking yang sudah ada tidak akan terhapus, tapi barberman ini tidak bisa dipilih lagi untuk booking baru.`;
-  openM('mConfirmDelete');
-}
-
-// ============================================================
-// PAKET — LOAD
-// ============================================================
-async function loadPackages() {
-  const wrap = document.getElementById('pkgListWrap');
-  wrap.innerHTML = '<div class="loading-row">Memuat data paket...</div>';
-
-  try {
-    const { data, error } = await sb.from('packages').select('*').eq('store_id', STATE.store.id).order('sort_order');
-    if (error) throw error;
-    STATE.packages = data || [];
-    renderPkgList();
-  } catch (e) {
-    console.error('loadPackages error:', e);
-    wrap.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="ti ti-wifi-off"></i></div><div class="empty-title">Gagal memuat data</div><div class="empty-sub">Cek koneksi internet, lalu klik Refresh</div></div>`;
-  }
-}
-
-function renderPkgList() {
-  const wrap = document.getElementById('pkgListWrap');
-  if (STATE.packages.length === 0) {
-    wrap.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="ti ti-package"></i></div><div class="empty-title">Belum ada paket</div><div class="empty-sub">Tambah paket layanan pertama kamu</div></div>`;
-    return;
-  }
-
-  wrap.innerHTML = STATE.packages.map(p => `
-    <div class="list-item">
-      <div style="flex:1;min-width:0;">
-        <div class="list-item-name">
-          ${escapeHtml(p.name)}
-          ${p.is_featured ? '<span class="badge bg">Terpopuler</span>' : ''}
-          ${p.is_active ? '' : '<span class="badge brd">Nonaktif</span>'}
-        </div>
-        <div class="list-item-sub">${escapeHtml(p.description || 'Tanpa deskripsi')}</div>
-        <div class="list-item-meta">
-          <span style="color:var(--gold);font-weight:500;font-size:13px;">${fmtRp(p.price)}</span>
-          <span><i class="ti ti-clock" style="font-size:11px;"></i> ${p.duration_min} mnt kerja + ${p.buffer_min} mnt buffer</span>
-        </div>
-      </div>
-      <div class="list-item-actions">
-        <button class="act-btn" title="Edit" onclick="openPkgModal('${p.id}')"><i class="ti ti-edit" style="font-size:14px;"></i></button>
-        <button class="act-btn danger" title="Hapus" onclick="askDeletePkg('${p.id}')"><i class="ti ti-trash" style="font-size:14px;"></i></button>
-      </div>
-    </div>`).join('');
-}
-
-// ============================================================
-// PAKET — ADD / EDIT MODAL
-// ============================================================
-function openPkgModal(id) {
-  clearFieldErrors(['fPName', 'fPPrice', 'fPDur']);
-  document.getElementById('pName').value = '';
-  document.getElementById('pDesc').value = '';
-  document.getElementById('pPrice').value = '';
-  document.getElementById('pDur').value = '';
-  document.getElementById('pBuf').value = '15';
-  document.getElementById('pFeatured').checked = false;
-  document.getElementById('pActive').checked = true;
-  document.getElementById('pkgPreviewBox').style.display = 'none';
-
-  if (id) {
-    const p = STATE.packages.find(x => x.id === id);
-    if (!p) return;
-    document.getElementById('pkgModalTitle').textContent = 'Edit Paket';
-    document.getElementById('pName').value = p.name;
-    document.getElementById('pDesc').value = p.description || '';
-    document.getElementById('pPrice').value = p.price;
-    document.getElementById('pDur').value = p.duration_min;
-    document.getElementById('pBuf').value = p.buffer_min;
-    document.getElementById('pFeatured').checked = p.is_featured;
-    document.getElementById('pActive').checked = p.is_active;
-    document.getElementById('btnSavePkg').dataset.editId = id;
-    updatePkgPreviewBox();
-  } else {
-    document.getElementById('pkgModalTitle').textContent = 'Tambah Paket';
-    delete document.getElementById('btnSavePkg').dataset.editId;
-  }
-  openM('mPkg');
-}
-
-function updatePkgPreviewBox() {
-  const dur = parseInt(document.getElementById('pDur').value) || 0;
-  const buf = parseInt(document.getElementById('pBuf').value) || 0;
-  const box = document.getElementById('pkgPreviewBox');
-  if (dur > 0) {
-    box.style.display = 'block';
-    box.innerHTML = `<i class="ti ti-info-circle" style="font-size:13px;vertical-align:-2px;margin-right:5px;"></i>Total waktu diblokir per booking: <strong>${dur + buf} menit</strong>`;
-  } else {
-    box.style.display = 'none';
-  }
-}
-document.getElementById('pDur')?.addEventListener('input', updatePkgPreviewBox);
-document.getElementById('pBuf')?.addEventListener('input', updatePkgPreviewBox);
-
-async function savePkg() {
-  clearFieldErrors(['fPName', 'fPPrice', 'fPDur']);
-  const name = document.getElementById('pName').value.trim();
-  const desc = document.getElementById('pDesc').value.trim();
-  const price = parseInt(document.getElementById('pPrice').value) || 0;
-  const dur = parseInt(document.getElementById('pDur').value) || 0;
-  const buf = parseInt(document.getElementById('pBuf').value) || 0;
-  const featured = document.getElementById('pFeatured').checked;
-  const isActive = document.getElementById('pActive').checked;
-  const editId = document.getElementById('btnSavePkg').dataset.editId;
-
-  let valid = true;
-  if (!name) { validateField('fPName', false); valid = false; }
-  if (!price) { validateField('fPPrice', false); valid = false; }
-  if (!dur) { validateField('fPDur', false); valid = false; }
-  if (!valid) return;
-
-  const btn = document.getElementById('btnSavePkg');
-  btn.disabled = true;
-  const origHtml = btn.innerHTML;
-  btn.innerHTML = '<div style="width:13px;height:13px;border:2px solid rgba(17,17,17,.3);border-top-color:#111;border-radius:50%;animation:spin .6s linear infinite;"></div>Menyimpan...';
-
-  try {
-    const payload = {
-      name, description: desc || null, price, duration_min: dur, buffer_min: buf,
-      is_featured: featured, is_active: isActive,
-    };
-
-    if (editId) {
-      const { error } = await sb.from('packages').update(payload).eq('id', editId);
-      if (error) throw error;
-    } else {
-      const { error } = await sb.from('packages').insert({
-        ...payload, store_id: STATE.store.id, sort_order: STATE.packages.length,
-      });
-      if (error) throw error;
-    }
-
-    closeM('mPkg');
-    showToast(editId ? 'Paket berhasil diperbarui' : 'Paket berhasil ditambahkan', 'ok');
-    await loadPackages();
-  } catch (e) {
-    console.error('savePkg error:', e);
-    showToast('Gagal menyimpan. Coba lagi.', 'err');
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = origHtml;
-  }
-}
-
-function askDeletePkg(id) {
-  const p = STATE.packages.find(x => x.id === id);
-  if (!p) return;
-  STATE.deleteTarget = { type: 'package', id };
-  document.getElementById('deleteConfirmText').innerHTML =
-    `Hapus paket <strong>${escapeHtml(p.name)}</strong>? Paket ini tidak akan bisa dipilih lagi untuk booking baru.`;
-  openM('mConfirmDelete');
-}
-
-// ============================================================
-// EKSEKUSI HAPUS (dipakai bersama Barberman & Paket)
-// ============================================================
-async function executeDelete() {
-  const target = STATE.deleteTarget;
-  if (!target) return;
-
-  const btn = document.getElementById('btnConfirmDelete');
-  btn.disabled = true;
-  btn.innerHTML = '<div style="width:13px;height:13px;border:2px solid rgba(248,113,113,.3);border-top-color:var(--rd);border-radius:50%;animation:spin .6s linear infinite;"></div>Menghapus...';
-
-  try {
-    const table = target.type === 'barber' ? 'barbers' : 'packages';
-    const { error } = await sb.from(table).delete().eq('id', target.id);
-    if (error) throw error;
-
-    closeM('mConfirmDelete');
-    showToast('Berhasil dihapus', 'ok');
-
-    if (target.type === 'barber') await loadBarbers();
-    else await loadPackages();
-  } catch (e) {
-    console.error('executeDelete error:', e);
-    showToast('Gagal menghapus. Mungkin data ini masih dipakai di booking aktif.', 'err');
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = '<i class="ti ti-trash" style="font-size:14px;"></i>Ya, Hapus';
-    STATE.deleteTarget = null;
+    }).catch(() => { showToast('Link booking: ' + url, 'ok'); });
   }
 }
 
 // ============================================================
-// LOAD BOOKINGS DARI SUPABASE
+// BOOKING — LOAD
 // ============================================================
 async function loadBookings() {
   const tbody = document.getElementById('bkTableBody');
@@ -1039,31 +669,19 @@ async function loadBookings() {
       .limit(500);
 
     if (error) throw error;
-
     STATE.bookings = data || [];
     updateStats();
     applyFilters();
   } catch (e) {
     console.error('loadBookings error:', e);
     showToast('Gagal memuat data booking. Cek koneksi internet.', 'err');
-    tbody.innerHTML = `
-      <tr><td colspan="8">
-        <div class="empty-state">
-          <div class="empty-icon"><i class="ti ti-wifi-off"></i></div>
-          <div class="empty-title">Gagal memuat data</div>
-          <div class="empty-sub">Cek koneksi internet kamu, lalu klik Refresh</div>
-        </div>
-      </td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon"><i class="ti ti-wifi-off"></i></div><div class="empty-title">Gagal memuat data</div><div class="empty-sub">Cek koneksi internet kamu, lalu klik Refresh</div></div></td></tr>`;
   }
 }
 
 function renderSkeletonRows(n) {
   let html = '';
-  for (let i = 0; i < n; i++) {
-    html += `<tr>
-      <td colspan="8"><div class="skel" style="height:38px;width:100%;"></div></td>
-    </tr>`;
-  }
+  for (let i = 0; i < n; i++) html += `<tr><td colspan="8"><div class="skel" style="height:38px;width:100%;"></div></td></tr>`;
   return html;
 }
 
@@ -1076,13 +694,10 @@ function updateStats() {
 
   const todayCount = STATE.bookings.filter(b => b.booking_date === today).length;
   const pendingCount = STATE.bookings.filter(b => b.status === 'pending').length;
-  const doneThisMonth = STATE.bookings.filter(b =>
-    b.status === 'done' && b.booking_date?.startsWith(thisMonth)
-  );
+  const doneThisMonth = STATE.bookings.filter(b => b.status === 'done' && b.booking_date?.startsWith(thisMonth));
   const revenueThisMonth = doneThisMonth.reduce((sum, b) => sum + (b.total_price || 0), 0);
 
-  const grid = document.getElementById('statGrid');
-  grid.innerHTML = `
+  document.getElementById('statGrid').innerHTML = `
     <div class="stat"><div class="stat-lbl">Booking Hari Ini</div><div class="stat-val">${todayCount}</div></div>
     <div class="stat"><div class="stat-lbl">Menunggu Konfirmasi</div><div class="stat-val" style="color:${pendingCount > 0 ? 'var(--or)' : 'var(--t)'};">${pendingCount}</div></div>
     <div class="stat"><div class="stat-lbl">Selesai Bulan Ini</div><div class="stat-val" style="color:var(--gr);">${doneThisMonth.length}</div></div>
@@ -1094,13 +709,11 @@ function updateStats() {
 // FILTER & SEARCH
 // ============================================================
 function setFilter(status, el) {
-  STATE.statusFilter = status;
-  STATE.page = 1;
+  STATE.statusFilter = status; STATE.page = 1;
   document.querySelectorAll('.fchip').forEach(c => c.classList.remove('active'));
   el.classList.add('active');
   applyFilters();
 }
-
 let searchDebounce;
 function onSearch() {
   clearTimeout(searchDebounce);
@@ -1110,20 +723,15 @@ function onSearch() {
     applyFilters();
   }, 250);
 }
-
 function applyFilters() {
   let result = STATE.bookings;
-
-  if (STATE.statusFilter !== 'all') {
-    result = result.filter(b => b.status === STATE.statusFilter);
-  }
+  if (STATE.statusFilter !== 'all') result = result.filter(b => b.status === STATE.statusFilter);
   if (STATE.searchTerm) {
     result = result.filter(b =>
       (b.customer_name || '').toLowerCase().includes(STATE.searchTerm) ||
       (b.booking_code || '').toLowerCase().includes(STATE.searchTerm)
     );
   }
-
   STATE.filtered = result;
   renderTable();
 }
@@ -1133,20 +741,11 @@ function applyFilters() {
 // ============================================================
 function renderTable() {
   const tbody = document.getElementById('bkTableBody');
-  const countText = document.getElementById('bkCountText');
   const total = STATE.filtered.length;
-
-  countText.textContent = `${total} booking ditemukan`;
+  document.getElementById('bkCountText').textContent = `${total} booking ditemukan`;
 
   if (total === 0) {
-    tbody.innerHTML = `
-      <tr><td colspan="8">
-        <div class="empty-state">
-          <div class="empty-icon"><i class="ti ti-calendar-off"></i></div>
-          <div class="empty-title">Belum ada booking</div>
-          <div class="empty-sub">${STATE.bookings.length === 0 ? 'Bagikan link booking ke customer untuk mulai menerima booking' : 'Coba ubah filter atau kata kunci pencarian'}</div>
-        </div>
-      </td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon"><i class="ti ti-calendar-off"></i></div><div class="empty-title">Belum ada booking</div><div class="empty-sub">${STATE.bookings.length === 0 ? 'Bagikan link booking ke customer untuk mulai menerima booking' : 'Coba ubah filter atau kata kunci pencarian'}</div></div></td></tr>`;
     document.getElementById('paginationBar').style.display = 'none';
     return;
   }
@@ -1202,27 +801,17 @@ function renderTable() {
   renderPagination(total);
 }
 
-function escapeHtml(str) {
-  const div = document.createElement('div');
-  div.textContent = str ?? '';
-  return div.innerHTML;
-}
-
 function renderPagination(total) {
   const bar = document.getElementById('paginationBar');
   const totalPages = Math.ceil(total / STATE.pageSize);
-
   if (totalPages <= 1) { bar.style.display = 'none'; return; }
   bar.style.display = 'flex';
-
   const start = (STATE.page - 1) * STATE.pageSize + 1;
   const end = Math.min(STATE.page * STATE.pageSize, total);
   document.getElementById('pageInfo').textContent = `Menampilkan ${start}–${end} dari ${total}`;
-
   document.getElementById('prevBtn').disabled = STATE.page <= 1;
   document.getElementById('nextBtn').disabled = STATE.page >= totalPages;
 }
-
 function changePage(delta) {
   STATE.page += delta;
   renderTable();
@@ -1235,7 +824,6 @@ function changePage(delta) {
 function showDetail(id) {
   const b = STATE.bookings.find(x => x.id === id);
   if (!b) return;
-
   const st = STATUS_LABEL[b.status] || STATUS_LABEL.pending;
   const tp = TYPE_LABEL[b.type] || TYPE_LABEL.online;
 
@@ -1254,12 +842,10 @@ function showDetail(id) {
     ${b.dp_amount ? `<div class="detail-row"><span class="detail-k">DP</span><span class="detail-v">${fmtRp(b.dp_amount)} · ${b.dp_status === 'paid' ? '<span style="color:var(--gr);">Lunas</span>' : 'Belum bayar'}</span></div>` : ''}
     <div class="detail-row"><span class="detail-k">Dibuat</span><span class="detail-v">${new Date(b.created_at).toLocaleString('id-ID')}</span></div>
   `;
-
   document.getElementById('detailFoot').innerHTML = `
     <button class="btn btn-gh" onclick="closeM('mDetail')">Tutup</button>
     <button class="btn btn-g" onclick="closeM('mDetail');openStatusModal('${b.id}')"><i class="ti ti-edit" style="font-size:14px;"></i>Ubah Status</button>
   `;
-
   openM('mDetail');
 }
 
@@ -1269,40 +855,30 @@ function showDetail(id) {
 function openStatusModal(id) {
   const b = STATE.bookings.find(x => x.id === id);
   if (!b) return;
-
   STATE.statusTarget = id;
-  document.getElementById('statusBookingInfo').innerHTML =
-    `<strong>${escapeHtml(b.customer_name)}</strong> · ${b.booking_code} · ${fmtDate(b.booking_date)}`;
+  document.getElementById('statusBookingInfo').innerHTML = `<strong>${escapeHtml(b.customer_name)}</strong> · ${b.booking_code} · ${fmtDate(b.booking_date)}`;
   document.getElementById('newStatusSelect').value = b.status;
   toggleNoshowWarning();
   openM('mStatus');
 }
-
 document.getElementById('newStatusSelect')?.addEventListener('change', toggleNoshowWarning);
 function toggleNoshowWarning() {
   const val = document.getElementById('newStatusSelect').value;
   document.getElementById('noshowWarning').classList.toggle('hidden', val !== 'noshow');
 }
-
 async function confirmStatusChange() {
   const id = STATE.statusTarget;
   const newStatus = document.getElementById('newStatusSelect').value;
   if (!id) return;
-
   try {
     const updatePayload = { status: newStatus };
     if (newStatus === 'done') updatePayload.done_at = new Date().toISOString();
     if (newStatus === 'cancelled') updatePayload.cancelled_at = new Date().toISOString();
-
     const { error } = await sb.from('bookings').update(updatePayload).eq('id', id);
     if (error) throw error;
-
     const idx = STATE.bookings.findIndex(x => x.id === id);
     if (idx > -1) STATE.bookings[idx].status = newStatus;
-
-    updateStats();
-    applyFilters();
-    closeM('mStatus');
+    updateStats(); applyFilters(); closeM('mStatus');
     showToast('Status booking berhasil diubah', 'ok');
   } catch (e) {
     console.error('confirmStatusChange error:', e);
@@ -1311,17 +887,302 @@ async function confirmStatusChange() {
 }
 
 // ============================================================
-// REALTIME — auto refresh kalau ada booking baru masuk
+// BARBERMAN
+// ============================================================
+async function loadBarbers() {
+  const wrap = document.getElementById('barberListWrap');
+  wrap.innerHTML = '<div class="loading-row">Memuat data barberman...</div>';
+  try {
+    const [barbersRes, daysOffRes] = await Promise.all([
+      sb.from('barbers').select('*').eq('store_id', STATE.store.id).order('sort_order'),
+      sb.from('barber_days_off').select('barber_id, day_of_week'),
+    ]);
+    if (barbersRes.error) throw barbersRes.error;
+    STATE.barbers = barbersRes.data || [];
+    const daysOffMap = {};
+    (daysOffRes.data || []).forEach(d => {
+      if (!daysOffMap[d.barber_id]) daysOffMap[d.barber_id] = [];
+      daysOffMap[d.barber_id].push(d.day_of_week);
+    });
+    STATE.barberDaysOff = daysOffMap;
+    renderBarberList();
+  } catch (e) {
+    console.error('loadBarbers error:', e);
+    wrap.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="ti ti-wifi-off"></i></div><div class="empty-title">Gagal memuat data</div><div class="empty-sub">Cek koneksi internet, lalu klik Refresh</div></div>`;
+  }
+}
+function renderBarberList() {
+  const wrap = document.getElementById('barberListWrap');
+  if (STATE.barbers.length === 0) {
+    wrap.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="ti ti-users"></i></div><div class="empty-title">Belum ada barberman</div><div class="empty-sub">Tambah barberman pertama kamu</div></div>`;
+    return;
+  }
+  wrap.innerHTML = STATE.barbers.map(b => {
+    const color = b.avatar_color || '#C9A84C';
+    const offDays = STATE.barberDaysOff[b.id] || [];
+    return `
+    <div class="list-item">
+      <div class="av av-l" style="background:${color}22;color:${color};">${b.name[0]}</div>
+      <div class="list-item-info">
+        <div class="list-item-name">
+          ${escapeHtml(b.name)}
+          ${b.is_active ? '<span class="badge bgr">Aktif</span>' : '<span class="badge brd">Nonaktif</span>'}
+        </div>
+        <div class="list-item-sub">${escapeHtml(b.specialty || 'Belum ada spesialisasi')} ${b.phone_wa ? '· ' + escapeHtml(b.phone_wa) : ''}</div>
+        <div class="list-item-meta"><span><i class="ti ti-star-filled" style="font-size:11px;color:var(--gold);"></i> ${b.rating || 5.0} (${b.review_count || 0} ulasan)</span></div>
+        ${offDays.length ? `<div class="dayoff-tags">${offDays.map(d => `<span class="dayoff-tag">Libur ${DAY_NAMES_FULL[d]}</span>`).join('')}</div>` : ''}
+      </div>
+      <div class="list-item-actions">
+        <button class="act-btn" title="Edit" onclick="openBarberModal('${b.id}')"><i class="ti ti-edit" style="font-size:14px;"></i></button>
+        <button class="act-btn danger" title="Hapus" onclick="askDeleteBarber('${b.id}')"><i class="ti ti-trash" style="font-size:14px;"></i></button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function openBarberModal(id) {
+  clearFieldErrors(['fBName']);
+  document.getElementById('bName').value = '';
+  document.getElementById('bSpec').value = '';
+  document.getElementById('bWA').value = '';
+  document.getElementById('bActive').checked = true;
+  document.querySelectorAll('#bDays .day-btn').forEach(d => d.classList.remove('off'));
+
+  if (id) {
+    const b = STATE.barbers.find(x => x.id === id);
+    if (!b) return;
+    document.getElementById('barberModalTitle').textContent = 'Edit Barberman';
+    document.getElementById('bName').value = b.name;
+    document.getElementById('bSpec').value = b.specialty || '';
+    document.getElementById('bWA').value = b.phone_wa || '';
+    document.getElementById('bActive').checked = b.is_active;
+    const offDays = STATE.barberDaysOff[b.id] || [];
+    document.querySelectorAll('#bDays .day-btn').forEach(d => { if (offDays.includes(parseInt(d.dataset.day))) d.classList.add('off'); });
+    document.getElementById('btnSaveBarber').dataset.editId = id;
+  } else {
+    document.getElementById('barberModalTitle').textContent = 'Tambah Barberman';
+    delete document.getElementById('btnSaveBarber').dataset.editId;
+  }
+  openM('mBarber');
+}
+function toggleDayBtn(el) { el.classList.toggle('off'); }
+async function saveBarber() {
+  clearFieldErrors(['fBName']);
+  const name = document.getElementById('bName').value.trim();
+  const spec = document.getElementById('bSpec').value.trim();
+  const wa = document.getElementById('bWA').value.trim();
+  const isActive = document.getElementById('bActive').checked;
+  const editId = document.getElementById('btnSaveBarber').dataset.editId;
+  if (!name) { validateField('fBName', false); return; }
+  const daysOff = [...document.querySelectorAll('#bDays .day-btn.off')].map(d => parseInt(d.dataset.day));
+
+  const btn = document.getElementById('btnSaveBarber');
+  btn.disabled = true;
+  const origHtml = btn.innerHTML;
+  btn.innerHTML = '<div style="width:13px;height:13px;border:2px solid rgba(17,17,17,.3);border-top-color:#111;border-radius:50%;animation:spin .6s linear infinite;"></div>Menyimpan...';
+
+  try {
+    let barberId = editId;
+    if (editId) {
+      const { error } = await sb.from('barbers').update({ name, specialty: spec || null, phone_wa: wa || null, is_active: isActive }).eq('id', editId);
+      if (error) throw error;
+    } else {
+      const colors = ['#C9A84C','#60a5fa','#4ade80','#c084fc','#f87171','#fb923c'];
+      const color = colors[STATE.barbers.length % colors.length];
+      const { data, error } = await sb.from('barbers').insert({
+        store_id: STATE.store.id, name, specialty: spec || null, phone_wa: wa || null,
+        avatar_color: color, is_active: isActive, sort_order: STATE.barbers.length,
+      }).select().single();
+      if (error) throw error;
+      barberId = data.id;
+    }
+    await sb.from('barber_days_off').delete().eq('barber_id', barberId);
+    if (daysOff.length > 0) {
+      await sb.from('barber_days_off').insert(daysOff.map(day => ({ barber_id: barberId, day_of_week: day })));
+    }
+    closeM('mBarber');
+    showToast(editId ? 'Barberman berhasil diperbarui' : 'Barberman berhasil ditambahkan', 'ok');
+    await loadBarbers();
+  } catch (e) {
+    console.error('saveBarber error:', e);
+    showToast('Gagal menyimpan. Coba lagi.', 'err');
+  } finally {
+    btn.disabled = false; btn.innerHTML = origHtml;
+  }
+}
+function askDeleteBarber(id) {
+  const b = STATE.barbers.find(x => x.id === id);
+  if (!b) return;
+  STATE.deleteTarget = { type: 'barber', id };
+  document.getElementById('deleteConfirmText').innerHTML = `Hapus barberman <strong>${escapeHtml(b.name)}</strong>? Riwayat booking yang sudah ada tidak akan terhapus, tapi barberman ini tidak bisa dipilih lagi untuk booking baru.`;
+  openM('mConfirmDelete');
+}
+
+// ============================================================
+// PAKET
+// ============================================================
+async function loadPackages() {
+  const wrap = document.getElementById('pkgListWrap');
+  wrap.innerHTML = '<div class="loading-row">Memuat data paket...</div>';
+  try {
+    const { data, error } = await sb.from('packages').select('*').eq('store_id', STATE.store.id).order('sort_order');
+    if (error) throw error;
+    STATE.packages = data || [];
+    renderPkgList();
+  } catch (e) {
+    console.error('loadPackages error:', e);
+    wrap.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="ti ti-wifi-off"></i></div><div class="empty-title">Gagal memuat data</div><div class="empty-sub">Cek koneksi internet, lalu klik Refresh</div></div>`;
+  }
+}
+function renderPkgList() {
+  const wrap = document.getElementById('pkgListWrap');
+  if (STATE.packages.length === 0) {
+    wrap.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="ti ti-package"></i></div><div class="empty-title">Belum ada paket</div><div class="empty-sub">Tambah paket layanan pertama kamu</div></div>`;
+    return;
+  }
+  wrap.innerHTML = STATE.packages.map(p => `
+    <div class="list-item">
+      <div style="flex:1;min-width:0;">
+        <div class="list-item-name">
+          ${escapeHtml(p.name)}
+          ${p.is_featured ? '<span class="badge bg">Terpopuler</span>' : ''}
+          ${p.is_active ? '' : '<span class="badge brd">Nonaktif</span>'}
+        </div>
+        <div class="list-item-sub">${escapeHtml(p.description || 'Tanpa deskripsi')}</div>
+        <div class="list-item-meta">
+          <span style="color:var(--gold);font-weight:500;font-size:13px;">${fmtRp(p.price)}</span>
+          <span><i class="ti ti-clock" style="font-size:11px;"></i> ${p.duration_min} mnt kerja + ${p.buffer_min} mnt buffer</span>
+        </div>
+      </div>
+      <div class="list-item-actions">
+        <button class="act-btn" title="Edit" onclick="openPkgModal('${p.id}')"><i class="ti ti-edit" style="font-size:14px;"></i></button>
+        <button class="act-btn danger" title="Hapus" onclick="askDeletePkg('${p.id}')"><i class="ti ti-trash" style="font-size:14px;"></i></button>
+      </div>
+    </div>`).join('');
+}
+function openPkgModal(id) {
+  clearFieldErrors(['fPName', 'fPPrice', 'fPDur']);
+  document.getElementById('pName').value = '';
+  document.getElementById('pDesc').value = '';
+  document.getElementById('pPrice').value = '';
+  document.getElementById('pDur').value = '';
+  document.getElementById('pBuf').value = '15';
+  document.getElementById('pFeatured').checked = false;
+  document.getElementById('pActive').checked = true;
+  document.getElementById('pkgPreviewBox').style.display = 'none';
+
+  if (id) {
+    const p = STATE.packages.find(x => x.id === id);
+    if (!p) return;
+    document.getElementById('pkgModalTitle').textContent = 'Edit Paket';
+    document.getElementById('pName').value = p.name;
+    document.getElementById('pDesc').value = p.description || '';
+    document.getElementById('pPrice').value = p.price;
+    document.getElementById('pDur').value = p.duration_min;
+    document.getElementById('pBuf').value = p.buffer_min;
+    document.getElementById('pFeatured').checked = p.is_featured;
+    document.getElementById('pActive').checked = p.is_active;
+    document.getElementById('btnSavePkg').dataset.editId = id;
+    updatePkgPreviewBox();
+  } else {
+    document.getElementById('pkgModalTitle').textContent = 'Tambah Paket';
+    delete document.getElementById('btnSavePkg').dataset.editId;
+  }
+  openM('mPkg');
+}
+function updatePkgPreviewBox() {
+  const dur = parseInt(document.getElementById('pDur').value) || 0;
+  const buf = parseInt(document.getElementById('pBuf').value) || 0;
+  const box = document.getElementById('pkgPreviewBox');
+  if (dur > 0) {
+    box.style.display = 'block';
+    box.innerHTML = `<i class="ti ti-info-circle" style="font-size:13px;vertical-align:-2px;margin-right:5px;"></i>Total waktu diblokir per booking: <strong>${dur + buf} menit</strong>`;
+  } else { box.style.display = 'none'; }
+}
+document.getElementById('pDur')?.addEventListener('input', updatePkgPreviewBox);
+document.getElementById('pBuf')?.addEventListener('input', updatePkgPreviewBox);
+async function savePkg() {
+  clearFieldErrors(['fPName', 'fPPrice', 'fPDur']);
+  const name = document.getElementById('pName').value.trim();
+  const desc = document.getElementById('pDesc').value.trim();
+  const price = parseInt(document.getElementById('pPrice').value) || 0;
+  const dur = parseInt(document.getElementById('pDur').value) || 0;
+  const buf = parseInt(document.getElementById('pBuf').value) || 0;
+  const featured = document.getElementById('pFeatured').checked;
+  const isActive = document.getElementById('pActive').checked;
+  const editId = document.getElementById('btnSavePkg').dataset.editId;
+  let valid = true;
+  if (!name) { validateField('fPName', false); valid = false; }
+  if (!price) { validateField('fPPrice', false); valid = false; }
+  if (!dur) { validateField('fPDur', false); valid = false; }
+  if (!valid) return;
+
+  const btn = document.getElementById('btnSavePkg');
+  btn.disabled = true;
+  const origHtml = btn.innerHTML;
+  btn.innerHTML = '<div style="width:13px;height:13px;border:2px solid rgba(17,17,17,.3);border-top-color:#111;border-radius:50%;animation:spin .6s linear infinite;"></div>Menyimpan...';
+
+  try {
+    const payload = { name, description: desc || null, price, duration_min: dur, buffer_min: buf, is_featured: featured, is_active: isActive };
+    if (editId) {
+      const { error } = await sb.from('packages').update(payload).eq('id', editId);
+      if (error) throw error;
+    } else {
+      const { error } = await sb.from('packages').insert({ ...payload, store_id: STATE.store.id, sort_order: STATE.packages.length });
+      if (error) throw error;
+    }
+    closeM('mPkg');
+    showToast(editId ? 'Paket berhasil diperbarui' : 'Paket berhasil ditambahkan', 'ok');
+    await loadPackages();
+  } catch (e) {
+    console.error('savePkg error:', e);
+    showToast('Gagal menyimpan. Coba lagi.', 'err');
+  } finally {
+    btn.disabled = false; btn.innerHTML = origHtml;
+  }
+}
+function askDeletePkg(id) {
+  const p = STATE.packages.find(x => x.id === id);
+  if (!p) return;
+  STATE.deleteTarget = { type: 'package', id };
+  document.getElementById('deleteConfirmText').innerHTML = `Hapus paket <strong>${escapeHtml(p.name)}</strong>? Paket ini tidak akan bisa dipilih lagi untuk booking baru.`;
+  openM('mConfirmDelete');
+}
+
+// ============================================================
+// EKSEKUSI HAPUS
+// ============================================================
+async function executeDelete() {
+  const target = STATE.deleteTarget;
+  if (!target) return;
+  const btn = document.getElementById('btnConfirmDelete');
+  btn.disabled = true;
+  btn.innerHTML = '<div style="width:13px;height:13px;border:2px solid rgba(248,113,113,.3);border-top-color:var(--rd);border-radius:50%;animation:spin .6s linear infinite;"></div>Menghapus...';
+  try {
+    const table = target.type === 'barber' ? 'barbers' : 'packages';
+    const { error } = await sb.from(table).delete().eq('id', target.id);
+    if (error) throw error;
+    closeM('mConfirmDelete');
+    showToast('Berhasil dihapus', 'ok');
+    if (target.type === 'barber') await loadBarbers(); else await loadPackages();
+  } catch (e) {
+    console.error('executeDelete error:', e);
+    showToast('Gagal menghapus. Mungkin data ini masih dipakai di booking aktif.', 'err');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ti ti-trash" style="font-size:14px;"></i>Ya, Hapus';
+    STATE.deleteTarget = null;
+  }
+}
+
+// ============================================================
+// REALTIME
 // ============================================================
 function setupRealtime() {
   if (!STATE.store) return;
   sb.channel('bookings-changes')
     .on('postgres_changes',
       { event: '*', schema: 'public', table: 'bookings', filter: `store_id=eq.${STATE.store.id}` },
-      (payload) => {
-        showToast('Ada perubahan booking baru, memperbarui data...', 'ok');
-        loadBookings();
-      }
+      () => { showToast('Ada perubahan booking baru, memperbarui data...', 'ok'); loadBookings(); }
     )
     .subscribe();
 }
@@ -1329,9 +1190,7 @@ function setupRealtime() {
 // ============================================================
 // START
 // ============================================================
-initGuard().then(() => {
-  if (STATE.store) setupRealtime();
-});
+initGuard().then(() => { if (STATE.store) setupRealtime(); });
 </script>
 </body>
 </html>
