@@ -241,7 +241,7 @@ button,input,select,textarea{font-family:'Inter',sans-serif;}
 <div class="layout">
   <div class="side">
     <div class="ssec">Menu Utama</div>
-    <div class="snav" onclick="goRingkasan()"><i class="ti ti-layout-dashboard"></i>Ringkasan</div>
+    <div class="snav" id="navRingkasan" onclick="switchView('ringkasan')"><i class="ti ti-layout-dashboard"></i>Ringkasan</div>
     <div class="snav active" id="navBooking" onclick="switchView('booking')"><i class="ti ti-calendar"></i>Kelola Booking</div>
     <div class="snav" id="navBarbers" onclick="switchView('barbers')"><i class="ti ti-users"></i>Barberman</div>
     <div class="snav" id="navPackages" onclick="switchView('packages')"><i class="ti ti-package"></i>Paket & Harga</div>
@@ -266,6 +266,66 @@ button,input,select,textarea{font-family:'Inter',sans-serif;}
       <div class="stat"><div class="stat-lbl">Selesai Bulan Ini</div><div class="stat-val skel" style="width:40px;height:24px;">&nbsp;</div></div>
       <div class="stat"><div class="stat-lbl">Pendapatan Bulan Ini</div><div class="stat-val skel" style="width:80px;height:24px;">&nbsp;</div></div>
     </div>
+
+    <!-- ===== VIEW: RINGKASAN ===== -->
+    <div class="view-panel hidden" id="view-ringkasan">
+
+      <!-- Grafik booking 7 hari terakhir -->
+      <div class="card" style="margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <div style="font-size:16px;font-weight:500;font-family:'Playfair Display',serif;">Booking 7 Hari Terakhir</div>
+          <div style="font-size:12px;color:var(--t3);" id="chartSubtitle">Memuat...</div>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:6px;height:140px;padding-top:10px;" id="barChart"></div>
+        <div style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t3);">
+            <div style="width:10px;height:10px;background:var(--gold-d);border:.5px solid var(--gold-b);border-radius:2px;"></div>Hari lain
+          </div>
+          <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t3);">
+            <div style="width:10px;height:10px;background:rgba(201,168,76,.28);border:.5px solid var(--gold);border-radius:2px;"></div>Hari ini
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+
+        <!-- Booking terbaru -->
+        <div class="card">
+          <div style="font-size:14px;font-weight:500;font-family:'Playfair Display',serif;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+            <i class="ti ti-calendar" style="color:var(--gold);font-size:16px;"></i>Booking Terbaru
+          </div>
+          <div id="recentBookings"><div class="loading-row">Memuat...</div></div>
+          <div style="margin-top:12px;padding-top:12px;border-top:.5px solid var(--b);">
+            <button class="btn btn-gh" style="font-size:12px;padding:6px 0;" onclick="switchView('booking')">
+              Lihat semua booking <i class="ti ti-arrow-right" style="font-size:12px;"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Performa barberman -->
+        <div class="card">
+          <div style="font-size:14px;font-weight:500;font-family:'Playfair Display',serif;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+            <i class="ti ti-trophy" style="color:var(--gold);font-size:16px;"></i>Performa Barberman
+          </div>
+          <div id="barberPerf"><div class="loading-row">Memuat...</div></div>
+        </div>
+
+      </div>
+
+      <!-- Ringkasan bulan ini -->
+      <div class="card">
+        <div style="font-size:14px;font-weight:500;font-family:'Playfair Display',serif;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+          <i class="ti ti-calendar-month" style="color:var(--gold);font-size:16px;"></i>Ringkasan Bulan Ini
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;" id="monthStats">
+          <div class="stat"><div class="stat-lbl">Total Booking</div><div class="stat-val skel" style="width:40px;height:24px;">&nbsp;</div></div>
+          <div class="stat"><div class="stat-lbl">Selesai</div><div class="stat-val skel" style="width:40px;height:24px;">&nbsp;</div></div>
+          <div class="stat"><div class="stat-lbl">Dibatalkan</div><div class="stat-val skel" style="width:40px;height:24px;">&nbsp;</div></div>
+          <div class="stat"><div class="stat-lbl">Pendapatan</div><div class="stat-val skel" style="width:80px;height:24px;">&nbsp;</div></div>
+        </div>
+      </div>
+
+    </div><!-- end view-ringkasan -->
 
     <!-- ===== VIEW: KELOLA BOOKING ===== -->
     <div class="view-panel" id="view-booking">
@@ -613,7 +673,7 @@ function greetingByHour(d) {
   return 'Selamat malam';
 }
 
-function goRingkasan() { showToast('Halaman ringkasan lengkap segera hadir', 'warn'); }
+function goRingkasan() { switchView('ringkasan'); }
 
 // ============================================================
 // VIEW SWITCHING
@@ -624,17 +684,179 @@ function switchView(view) {
   document.getElementById('view-' + view).classList.remove('hidden');
 
   document.querySelectorAll('.snav').forEach(n => n.classList.remove('active'));
-  const navMap = { booking: 'navBooking', barbers: 'navBarbers', packages: 'navPackages' };
+  const navMap = { ringkasan: 'navRingkasan', booking: 'navBooking', barbers: 'navBarbers', packages: 'navPackages' };
   document.getElementById(navMap[view])?.classList.add('active');
 
+  if (view === 'ringkasan') loadRingkasan();
   if (view === 'barbers' && STATE.barbers.length === 0) loadBarbers();
   if (view === 'packages' && STATE.packages.length === 0) loadPackages();
 }
 
 function refreshCurrentView() {
+  if (STATE.currentView === 'ringkasan') loadRingkasan();
   if (STATE.currentView === 'booking') loadBookings();
   if (STATE.currentView === 'barbers') loadBarbers();
   if (STATE.currentView === 'packages') loadPackages();
+}
+
+// ============================================================
+// RINGKASAN — LOAD & RENDER
+// ============================================================
+async function loadRingkasan() {
+  if (!STATE.store) return;
+
+  const today = new Date();
+  const todayStr = today.toISOString().slice(0, 10);
+  const thisMonth = today.toISOString().slice(0, 7);
+
+  // Ambil semua booking bulan ini + 7 hari terakhir sekaligus
+  const startOf7Days = new Date(today);
+  startOf7Days.setDate(today.getDate() - 6);
+  const startStr = startOf7Days.toISOString().slice(0, 10);
+
+  try {
+    const { data: bookings } = await sb.from('bookings')
+      .select('id, booking_date, status, total_price, customer_name, barber_id, barbers(name, avatar_color)')
+      .eq('store_id', STATE.store.id)
+      .gte('booking_date', startStr)
+      .order('booking_date', { ascending: false });
+
+    const all = bookings || [];
+
+    // Grafik 7 hari
+    renderBarChart(all, today);
+
+    // Booking terbaru (5 terakhir)
+    renderRecentBookings(all.slice(0, 5));
+
+    // Performa barberman bulan ini
+    renderBarberPerf(all.filter(b => b.booking_date?.startsWith(thisMonth)));
+
+    // Ringkasan bulan ini — ambil semua bulan ini
+    const { data: monthData } = await sb.from('bookings')
+      .select('status, total_price')
+      .eq('store_id', STATE.store.id)
+      .like('booking_date', thisMonth + '%');
+
+    renderMonthStats(monthData || []);
+
+    document.getElementById('chartSubtitle').textContent =
+      `${startOf7Days.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })} – ${today.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+
+  } catch(e) {
+    console.error('loadRingkasan error:', e);
+    showToast('Gagal memuat ringkasan', 'err');
+  }
+}
+
+function renderBarChart(bookings, today) {
+  const todayStr = today.toISOString().slice(0, 10);
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const dateStr = d.toISOString().slice(0, 10);
+    const count = bookings.filter(b => b.booking_date === dateStr).length;
+    days.push({
+      dateStr,
+      label: d.toLocaleDateString('id-ID', { weekday: 'short' }),
+      count,
+      isToday: dateStr === todayStr,
+    });
+  }
+
+  const maxCount = Math.max(...days.map(d => d.count), 1);
+  const chart = document.getElementById('barChart');
+  chart.innerHTML = days.map(d => `
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
+      <div style="font-size:10px;color:${d.count > 0 ? 'var(--gold)' : 'var(--t4)'};">${d.count > 0 ? d.count : ''}</div>
+      <div style="
+        background:${d.isToday ? 'rgba(201,168,76,.28)' : 'var(--gold-d)'};
+        border:.5px solid ${d.isToday ? 'var(--gold)' : 'var(--gold-b)'};
+        border-radius:3px 3px 0 0;
+        width:100%;
+        height:${Math.max(d.count / maxCount * 100, d.count > 0 ? 8 : 4)}px;
+        transition:height .5s;
+        min-height:4px;
+      "></div>
+      <div style="font-size:10px;color:${d.isToday ? 'var(--gold)' : 'var(--t3)'};">${d.label}</div>
+    </div>
+  `).join('');
+}
+
+function renderRecentBookings(bookings) {
+  const el = document.getElementById('recentBookings');
+  if (!bookings.length) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--t4);padding:10px 0;">Belum ada booking</div>';
+    return;
+  }
+  el.innerHTML = bookings.map(b => {
+    const st = STATUS_LABEL[b.status] || STATUS_LABEL.pending;
+    const color = avatarColorFor(b.customer_name);
+    const d = b.booking_date ? new Date(b.booking_date + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) : '—';
+    return `
+      <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:.5px solid rgba(245,245,240,.04);">
+        <div class="av av-s" style="background:${color}22;color:${color};">${(b.customer_name||'?')[0].toUpperCase()}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:500;">${escapeHtml(b.customer_name||'—')}</div>
+          <div style="font-size:11px;color:var(--t3);">${d} · ${escapeHtml(b.barbers?.name||'—')}</div>
+        </div>
+        <span class="badge ${st.cls}">${st.label}</span>
+      </div>`;
+  }).join('');
+}
+
+function renderBarberPerf(bookings) {
+  const el = document.getElementById('barberPerf');
+  if (!bookings.length) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--t4);padding:10px 0;">Belum ada data bulan ini</div>';
+    return;
+  }
+
+  // Hitung per barberman
+  const perfMap = {};
+  bookings.forEach(b => {
+    if (!b.barbers) return;
+    const key = b.barber_id;
+    if (!perfMap[key]) perfMap[key] = { name: b.barbers.name, color: b.barbers.avatar_color || '#C9A84C', count: 0, done: 0, revenue: 0 };
+    perfMap[key].count++;
+    if (b.status === 'done') { perfMap[key].done++; perfMap[key].revenue += (b.total_price || 0); }
+  });
+
+  const sorted = Object.values(perfMap).sort((a, b) => b.done - a.done);
+  const max = Math.max(...sorted.map(p => p.count), 1);
+
+  el.innerHTML = sorted.map((p, i) => `
+    <div style="padding:8px 0;border-bottom:.5px solid rgba(245,245,240,.04);">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+        <div style="font-size:11px;color:var(--t3);min-width:14px;">${i+1}.</div>
+        <div class="av av-s" style="background:${p.color}22;color:${p.color};">${p.name[0]}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;">${escapeHtml(p.name)}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:12px;color:var(--gold);">${p.done} selesai</div>
+          <div style="font-size:11px;color:var(--t3);">${fmtRp(p.revenue)}</div>
+        </div>
+      </div>
+      <div style="background:var(--bg2);border-radius:3px;height:4px;overflow:hidden;">
+        <div style="background:var(--gold);height:100%;width:${p.count/max*100}%;border-radius:3px;transition:width .5s;"></div>
+      </div>
+    </div>`).join('');
+}
+
+function renderMonthStats(bookings) {
+  const total = bookings.length;
+  const done = bookings.filter(b => b.status === 'done').length;
+  const cancelled = bookings.filter(b => ['cancelled','noshow'].includes(b.status)).length;
+  const revenue = bookings.filter(b => b.status === 'done').reduce((s, b) => s + (b.total_price || 0), 0);
+
+  document.getElementById('monthStats').innerHTML = `
+    <div class="stat"><div class="stat-lbl">Total Booking</div><div class="stat-val">${total}</div></div>
+    <div class="stat"><div class="stat-lbl">Selesai</div><div class="stat-val" style="color:var(--gr);">${done}</div></div>
+    <div class="stat"><div class="stat-lbl">Dibatalkan</div><div class="stat-val" style="color:var(--rd);">${cancelled}</div></div>
+    <div class="stat"><div class="stat-lbl">Pendapatan</div><div class="stat-val" style="color:var(--gold);font-size:18px;">${fmtRp(revenue)}</div></div>
+  `;
 }
 
 function openPage(name) {
