@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BarberBook — Platform Booking Barber Shop Modern</title>
+    <meta name="description" content="Kelola booking, antrian, dan barberman toko kamu dalam satu platform. Gratis untuk mulai.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500;1,700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+    *, * ::before, * ::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background: #0A0A0A;
+        color: #F0EDE8;
+        overflow-x: hidden;
+    }
+
+    :root {
+        --gold: #C9A84C;
+        --gold-l: #DDB95E;
+        --gold-d: rgba(201, 168, 76, 0.1);
+        --gold-b: rgba(201, 168, 76, 0.25);
+        --bg: #0A0A0A;
+        --bg2: #111;
+        --bg3: #161616;
+        --bg4: #1C1C1C;
+        --t: #F0EDE8;
+        --t2: rgba(240, 237, 232, 0.6);
+        --t3: rgba(240, 237, 232, 0.35);
+        --t4: rgba(240, 237, 232, 0.12);
+        --b: rgba(240, 237, 232, 0.06);
+        --b2: rgba(240, 237, 232, 0.1);
+        --gr: #4ade80;
+        --rd: #f87171;
+        --r: 8px;
+        --rl: 14px;
+    }/* ===== TYPOGRAPHY ===== */
+    .serif {
+        font-family: 'Playfair Display', serif;
+    }
+
+    h1, h2, h3 {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+    }/* ===== NAV ===== */
+    nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 60px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background: rgba(10, 10, 10, 0.88);
+        backdrop-filter: blur(16px);
+        border-bottom: .5px solid transparent;
+        transition: border-color .3s;
+    }
+
+    nav.scrolled {
+        border-bottom-color: var(--b2);
+    }
+
+    .nav-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+    }
+
+    .nav-logo-ic {
+        width: 34px;
+        height: 34px;
+        background: var(--gold-d);
+        border: .5px solid var(--gold-b);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .nav-logo-ic svg {
+        width: 16px;
+        height: 16px;
+        fill: var(--gold);
+    }
+
+    .nav-logo-text {
+        font-family: 'Playfair Display', serif;
+        font-size: 19px;
+        color: var(--gold);
+    }
+
+    .nav-logo-text span {
+        color: var(--t);
+    }
+
+    .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 32px;
+    }
+
+    .nav-links a {
+        font-size: 13px;
+        color: var(--t3);
+        text-decoration: none;
+        transition: color .2s;
+    }
+
+    .nav-links a:hover {
+        color: var(--t);
+    }
+
+    .nav-cta {
+        background: var(--gold);
+        color: #111;
+        border: none;
+        padding: 9px 20px;
+        border-radius: var(--r);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background .2s;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .nav-cta:hover {
+        background: var(--gold-l);
+    }/* ===== HERO ===== */
+    .hero {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 120px 24px 80px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-bg {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse 70% 60% at 50% 40%, rgba(201, 168, 76, 0.07) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .hero-lines {
+        position: absolute;
+        inset: 0;
+        background-image: linear-gradient(rgba(201, 168, 76, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(201, 168, 76, 0.03) 1px, transparent 1px);
+        background-size: 60px 60px;
+        pointer-events: none;
+        mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 80%);
+    }
+
+    .hero-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--gold-d);
+        border: .5px solid var(--gold-b);
+        padding: 7px 16px;
+        border-radius: 40px;
+        font-size: 12px;
+        color: rgba(201, 168, 76, 0.8);
+        margin-bottom: 24px;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+    }
+
+    .hero-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--gold);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: .3;
+        }
+    }
+
+    .hero h1 {
+        font-size: clamp(40px, 6vw, 78px);
+        line-height: 1.05;
+        margin-bottom: 22px;
+        letter-spacing: -.02em;
+    }
+
+    .hero h1 em {
+        font-style: italic;
+        color: var(--gold);
+    }
+
+    .hero-sub {
+        font-size: clamp(15px, 1.8vw, 18px);
+        color: var(--t2);
+        max-width: 520px;
+        margin: 0 auto 40px;
+        line-height: 1.75;
+    }
+
+    .hero-actions {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn-hero {
+        background: var(--gold);
+        color: #111;
+        padding: 14px 32px;
+        border-radius: var(--r);
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        text-decoration: none;
+        border: none;
+        font-family: 'Inter', sans-serif;
+        transition: all .2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-hero:hover {
+        background: var(--gold-l);
+        transform: translateY(-1px);
+    }
+
+    .btn-ghost {
+        background: transparent;
+        color: var(--t2);
+        padding: 13px 28px;
+        border-radius: var(--r);
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: none;
+        border: .5px solid var(--b2);
+        font-family: 'Inter', sans-serif;
+        transition: all .2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-ghost:hover {
+        border-color: var(--gold-b);
+        color: var(--gold);
+    }
+
+    .hero-note {
+        margin-top: 16px;
+        font-size: 12px;
+        color: var(--t3);
+    }/* MOCKUP */
+    .hero-mockup {
+        margin-top: 72px;
+        max-width: 780px;
+        margin-left: auto;
+        margin-right: auto;
+        background: var(--bg2);
+        border: .5px solid var(--b2);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 40px 120px rgba(0, 0, 0, .6), 0 0 0 1px rgba(201, 168, 76, 0.08);
+        position: relative;
+    }
+
+    .mockup-bar {
+        background: var(--bg3);
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border-bottom: .5px solid var(--b);
+    }
+
+    .mock-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+    }
+
+    .mockup-url {
+        flex: 1;
+        background: var(--bg4);
+        border-radius: 4px;
+        padding: 5px 12px;
+        font-size: 11px;
+        color: var(--t3);
+        text-align: center;
+    }
+
+    .mockup-body {
+        padding: 20px;
+        display: grid;
+        grid-template-columns: 180px 1fr;
+        gap: 14px;
+        min-height: 300px;
+    }
+
+    .mock-side {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .mock-nav-item {
+        padding: 9px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .mock-nav-item.act {
+        background: rgba(201, 168, 76, .08);
+        color: var(--gold);
+        border-left: 2px solid var(--gold);
+    }
+
+    .mock-nav-item.off {
+        color: var(--t4);
+    }
+
+    .mock-main {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .mock-stat-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+    }
+
+    .mock-stat {
+        background: var(--bg3);
+        border: .5px solid var(--b);
+        border-radius: 8px;
+        padding: 11px 13px;
+    }
+
+    .mock-stat-lbl {
+        font-size: 9px;
+        color: var(--t3);
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        margin-bottom: 5px;
+    }
+
+    .mock-stat-val {
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .mock-table {
+        background: var(--bg3);
+        border: .5px solid var(--b);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .mock-th {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 8px;
+        padding: 8px 12px;
+        border-bottom: .5px solid var(--b);
+    }
+
+    .mock-th span {
+        font-size: 9px;
+        color: var(--t4);
+        text-transform: uppercase;
+        letter-spacing: .08em;
+    }
+
+    .mock-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 8px;
+        padding: 10px 12px;
+        border-bottom: .5px solid rgba(240, 237, 232, .03);
+        align-items: center;
+    }
+
+    .mock-row:last-child {
+        border-bottom: none;
+    }
+
+    .mock-row span {
+        font-size: 11px;
+        color: var(--t2);
+    }
+
+    .mock-badge {
+        font-size: 9px;
+        padding: 2px 7px;
+        border-radius: 10px;
+        font-weight: 500;
+        display: inline-block;
+    }
+
+    .mb-pend {
+        background: rgba(240, 237, 232, .05);
+        color: var(--t3);
+    }
+
+    .mb-conf {
+        background: rgba(96, 165, 250, .1);
+        color: #60a5fa;
+    }
+
+    .mb-done {
+        background: rgba(74, 222, 128, .1);
+        color: #4ade80;
+    }/* ===== SECTION ===== */
+    section {
+        padding: 100px 60px;
+    }
+
+    .section-eyebrow {
+        font-size: 11px;
+        letter-spacing: .18em;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin-bottom: 12px;
+    }
+
+    .section-h2 {
+        font-size: clamp(32px, 4vw, 48px);
+        line-height: 1.1;
+        margin-bottom: 16px;
+    }
+
+    .section-sub {
+        font-size: 15px;
+        color: var(--t2);
+        line-height: 1.75;
+        max-width: 520px;
+    }
+
+    .center {
+        text-align: center;
+    }
+
+    .center .section-sub {
+        margin: 0 auto;
+    }/* ===== PROBLEM ===== */
+    .problem {
+        background: var(--bg2);
+        border-top: .5px solid var(--b);
+        border-bottom: .5px solid var(--b);
+    }
+
+    .problem-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1px;
+        background: var(--b);
+        border: .5px solid var(--b);
+        border-radius: var(--rl);
+        overflow: hidden;
+        margin-top: 56px;
+    }
+
+    .prob-item {
+        background: var(--bg2);
+        padding: 32px 28px;
+    }
+
+    .prob-num {
+        font-family: 'Playfair Display', serif;
+        font-size: 48px;
+        color: rgba(201, 168, 76, .15);
+        line-height: 1;
+        margin-bottom: 12px;
+    }
+
+    .prob-title {
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .prob-desc {
+        font-size: 13px;
+        color: var(--t3);
+        line-height: 1.65;
+    }/* ===== FEATURES ===== */
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin-top: 56px;
+    }
+
+    .feat-card {
+        background: var(--bg2);
+        border: .5px solid var(--b);
+        border-radius: var(--rl);
+        padding: 28px 24px;
+        transition: border-color .2s;
+    }
+
+    .feat-card:hover {
+        border-color: var(--gold-b);
+    }
+
+    .feat-ic {
+        width: 44px;
+        height: 44px;
+        background: var(--gold-d);
+        border: .5px solid var(--gold-b);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 18px;
+    }
+
+    .feat-ic svg {
+        width: 20px;
+        height: 20px;
+        fill: var(--gold);
+    }
+
+    .feat-title {
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .feat-desc {
+        font-size: 13px;
+        color: var(--t3);
+        line-height: 1.65;
+    }/* ===== HOW IT WORKS ===== */
+    .how {
+        background: var(--bg2);
+        border-top: .5px solid var(--b);
+        border-bottom: .5px solid var(--b);
+    }
+
+    .how-steps {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0;
+        margin-top: 60px;
+        position: relative;
+    }
+
+    .how-steps::before {
+        content: '';
+        position: absolute;
+        top: 22px;
+        left: 10%;
+        right: 10%;
+        height: .5px;
+        background: linear-gradient(90deg, transparent, var(--gold-b), var(--gold-b), transparent);
+    }
+
+    .how-step {
+        text-align: center;
+        padding: 0 20px;
+    }
+
+    .how-num {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: var(--bg3);
+        border: .5px solid var(--gold-b);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-family: 'Playfair Display', serif;
+        font-size: 16px;
+        color: var(--gold);
+        position: relative;
+        z-index: 1;
+    }
+
+    .how-title {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .how-desc {
+        font-size: 12px;
+        color: var(--t3);
+        line-height: 1.65;
+    }/* ===== STATS ===== */
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1px;
+        background: var(--b);
+        border: .5px solid var(--b);
+        border-radius: var(--rl);
+        overflow: hidden;
+        margin-top: 56px;
+    }
+
+    .stat-item {
+        background: var(--bg);
+        padding: 48px 32px;
+        text-align: center;
+    }
+
+    .stat-num {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(40px, 5vw, 64px);
+        color: var(--gold);
+        line-height: 1;
+        margin-bottom: 8px;
+    }
+
+    .stat-lbl {
+        font-size: 13px;
+        color: var(--t3);
+    }/* ===== PRICING ===== */
+    .pricing-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+        max-width: 720px;
+        margin: 56px auto 0;
+    }
+
+    .price-card {
+        background: var(--bg2);
+        border: .5px solid var(--b);
+        border-radius: var(--rl);
+        padding: 32px 28px;
+    }
+
+    .price-card.featured {
+        border-color: var(--gold-b);
+        background: linear-gradient(135deg, rgba(201, 168, 76, 0.06) 0%, var(--bg2) 60%);
+    }
+
+    .price-badge {
+        font-size: 10px;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: var(--gold);
+        background: var(--gold-d);
+        border: .5px solid var(--gold-b);
+        padding: 4px 10px;
+        border-radius: 20px;
+        display: inline-block;
+        margin-bottom: 14px;
+    }
+
+    .price-name {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+
+    .price-amount {
+        font-family: 'Playfair Display', serif;
+        font-size: 42px;
+        line-height: 1;
+        margin-bottom: 4px;
+    }
+
+    .price-amount span {
+        font-size: 16px;
+        font-family: 'Inter', sans-serif;
+        font-weight: 400;
+        color: var(--t3);
+    }
+
+    .price-period {
+        font-size: 12px;
+        color: var(--t3);
+        margin-bottom: 24px;
+    }
+
+    .price-features {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 28px;
+    }
+
+    .price-features li {
+        font-size: 13px;
+        color: var(--t2);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .price-features li::before {
+        content: '✓';
+        color: var(--gold);
+        font-size: 12px;
+        flex-shrink: 0;
+    }
+
+    .price-features li.off {
+        color: var(--t4);
+    }
+
+    .price-features li.off::before {
+        content: '–';
+        color: var(--t4);
+    }
+
+    .price-btn {
+        width: 100%;
+        padding: 12px;
+        border-radius: var(--r);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        font-family: 'Inter', sans-serif;
+        transition: all .2s;
+        text-decoration: none;
+        display: block;
+        text-align: center;
+    }
+
+    .price-btn-gold {
+        background: var(--gold);
+        color: #111;
+    }
+
+    .price-btn-gold:hover {
+        background: var(--gold-l);
+    }
+
+    .price-btn-outline {
+        background: transparent;
+        color: var(--t2);
+        border: .5px solid var(--b2);
+    }
+
+    .price-btn-outline:hover {
+        border-color: var(--gold-b);
+        color: var(--gold);
+    }/* ===== TESTIMONIAL ===== */
+    .testi-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin-top: 56px;
+    }
+
+    .testi-card {
+        background: var(--bg2);
+        border: .5px solid var(--b);
+        border-radius: var(--rl);
+        padding: 28px 24px;
+    }
+
+    .testi-stars {
+        color: var(--gold);
+        font-size: 13px;
+        margin-bottom: 14px;
+        letter-spacing: 2px;
+    }
+
+    .testi-text {
+        font-size: 14px;
+        color: var(--t2);
+        line-height: 1.7;
+        margin-bottom: 20px;
+        font-style: italic;
+    }
+
+    .testi-author {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .testi-av {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+
+    .testi-name {
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .testi-role {
+        font-size: 11px;
+        color: var(--t3);
+        margin-top: 2px;
+    }/* ===== CTA ===== */
+    .cta-section {
+        text-align: center;
+        padding: 120px 60px;
+        background: radial-gradient(ellipse 60% 70% at 50% 50%, rgba(201, 168, 76, 0.08) 0%, transparent 70%);
+        border-top: .5px solid var(--b);
+    }
+
+    .cta-section h2 {
+        font-size: clamp(36px, 5vw, 60px);
+        margin-bottom: 18px;
+        line-height: 1.1;
+    }
+
+    .cta-section p {
+        font-size: 16px;
+        color: var(--t2);
+        margin-bottom: 40px;
+        max-width: 480px;
+        margin-left: auto;
+        margin-right: auto;
+        line-height: 1.7;
+    }/* ===== FOOTER ===== */
+    footer {
+        border-top: .5px solid var(--b);
+        padding: 40px 60px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .footer-logo {
+        font-family: 'Playfair Display', serif;
+        font-size: 16px;
+        color: var(--gold);
+    }
+
+    .footer-logo span {
+        color: var(--t3);
+    }
+
+    .footer-links {
+        display: flex;
+        gap: 24px;
+    }
+
+    .footer-links a {
+        font-size: 12px;
+        color: var(--t3);
+        text-decoration: none;
+        transition: color .2s;
+    }
+
+    .footer-links a:hover {
+        color: var(--t);
+    }
+
+    .footer-copy {
+        font-size: 12px;
+        color: var(--t4);
+    }/* ===== DIVIDER ===== */
+    .div {
+        height: .5px;
+        background: var(--b);
+        margin: 0 60px;
+    }
+
+    @media (max-width: 900px) {
+        nav {
+            padding: 14px 20px;
+        }
+
+        .nav-links {
+            display: none;
+        }
+
+        section {
+            padding: 70px 20px;
+        }
+
+        .div {
+            margin: 0 20px;
+        }
+
+        .problem-grid, .features-grid, .how-steps, .stats-row, .testi-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .how-steps::before {
+            display: none;
+        }
+
+        .pricing-grid {
+            grid-template-columns: 1fr;
+            max-width: 400px;
+        }
+
+        .mockup-body {
+            grid-template-columns: 1fr;
+        }
+
+        .mock-side {
+            display: none;
+        }
+
+        .mock-stat-row {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        footer {
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 28px 20px;
+        }
+
+        .cta-section {
+            padding: 80px 20px;
+        }
+    }
+    </style>
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav id="mainNav">
+        <a href="#" class="nav-logo">
+            <div class="nav-logo-ic">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0"/>
+                </svg>
+            </div>
+            <span class="nav-logo-text">
+                BARBER
+                <span>BOOK</span>
+            </span>
+        </a>
+        <div class="nav-links">
+            <a href="#fitur">Fitur</a>
+            <a href="#cara-kerja">Cara Kerja</a>
+            <a href="#harga">Harga</a>
+        </div>
+        <a href="auth.html" class="nav-cta">Daftar Gratis →</a>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-lines"></div>
+        <div style="position:relative;z-index:1;width:100%;">
+            <div class="hero-eyebrow">
+                <span class="hero-dot"></span>
+                Platform Booking Barber Shop
+            </div>
+            <h1>
+                Booking Mudah,
+                <br>
+                Toko 
+                <em>Lebih Rapi</em>
+            </h1>
+            <p class="hero-sub">BarberBook membantu barber shop kelola booking online, antrian walk-in, dan barberman — semua dari satu dashboard sederhana.</p>
+            <div class="hero-actions">
+                <a href="auth.html" class="btn-hero">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M12 5v14M5 12h14"/>
+                    </svg>
+
+                            Daftar Gratis Sekarang
+                          
+                </a>
+                <a href="booking.html?store=vinbarber-sigli" class="btn-ghost" target="_blank">
+                        Lihat Contoh Booking →
+                      </a>
+            </div>
+            <p class="hero-note">Gratis selamanya · Tidak perlu kartu kredit · Setup 5 menit</p>
+
+            <!-- MOCKUP -->
+            <div class="hero-mockup">
+                <div class="mockup-bar">
+                    <div class="mock-dot" style="background:#ff5f57;"></div>
+                    <div class="mock-dot" style="background:#febc2e;"></div>
+                    <div class="mock-dot" style="background:#28c840;"></div>
+                    <div class="mockup-url">barberbook-4yz.pages.dev/dashboard.html</div>
+                </div>
+                <div class="mockup-body">
+                    <div class="mock-side">
+                        <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;margin-bottom:6px;">
+                            <div style="width:28px;height:28px;background:rgba(201,168,76,.1);border-radius:6px;display:flex;align-items:center;justify-content:center;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--gold)">
+                                    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+                                </svg>
+                            </div>
+                            <span style="font-family:'Playfair Display',serif;font-size:14px;color:var(--gold);">
+                                BARBER
+                                <span style="color:var(--t);">BOOK</span>
+                            </span>
+                        </div>
+                        <div class="mock-nav-item act">📅 Kelola Booking</div>
+                        <div class="mock-nav-item off">👥 Barberman</div>
+                        <div class="mock-nav-item off">📦 Paket & Harga</div>
+                        <div class="mock-nav-item off">🏪 Profil Toko</div>
+                    </div>
+                    <div class="mock-main">
+                        <div class="mock-stat-row">
+                            <div class="mock-stat">
+                                <div class="mock-stat-lbl">Hari Ini</div>
+                                <div class="mock-stat-val">8</div>
+                            </div>
+                            <div class="mock-stat">
+                                <div class="mock-stat-lbl">Menunggu</div>
+                                <div class="mock-stat-val" style="color:#fb923c;">3</div>
+                            </div>
+                            <div class="mock-stat">
+                                <div class="mock-stat-lbl">Selesai</div>
+                                <div class="mock-stat-val" style="color:#4ade80;">24</div>
+                            </div>
+                            <div class="mock-stat">
+                                <div class="mock-stat-lbl">Pendapatan</div>
+                                <div class="mock-stat-val" style="color:var(--gold);font-size:14px;">2,4jt</div>
+                            </div>
+                        </div>
+                        <div class="mock-table">
+                            <div class="mock-th">
+                                <span>Customer</span>
+                                <span>Paket</span>
+                                <span>Waktu</span>
+                                <span>Status</span>
+                            </div>
+                            <div class="mock-row">
+                                <span>Rizal M.</span>
+                                <span>Basic</span>
+                                <span>09:00</span>
+                                <span>
+                                    <span class="mock-badge mb-done">Selesai</span>
+                                </span>
+                            </div>
+                            <div class="mock-row">
+                                <span>Dimas A.</span>
+                                <span>Premium</span>
+                                <span>10:30</span>
+                                <span>
+                                    <span class="mock-badge mb-conf">Terkonfirmasi</span>
+                                </span>
+                            </div>
+                            <div class="mock-row">
+                                <span>Fajar S.</span>
+                                <span>Exclusive</span>
+                                <span>11:00</span>
+                                <span>
+                                    <span class="mock-badge mb-pend">Menunggu</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MASALAH YANG DISELESAIKAN -->
+    <section class="problem" id="masalah">
+        <div class="center">
+            <div class="section-eyebrow">Masalah yang Kami Selesaikan</div>
+            <h2 class="section-h2">Kenapa barber shop butuh BarberBook?</h2>
+            <p class="section-sub">Tanpa sistem yang baik, owner barber shop kehilangan banyak waktu dan pendapatan setiap hari.</p>
+        </div>
+        <div class="problem-grid">
+            <div class="prob-item">
+                <div class="prob-num">01</div>
+                <div class="prob-title">Booking lewat WhatsApp berantakan</div>
+                <div class="prob-desc">Pesan terlewat, jadwal tabrakan, customer komplain. Butuh sistem yang otomatis dan rapi.</div>
+            </div>
+            <div class="prob-item">
+                <div class="prob-num">02</div>
+                <div class="prob-title">Antrian walk-in tidak teratur</div>
+                <div class="prob-desc">Customer nunggu lama tanpa kepastian, kasir kewalahan, barberman tidak tahu siapa giliran berikutnya.</div>
+            </div>
+            <div class="prob-item">
+                <div class="prob-num">03</div>
+                <div class="prob-title">Tidak ada data pendapatan yang jelas</div>
+                <div class="prob-desc">Susah tahu berapa omzet hari ini, barberman mana yang paling produktif, dan paket apa yang paling laku.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FITUR -->
+    <section id="fitur">
+        <div class="center">
+            <div class="section-eyebrow">Fitur Lengkap</div>
+            <h2 class="section-h2">Semua yang kamu butuhkan</h2>
+            <p class="section-sub">Dari booking online sampai kasir walk-in — satu platform untuk kelola semua.</p>
+        </div>
+        <div class="features-grid">
+            <div class="feat-card">
+                <div class="feat-ic">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M8 2v3M16 2v3M3 8h18M5 4h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z"/>
+                    </svg>
+                </div>
+                <div class="feat-title">Booking Online 24 Jam</div>
+                <div class="feat-desc">Customer booking kapan saja lewat link toko kamu. Pilih barberman, paket, dan slot waktu yang tersedia secara real-time.</div>
+            </div>
+            <div class="feat-card">
+                <div class="feat-ic">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+                    </svg>
+                </div>
+                <div class="feat-title">Kelola Barberman</div>
+                <div class="feat-desc">Tambah barberman, atur hari libur, dan pantau performa masing-masing — semuanya dari dashboard owner.</div>
+            </div>
+            <div class="feat-card">
+                <div class="feat-ic">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M9 7H6a2 2 0 00-2 2v9a2 2 0 002 2h9a2 2 0 002-2v-3M18 2l4 4-10 10H8v-4L18 2z"/>
+                    </svg>
+                </div>
+                <div class="feat-title">Panel Kasir Walk-in</div>
+                <div class="feat-desc">Kelola antrian customer yang datang langsung. Lihat estimasi waktu tunggu dan tandai selesai dengan satu klik.</div>
+            </div>
+            <div class="feat-card">
+                <div class="feat-ic">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                </div>
+                <div class="feat-title">Smart Scheduling</div>
+                <div class="feat-desc">Slot otomatis diblokir berdasarkan durasi + buffer waktu setiap paket. Tidak ada lagi jadwal yang tabrakan.</div>
+            </div>
+            <div class="feat-card">
+                <div class="feat-ic">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M18 20V10M12 20V4M6 20v-6"/>
+                    </svg>
+                </div>
+                <div class="feat-title">Dashboard & Ringkasan</div>
+                <div class="feat-desc">Lihat booking hari ini, pendapatan bulan ini, dan performa barberman dalam satu halaman yang bersih.</div>
+            </div>
+            <div class="feat-card">
+                <div class="feat-ic">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+                    </svg>
+                </div>
+                <div class="feat-title">Multi-Tenant</div>
+                <div class="feat-desc">Satu platform untuk banyak toko. Setiap toko punya data dan link booking sendiri yang terpisah sepenuhnya.</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="div"></div>
+
+    <!-- CARA KERJA -->
+    <section class="how" id="cara-kerja">
+        <div class="center">
+            <div class="section-eyebrow">Cara Kerja</div>
+            <h2 class="section-h2">Setup dalam 5 menit</h2>
+            <p class="section-sub">Tidak perlu keahlian teknis. Daftar, isi data toko, dan langsung siap terima booking.</p>
+        </div>
+        <div class="how-steps">
+            <div class="how-step">
+                <div class="how-num">1</div>
+                <div class="how-title">Daftar & Isi Data Toko</div>
+                <div class="how-desc">Buat akun owner, isi nama toko, jam buka, dan tambahkan barberman.</div>
+            </div>
+            <div class="how-step">
+                <div class="how-num">2</div>
+                <div class="how-title">Tambah Paket Layanan</div>
+                <div class="how-desc">Buat paket (Basic, Premium, dll) lengkap dengan harga dan durasi pengerjaan.</div>
+            </div>
+            <div class="how-step">
+                <div class="how-num">3</div>
+                <div class="how-title">Bagikan Link Booking</div>
+                <div class="how-desc">Copy link toko kamu dan bagikan ke customer lewat WhatsApp atau Instagram.</div>
+            </div>
+            <div class="how-step">
+                <div class="how-num">4</div>
+                <div class="how-title">Kelola dari Dashboard</div>
+                <div class="how-desc">Terima notifikasi booking baru dan kelola antrian dari dashboard owner.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS -->
+    <section>
+        <div class="center">
+            <div class="section-eyebrow">Kenapa BarberBook</div>
+            <h2 class="section-h2">Dibangun untuk barber shop Indonesia</h2>
+        </div>
+        <div class="stats-row">
+            <div class="stat-item">
+                <div class="stat-num">5 mnt</div>
+                <div class="stat-lbl">Waktu setup dari daftar sampai siap terima booking</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num">0 Rp</div>
+                <div class="stat-lbl">Biaya untuk memulai — gratis selamanya untuk fitur dasar</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num">24/7</div>
+                <div class="stat-lbl">Customer bisa booking kapan saja tanpa harus hubungi toko</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="div"></div>
+
+    <!-- HARGA -->
+    <section id="harga">
+        <div class="center">
+            <div class="section-eyebrow">Harga</div>
+            <h2 class="section-h2">Mulai gratis, upgrade kapan saja</h2>
+            <p class="section-sub">Tidak ada biaya tersembunyi. Semua fitur inti tersedia di paket gratis.</p>
+        </div>
+        <div class="pricing-grid">
+            <div class="price-card">
+                <div class="price-badge">Gratis</div>
+                <div class="price-name">Starter</div>
+                <div class="price-amount">
+                    Rp 0
+                    <span></span>
+                </div>
+                <div class="price-period">Selamanya gratis</div>
+                <ul class="price-features">
+                    <li>1 toko, barberman unlimited</li>
+                    <li>Booking online 24 jam</li>
+                    <li>Panel kasir walk-in</li>
+                    <li>Dashboard & ringkasan</li>
+                    <li>Kelola paket & harga</li>
+                    <li class="off">Notifikasi WhatsApp otomatis</li>
+                    <li class="off">Laporan & export Excel</li>
+                </ul>
+                <a href="auth.html" class="price-btn price-btn-outline">Mulai Gratis</a>
+            </div>
+            <div class="price-card featured">
+                <div class="price-badge">Segera Hadir</div>
+                <div class="price-name">Pro</div>
+                <div class="price-amount">
+                    Rp 99k
+                    <span>/bulan</span>
+                </div>
+                <div class="price-period">Per toko</div>
+                <ul class="price-features">
+                    <li>Semua fitur Starter</li>
+                    <li>Notifikasi WhatsApp otomatis</li>
+                    <li>Laporan & export Excel</li>
+                    <li>TV antrian untuk layar toko</li>
+                    <li>Review & rating customer</li>
+                    <li>Prioritas support</li>
+                </ul>
+                <a href="#" class="price-btn price-btn-gold" style="opacity:.6;cursor:default;">Segera Tersedia</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- TESTIMONIAL -->
+    <section style="background:var(--bg2);border-top:.5px solid var(--b);border-bottom:.5px solid var(--b);">
+        <div class="center">
+            <div class="section-eyebrow">Testimoni</div>
+            <h2 class="section-h2">Yang owner katakan</h2>
+        </div>
+        <div class="testi-grid">
+            <div class="testi-card">
+                <div class="testi-stars">★★★★★</div>
+                <p class="testi-text">"Dulu booking via WA sering tabrakan jadwal. Sekarang customer langsung pilih slot sendiri, saya tinggal lihat dashboard."</p>
+                <div class="testi-author">
+                    <div class="testi-av" style="background:rgba(201,168,76,.15);color:var(--gold);">V</div>
+                    <div>
+                        <div class="testi-name">Vin</div>
+                        <div class="testi-role">Owner · Vin Barber Sigli</div>
+                    </div>
+                </div>
+            </div>
+            <div class="testi-card">
+                <div class="testi-stars">★★★★★</div>
+                <p class="testi-text">"Panel kasir walk-in sangat membantu. Barberman jadi tahu urutan antrian tanpa perlu tanya-tanya ke kasir terus."</p>
+                <div class="testi-author">
+                    <div class="testi-av" style="background:rgba(96,165,250,.15);color:#60a5fa;">R</div>
+                    <div>
+                        <div class="testi-name">Rizal</div>
+                        <div class="testi-role">Owner · Prime Cut Banda Aceh</div>
+                    </div>
+                </div>
+            </div>
+            <div class="testi-card">
+                <div class="testi-stars">★★★★★</div>
+                <p class="testi-text">"Setup cuma 10 menit, langsung bisa kirim link booking ke Instagram. Customer senang karena bisa booking malam hari."</p>
+                <div class="testi-author">
+                    <div class="testi-av" style="background:rgba(74,222,128,.15);color:#4ade80;">A</div>
+                    <div>
+                        <div class="testi-name">Arif</div>
+                        <div class="testi-role">Owner · Kings Barbershop</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA AKHIR -->
+    <section class="cta-section">
+        <div class="section-eyebrow center">Mulai Sekarang</div>
+        <h2 class="serif">
+            Siap terima booking
+            <br>
+            <em style="color:var(--gold);">lebih rapi?</em>
+        </h2>
+        <p>Daftar gratis dalam 5 menit. Tidak perlu kartu kredit, tidak perlu keahlian teknis.</p>
+        <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+            <a href="auth.html" class="btn-hero">
+                  Daftar Gratis Sekarang →
+                </a>
+            <a href="booking.html?store=vinbarber-sigli" class="btn-ghost" target="_blank">
+                  Lihat Demo Booking
+                </a>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-logo">
+            BARBER
+            <span>BOOK</span>
+        </div>
+        <div class="footer-links">
+            <a href="#fitur">Fitur</a>
+            <a href="#cara-kerja">Cara Kerja</a>
+            <a href="#harga">Harga</a>
+            <a href="auth.html">Login Owner</a>
+        </div>
+        <div class="footer-copy">© 2026 BarberBook. Platform booking barber shop Indonesia.</div>
+    </footer>
+
+    <script>
+    // Navbar shadow saat scroll
+    window.addEventListener('scroll', () => {
+        document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 20);
+    });
+
+    // Smooth scroll untuk anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+        a.addEventListener('click', e => {
+            const target = document.querySelector(a.getAttribute('href'));
+            if (target) {
+                e.preventDefault();
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+    </script>
+</body>
+</html>
