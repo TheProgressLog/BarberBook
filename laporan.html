@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan — BarberBook</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+    *, * ::before, * ::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background: #0E0E0E;
+        color: #F5F5F0;
+        min-height: 100vh;
+    }
+
+    button, input, select {
+        font-family: 'Inter', sans-serif;
+    }
+
+    :root {
+        --gold: #C9A84C;
+        --gold-l: #e0bc5a;
+        --gold-d: rgba(201, 168, 76, 0.12);
+        --gold-b: rgba(201, 168, 76, 0.28);
+        --bg: #0E0E0E;
+        --bg2: #141414;
+        --bg3: #1A1A1A;
+        --bg4: #222;
+        --t: #F5F5F0;
+        --t2: rgba(245, 245, 240, 0.6);
+        --t3: rgba(245, 245, 240, 0.35);
+        --t4: rgba(245, 245, 240, 0.14);
+        --b: rgba(245, 245, 240, 0.07);
+        --b2: rgba(245, 245, 240, 0.12);
+        --gr: #4ade80;
+        --grd: rgba(74, 222, 128, 0.1);
+        --rd: #f87171;
+        --rdd: rgba(248, 113, 113, 0.1);
+        --r: 8px;
+        --rl: 12px;
+    }
+
+    .hidden {
+        display: none !important;
+    }
+
+    ::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--b2);
+        border-radius: 3px;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    @keyframes tIn {
+        from {
+            opacity: 0;
+            transform: translateX(14px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes skel {
+        0% {
+            background-position: 100% 50%;
+        }
+
+        100% {
+            background-position: 0 50%;
+        }
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        border: none;
+        border-radius: var(--r);
+        cursor: pointer;
+        font-weight: 500;
+        transition: all .18s;
+        font-size: 13px;
+    }
+
+    .btn:disabled {
+        opacity: .4;
+        cursor: not-allowed;
+    }
+
+    .btn-g {
+        background: var(--gold);
+        color: #111;
+        padding: 10px 18px;
+        font-weight: 600;
+    }
+
+    .btn-g:hover:not(:disabled) {
+        background: var(--gold-l);
+    }
+
+    .btn-o {
+        background: transparent;
+        color: var(--t2);
+        border: .5px solid var(--b2);
+        padding: 9px 16px;
+    }
+
+    .btn-o:hover:not(:disabled) {
+        border-color: var(--gold-b);
+        color: var(--gold);
+    }
+
+    .btn-gh {
+        background: transparent;
+        color: var(--t3);
+        border: none;
+        padding: 8px 12px;
+    }
+
+    .btn-gh:hover:not(:disabled) {
+        background: var(--bg3);
+        color: var(--t);
+    }/* NAV */
+    .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 24px;
+        border-bottom: .5px solid var(--b);
+        background: var(--bg);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    .nav-logo {
+        font-family: 'Playfair Display', serif;
+        font-size: 18px;
+        color: var(--gold);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .nav-logo span {
+        color: var(--t);
+    }
+
+    .nav-logo-ic {
+        width: 30px;
+        height: 30px;
+        background: var(--gold-d);
+        border: .5px solid var(--gold-b);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        color: var(--gold);
+    }/* CONTENT */
+    .content {
+        padding: 24px 28px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }/* FILTER BAR */
+    .filter-bar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        background: var(--bg3);
+        border: .5px solid var(--b);
+        border-radius: var(--rl);
+        padding: 14px 16px;
+        margin-bottom: 18px;
+    }
+
+    .filter-bar label {
+        font-size: 10px;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        color: var(--t3);
+    }
+
+    .filter-bar input, .filter-bar select {
+        background: var(--bg2);
+        border: .5px solid var(--b2);
+        color: var(--t);
+        padding: 8px 11px;
+        border-radius: var(--r);
+        font-size: 13px;
+        outline: none;
+    }
+
+    .filter-bar input:focus, .filter-bar select:focus {
+        border-color: var(--gold-b);
+    }
+
+    .fgroup {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .filter-sep {
+        flex: 1;
+    }
+
+    .period-chips {
+        display: flex;
+        gap: 6px;
+    }
+
+    .pchip {
+        padding: 6px 12px;
+        border: .5px solid var(--b2);
+        border-radius: 20px;
+        font-size: 11px;
+        color: var(--t3);
+        cursor: pointer;
+        transition: all .15s;
+        background: var(--bg2);
+    }
+
+    .pchip:hover {
+        border-color: var(--gold-b);
+        color: var(--gold);
+    }
+
+    .pchip.active {
+        background: var(--gold-d);
+        border-color: var(--gold-b);
+        color: var(--gold);
+    }/* STATS */
+    .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+        margin-bottom: 18px;
+    }
+
+    .stat {
+        background: var(--bg3);
+        border: .5px solid var(--b);
+        border-radius: var(--rl);
+        padding: 14px 16px;
+    }
+
+    .stat-lbl {
+        font-size: 10px;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: var(--t3);
+        margin-bottom: 6px;
+    }
+
+    .stat-val {
+        font-size: 22px;
+        font-weight: 500;
+        line-height: 1;
+    }
+
+    .stat-sub {
+        font-size: 11px;
+        color: var(--t3);
+        margin-top: 4px;
+    }
+
+    .skel {
+        background: linear-gradient(90deg, var(--bg3) 25%, var(--bg4) 37%, var(--bg3) 63%);
+        background-size: 400% 100%;
+        animation: skel 1.4s ease infinite;
+        border-radius: 6px;
+    }/* CARDS */
+    .card {
+        background: var(--bg3);
+        border: .5px solid var(--b);
+        border-radius: var(--rl);
+        padding: 18px 20px;
+        margin-bottom: 14px;
+    }
+
+    .card-title {
+        font-size: 14px;
+        font-weight: 500;
+        font-family: 'Playfair Display', serif;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }/* TABLE */
+    .rpt-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .rpt-table th {
+        text-align: left;
+        font-size: 10px;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        color: var(--t3);
+        padding: 10px 12px;
+        border-bottom: .5px solid var(--b);
+        font-weight: 500;
+    }
+
+    .rpt-table td {
+        padding: 11px 12px;
+        border-bottom: .5px solid rgba(245, 245, 240, .04);
+        font-size: 13px;
+        vertical-align: middle;
+    }
+
+    .rpt-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .rpt-table tr:hover td {
+        background: rgba(245, 245, 240, .015);
+    }/* BADGE */
+    .badge {
+        font-size: 10px;
+        padding: 3px 9px;
+        border-radius: 20px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .bgr {
+        background: var(--grd);
+        color: var(--gr);
+    }
+
+    .brd {
+        background: var(--rdd);
+        color: var(--rd);
+    }
+
+    .bbl {
+        background: rgba(96, 165, 250, .1);
+        color: #60a5fa;
+    }
+
+    .bgy {
+        background: rgba(245, 245, 240, .05);
+        color: var(--t3);
+    }
+
+    .bg {
+        background: var(--gold-d);
+        color: var(--gold);
+        border: .5px solid var(--gold-b);
+    }
+
+    .bpr {
+        background: rgba(192, 132, 252, .1);
+        color: #c084fc;
+    }/* CHART BAR */
+    .chart-wrap {
+        display: flex;
+        align-items: flex-end;
+        gap: 8px;
+        height: 160px;
+        padding: 10px 0 0;
+    }
+
+    .chart-col {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        flex: 1;
+    }
+
+    .chart-bar {
+        width: 100%;
+        border-radius: 3px 3px 0 0;
+        background: var(--gold-d);
+        border: .5px solid var(--gold-b);
+        min-height: 4px;
+        transition: height .4s;
+    }
+
+    .chart-bar.today {
+        background: rgba(201, 168, 76, .28);
+        border-color: var(--gold);
+    }
+
+    .chart-lbl {
+        font-size: 10px;
+        color: var(--t3);
+    }
+
+    .chart-val {
+        font-size: 10px;
+        color: var(--gold);
+    }/* BARBERMAN TABLE */
+    .barber-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: .5px solid rgba(245, 245, 240, .04);
+    }
+
+    .barber-row:last-child {
+        border-bottom: none;
+    }
+
+    .av {
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        flex-shrink: 0;
+    }
+
+    .av-s {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+
+    .bar-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .bar-name {
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .bar-meta {
+        font-size: 11px;
+        color: var(--t3);
+        margin-top: 2px;
+    }
+
+    .bar-prog {
+        background: var(--bg2);
+        border-radius: 3px;
+        height: 4px;
+        margin-top: 6px;
+        overflow: hidden;
+    }
+
+    .bar-prog-fill {
+        height: 100%;
+        background: var(--gold);
+        border-radius: 3px;
+        transition: width .4s;
+    }
+
+    .bar-rev {
+        font-size: 13px;
+        color: var(--gold);
+        font-weight: 500;
+        text-align: right;
+        flex-shrink: 0;
+    }/* EMPTY */
+    .empty-state {
+        text-align: center;
+        padding: 48px 20px;
+    }
+
+    .empty-icon {
+        font-size: 36px;
+        color: var(--t4);
+        margin-bottom: 12px;
+    }
+
+    .empty-title {
+        font-size: 14px;
+        color: var(--t2);
+        margin-bottom: 5px;
+    }
+
+    .empty-sub {
+        font-size: 12px;
+        color: var(--t3);
+    }/* TOAST */
+    #TB {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .toast {
+        background: var(--bg3);
+        border: .5px solid var(--b2);
+        border-radius: var(--r);
+        padding: 12px 16px;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        min-width: 230px;
+        max-width: 320px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, .4);
+        animation: tIn .25s ease;
+    }
+
+    .tok {
+        border-color: rgba(74, 222, 128, .3);
+    }
+
+    .tok i {
+        color: var(--gr);
+    }
+
+    .twarn {
+        border-color: rgba(251, 191, 36, .3);
+    }
+
+    .twarn i {
+        color: #fbbf24;
+    }
+
+    .terr {
+        border-color: rgba(248, 113, 113, .3);
+    }
+
+    .terr i {
+        color: var(--rd);
+    }
+
+    @media (max-width: 900px) {
+        .stat-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .filter-bar {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .rpt-table {
+            display: block;
+            overflow-x: auto;
+        }
+    }
+    </style>
+</head>
+<body>
+    <div id="TB"></div>
+
+    <!-- LOADING GUARD -->
+    <div id="guard" style="display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:14px;">
+        <div style="font-family:'Playfair Display',serif;font-size:24px;color:var(--gold);">
+            BARBER
+            <span style="color:var(--t);">BOOK</span>
+        </div>
+        <div style="width:22px;height:22px;border:2px solid rgba(201,168,76,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .6s linear infinite;"></div>
+    </div>
+
+    <!-- APP -->
+    <div id="app" class="hidden">
+
+        <nav class="nav">
+            <div class="nav-logo">
+                <div class="nav-logo-ic">
+                    <i class="ti ti-scissors"></i>
+                </div>
+
+                    BARBER
+                <span>BOOK</span>
+            </div>
+            <div style="display:flex;gap:8px;">
+                <a href="dashboard.html" class="btn btn-gh" style="text-decoration:none;">
+                    <i class="ti ti-arrow-left"></i>
+                    Dashboard
+                </a>
+                <button class="btn btn-g" onclick="exportExcel()" id="btnExport">
+                    <i class="ti ti-file-spreadsheet"></i>
+                    Export Excel
+                        
+                </button>
+            </div>
+        </nav>
+
+        <div class="content">
+
+            <div style="margin-bottom:20px;">
+                <h2 style="font-family:'Playfair Display',serif;font-size:22px;margin-bottom:4px;">Laporan & Analitik</h2>
+                <p style="font-size:13px;color:var(--t3);">Ringkasan performa toko dan data booking yang bisa di-export ke Excel</p>
+            </div>
+
+            <!-- FILTER -->
+            <div class="filter-bar">
+                <div class="fgroup">
+                    <label>Periode Cepat</label>
+                    <div class="period-chips">
+                        <div class="pchip" onclick="setPeriod('today',this)">Hari Ini</div>
+                        <div class="pchip active" onclick="setPeriod('month',this)">Bulan Ini</div>
+                        <div class="pchip" onclick="setPeriod('lastmonth',this)">Bulan Lalu</div>
+                        <div class="pchip" onclick="setPeriod('year',this)">Tahun Ini</div>
+                        <div class="pchip" onclick="setPeriod('all',this)">Semua</div>
+                    </div>
+                </div>
+                <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
+                    <div class="fgroup">
+                        <label>Dari Tanggal</label>
+                        <input type="date" id="dateFrom">
+                    </div>
+                    <div class="fgroup">
+                        <label>Sampai Tanggal</label>
+                        <input type="date" id="dateTo">
+                    </div>
+                    <button class="btn btn-o" onclick="loadData()">
+                        <i class="ti ti-search"></i>
+                        Tampilkan
+                    </button>
+                </div>
+                <div class="filter-sep"></div>
+                <div class="fgroup">
+                    <label>Filter Status</label>
+                    <select id="statusFilter">
+                        <option value="all">Semua Status</option>
+                        <option value="done">Selesai</option>
+                        <option value="confirmed">Terkonfirmasi</option>
+                        <option value="pending">Menunggu</option>
+                        <option value="cancelled">Dibatalkan</option>
+                        <option value="noshow">No-Show</option>
+                    </select>
+                </div>
+                <div class="fgroup">
+                    <label>Filter Barberman</label>
+                    <select id="barberFilter">
+                        <option value="all">Semua Barberman</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- STATS -->
+            <div class="stat-grid" id="statGrid">
+                <div class="stat">
+                    <div class="stat-lbl">Total Booking</div>
+                    <div class="stat-val skel" style="width:40px;height:22px;">&nbsp;</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-lbl">Selesai</div>
+                    <div class="stat-val skel" style="width:40px;height:22px;">&nbsp;</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-lbl">Dibatalkan</div>
+                    <div class="stat-val skel" style="width:40px;height:22px;">&nbsp;</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-lbl">Total Pendapatan</div>
+                    <div class="stat-val skel" style="width:80px;height:22px;">&nbsp;</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-lbl">Rata-rata/Booking</div>
+                    <div class="stat-val skel" style="width:60px;height:22px;">&nbsp;</div>
+                </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+
+                <!-- GRAFIK HARIAN -->
+                <div class="card">
+                    <div class="card-title">
+
+                                Booking per Hari
+                                
+                        <span style="font-size:11px;color:var(--t3);font-family:'Inter',sans-serif;" id="chartPeriodLabel">—</span>
+                    </div>
+                    <div class="chart-wrap" id="dailyChart">
+                        <div style="color:var(--t4);font-size:12px;align-self:center;margin:auto;">Memuat grafik...</div>
+                    </div>
+                </div>
+
+                <!-- PERFORMA BARBERMAN -->
+                <div class="card">
+                    <div class="card-title">Performa Barberman</div>
+                    <div id="barberPerfList">
+                        <div style="color:var(--t4);font-size:12px;">Memuat...</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- TABEL PAKET TERLARIS -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+                <div class="card">
+                    <div class="card-title">Paket Terlaris</div>
+                    <div id="pkgStats"></div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Ringkasan Tipe Booking</div>
+                    <div id="typeStats"></div>
+                </div>
+            </div>
+
+            <!-- TABEL BOOKING LENGKAP -->
+            <div class="card">
+                <div class="card-title">
+
+                          Detail Semua Booking
+                          
+                    <span style="font-size:12px;color:var(--t3);font-family:'Inter',sans-serif;" id="tableCount">—</span>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="rpt-table">
+                        <thead>
+                            <tr>
+                                <th>Kode</th>
+                                <th>Customer</th>
+                                <th>Barberman</th>
+                                <th>Paket</th>
+                                <th>Tanggal</th>
+                                <th>Waktu</th>
+                                <th>Tipe</th>
+                                <th>Total</th>
+                                <th>DP</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bookingTable"></tbody>
+                    </table>
+                </div>
+                <div id="tableEmpty" class="hidden">
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="ti ti-calendar-off"></i>
+                        </div>
+                        <div class="empty-title">Tidak ada data</div>
+                        <div class="empty-sub">Coba ubah filter tanggal atau status</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- end content -->
+    </div>
+    <!-- end app -->
+
+    <script>
+    // ============================================================
+    // KONFIGURASI SUPABASE
+    // ============================================================
+    const SUPABASE_URL = 'https://rdhytutkjzgizluyvrus.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_FGCxIQUPfWUKtdGI52oFKw_XCmRWFWh';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // ============================================================
+    // STATE
+    // ============================================================
+    let STATE = {
+        user: null,
+        store: null,
+        barbers: [],
+        bookings: [],
+        filtered: []
+    };
+
+    const STATUS_LABEL = {
+        pending: {
+            label: 'Menunggu',
+            cls: 'bgy'
+        },
+        confirmed: {
+            label: 'Terkonfirmasi',
+            cls: 'bbl'
+        },
+        active: {
+            label: 'Berlangsung',
+            cls: 'bg'
+        },
+        done: {
+            label: 'Selesai',
+            cls: 'bgr'
+        },
+        cancelled: {
+            label: 'Dibatalkan',
+            cls: 'brd'
+        },
+        noshow: {
+            label: 'No-Show',
+            cls: 'brd'
+        },
+    };
+
+    // ============================================================
+    // UTILS
+    // ============================================================
+    function fmtRp(n) {
+        return 'Rp ' + Math.round(n || 0).toLocaleString('id-ID');
+    }
+    function fmtDate(s) {
+        if (!s)
+            return '—';
+        const d = new Date(s + 'T00:00:00');
+        return d.toLocaleDateString('id-ID', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+        });
+    }
+    function fmtTime(t) {
+        return (t || '').slice(0, 5) || '—';
+    }
+    function escH(s) {
+        const d = document.createElement('div');
+        d.textContent = s ?? '';
+        return d.innerHTML;
+    }
+    function avatarColor(str) {
+        const cols = ['#C9A84C', '#60a5fa', '#4ade80', '#c084fc', '#f87171', '#fb923c'];
+        let h = 0;
+        for (let i = 0; i < (str || '').length; i++)
+            h = str.charCodeAt(i) + ((h << 5) - h);
+        return cols[Math.abs(h) % cols.length];
+    }
+
+    function showToast(msg, type='ok') {
+        const icons = {
+            ok: 'ti-check',
+            warn: 'ti-alert-triangle',
+            err: 'ti-x'
+        };
+        const cls = {
+            ok: 'tok',
+            warn: 'twarn',
+            err: 'terr'
+        };
+        const el = document.createElement('div');
+        el.className = `toast ${cls[type]}`;
+        el.innerHTML = `<i class="ti ${icons[type]}" style="font-size:15px;flex-shrink:0;"></i><span>${msg}</span>`;
+        document.getElementById('TB').appendChild(el);
+        setTimeout(() => {
+            el.style.opacity = '0';
+            el.style.transition = 'opacity .3s';
+            setTimeout(() => el.remove(), 300);
+        }, 3500);
+    }
+
+    // ============================================================
+    // AUTH GUARD
+    // ============================================================
+    async function initGuard() {
+        const timeout = new Promise((_, r) => setTimeout(() => r(new Error('TIMEOUT')), 8000));
+        try {
+            const {data: {session}} = await Promise.race([sb.auth.getSession(), timeout]);
+            if (!session?.user) {
+                window.location.href = 'auth.html';
+                return;
+            }
+            STATE.user = session.user;
+
+            const {data: store, error} = await sb.from('stores').select('*').eq('owner_id', STATE.user.id).maybeSingle();
+            if (error || !store) {
+                window.location.href = 'auth.html';
+                return;
+            }
+            STATE.store = store;
+
+            // Load barberman untuk filter
+            const {data: barbers} = await sb.from('barbers').select('id,name').eq('store_id', store.id).order('sort_order');
+            STATE.barbers = barbers || [];
+            const bSel = document.getElementById('barberFilter');
+            STATE.barbers.forEach(b => {
+                bSel.add(new Option(b.name, b.id));
+            });
+
+            document.getElementById('guard').classList.add('hidden');
+            document.getElementById('app').classList.remove('hidden');
+
+            // Default: bulan ini
+            setPeriod('month', document.querySelector('.pchip.active'));
+            await loadData();
+        } catch (e) {
+            console.error('Guard error:', e);
+            window.location.href = 'auth.html';
+        }
+    }
+
+    // ============================================================
+    // PERIODE CEPAT
+    // ============================================================
+    function setPeriod(period, el) {
+        document.querySelectorAll('.pchip').forEach(c => c.classList.remove('active'));
+        el?.classList.add('active');
+
+        const today = new Date();
+        const fmt = d => d.toISOString().slice(0, 10);
+
+        let from,
+            to = fmt(today);
+        if (period === 'today') {
+            from = fmt(today);
+        } else if (period === 'month') {
+            from = fmt(new Date(today.getFullYear(), today.getMonth(), 1));
+        } else if (period === 'lastmonth') {
+            const f = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+            const t = new Date(today.getFullYear(), today.getMonth(), 0);
+            from = fmt(f);
+            to = fmt(t);
+        } else if (period === 'year') {
+            from = fmt(new Date(today.getFullYear(), 0, 1));
+        } else {
+            from = '2020-01-01';
+        }
+
+        document.getElementById('dateFrom').value = from;
+        document.getElementById('dateTo').value = to;
+    }
+
+    // ============================================================
+    // LOAD DATA
+    // ============================================================
+    async function loadData() {
+        const from = document.getElementById('dateFrom').value;
+        const to = document.getElementById('dateTo').value;
+        const statusF = document.getElementById('statusFilter').value;
+        const barberF = document.getElementById('barberFilter').value;
+
+        if (!from || !to) {
+            showToast('Pilih tanggal dari dan sampai', 'warn');
+            return;
+        }
+
+        // Reset UI
+        document.getElementById('bookingTable').innerHTML = '<tr><td colspan="10" style="text-align:center;padding:24px;color:var(--t4);">Memuat data...</td></tr>';
+        document.getElementById('tableEmpty').classList.add('hidden');
+
+        try {
+            let query = sb.from('bookings')
+            .select(`
+        id,booking_code,type,status,customer_name,customer_phone,
+        booking_date,start_time,end_time,total_price,dp_amount,dp_status,created_at,
+        barbers(name,avatar_color),
+        packages(name)
+      `
+
+
+
+
+            )
+            .eq('store_id', STATE.store.id)
+            .gte('booking_date', from)
+            .lte('booking_date', to)
+            .order('booking_date', {
+                ascending: false
+            })
+            .order('start_time', {
+                ascending: false
+            });
+
+            if (statusF !== 'all')
+                query = query.eq('status', statusF);
+            if (barberF !== 'all')
+                query = query.eq('barber_id', barberF);
+
+            const {data, error} = await query.limit(2000);
+            if (error)
+                throw error;
+
+            STATE.bookings = data || [];
+            renderAll(from, to);
+        } catch (e) {
+            console.error('loadData error:', e);
+            showToast('Gagal memuat data. Coba lagi.', 'err');
+        }
+    }
+
+    // ============================================================
+    // RENDER SEMUA
+    // ============================================================
+    function renderAll(from, to) {
+        const bk = STATE.bookings;
+        renderStats(bk);
+        renderDailyChart(bk, from, to);
+        renderBarberPerf(bk);
+        renderPkgStats(bk);
+        renderTypeStats(bk);
+        renderTable(bk);
+    }
+
+    // ============================================================
+    // STATS
+    // ============================================================
+    function renderStats(bk) {
+        const total = bk.length;
+        const done = bk.filter(b => b.status === 'done');
+        const cancelled = bk.filter(b => ['cancelled', 'noshow'].includes(b.status));
+        const revenue = done.reduce((s, b) => s + (b.total_price || 0), 0);
+        const avg = done.length > 0 ? Math.round(revenue / done.length) : 0;
+
+        document.getElementById('statGrid').innerHTML = `
+    <div class="stat"><div class="stat-lbl">Total Booking</div><div class="stat-val">${total}</div></div>
+    <div class="stat"><div class="stat-lbl">Selesai</div><div class="stat-val" style="color:var(--gr);">${done.length}</div></div>
+    <div class="stat"><div class="stat-lbl">Dibatalkan/No-Show</div><div class="stat-val" style="color:var(--rd);">${cancelled.length}</div></div>
+    <div class="stat"><div class="stat-lbl">Total Pendapatan</div><div class="stat-val" style="color:var(--gold);font-size:18px;">${fmtRp(revenue)}</div></div>
+    <div class="stat"><div class="stat-lbl">Rata-rata/Booking</div><div class="stat-val" style="font-size:18px;">${done.length ? fmtRp(avg) : '—'}</div></div>
+  `
+        ;
+    }
+
+    // ============================================================
+    // GRAFIK HARIAN
+    // ============================================================
+    function renderDailyChart(bk, from, to) {
+        const el = document.getElementById('dailyChart');
+        const todayStr = new Date().toISOString().slice(0, 10);
+
+        // Buat map tanggal
+        const dateMap = {};
+        const start = new Date(from),
+            end = new Date(to);
+        const diff = Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1;
+        const maxDays = 30;
+
+        if (diff > maxDays) {
+            // Tampilkan per bulan kalau range > 30 hari
+            document.getElementById('chartPeriodLabel').textContent = 'Per Bulan';
+            const monthMap = {};
+            bk.forEach(b => {
+                const m=b.booking_date?.slice(0, 7);
+                if (m)
+                    monthMap[m] = (monthMap[m] || 0) + 1;
+            });
+            const months = Object.keys(monthMap).sort().slice(-12);
+            const maxVal = Math.max(...months.map(m => monthMap[m]), 1);
+            el.innerHTML = months.map(m => {
+                const count = monthMap[m] || 0;
+                const label = new Date(m + '-01').toLocaleDateString('id-ID', {
+                    month: 'short',
+                    year: '2-digit'
+                });
+                return `<div class="chart-col">
+        <div class="chart-val">${count > 0 ? count : ''}</div>
+        <div class="chart-bar" style="height:${count / maxVal * 120}px;"></div>
+        <div class="chart-lbl">${label}</div>
+      </div>`
+                ;
+            }).join('');
+        } else {
+            document.getElementById('chartPeriodLabel').textContent = `${diff} hari`;
+            for (let i = 0; i < diff; i++) {
+                const d = new Date(start);
+                d.setDate(start.getDate() + i);
+                dateMap[d.toISOString().slice(0, 10)] = 0;
+            }
+            bk.forEach(b => {
+                if (b.booking_date && dateMap[b.booking_date] !== undefined)
+                    dateMap[b.booking_date]++;
+            });
+            const dates = Object.keys(dateMap);
+            const maxVal = Math.max(...Object.values(dateMap), 1);
+            el.innerHTML = dates.map(d => {
+                const count = dateMap[d];
+                const isToday = d === todayStr;
+                const label = new Date(d + 'T00:00:00').toLocaleDateString('id-ID', {
+                    day: 'numeric',
+                    month: 'short'
+                });
+                return `<div class="chart-col">
+        <div class="chart-val">${count > 0 ? count : ''}</div>
+        <div class="chart-bar ${isToday ? 'today' : ''}" style="height:${count / maxVal * 120}px;"></div>
+        <div class="chart-lbl" style="${isToday ? 'color:var(--gold);' : ''}">${label}</div>
+      </div>`
+                ;
+            }).join('');
+        }
+    }
+
+    // ============================================================
+    // PERFORMA BARBERMAN
+    // ============================================================
+    function renderBarberPerf(bk) {
+        const el = document.getElementById('barberPerfList');
+        const map = {};
+        bk.forEach(b => {
+            if (!b.barbers)
+                return;
+            const name = b.barbers.name;
+            if (!map[name])
+                map[name] = {
+                    name,
+                    color: b.barbers.avatar_color || avatarColor(name),
+                    total: 0,
+                    done: 0,
+                    revenue: 0
+                };
+            map[name].total++;
+            if (b.status === 'done') {
+                map[name].done++;
+                map[name].revenue += (b.total_price || 0);
+            }
+        });
+        const sorted = Object.values(map).sort((a, b) => b.done - a.done);
+        if (!sorted.length) {
+            el.innerHTML = '<div style="color:var(--t4);font-size:12px;">Tidak ada data</div>';
+            return;
+        }
+        const maxTotal = Math.max(...sorted.map(p => p.total), 1);
+        el.innerHTML = sorted.map(p => `
+    <div class="barber-row">
+      <div class="av av-s" style="background:${
+        p.color}22;color:${p.color};">${p.name[0]}</div>
+      <div class="bar-info">
+        <div class="bar-name">${
+        escH(p.name)}</div>
+        <div class="bar-meta">${p.total} booking · ${p.done} selesai</div>
+        <div class="bar-prog"><div class="bar-prog-fill" style="width:${p.total / maxTotal * 100}%;"></div></div>
+      </div>
+      <div class="bar-rev">${
+        fmtRp(p.revenue)}</div>
+    </div>`
+        ).join('');
+    }
+
+    // ============================================================
+    // PAKET TERLARIS
+    // ============================================================
+    function renderPkgStats(bk) {
+        const el = document.getElementById('pkgStats');
+        const map = {};
+        bk.forEach(b => {
+            const n = b.packages?.name || 'Tanpa Paket';
+            if (!map[n])
+                map[n] = {
+                    name: n,
+                    count: 0,
+                    revenue: 0
+                };
+            map[n].count++;
+            if (b.status === 'done')
+                map[n].revenue += (b.total_price || 0);
+        });
+        const sorted = Object.values(map).sort((a, b) => b.count - a.count);
+        if (!sorted.length) {
+            el.innerHTML = '<div style="color:var(--t4);font-size:12px;">Tidak ada data</div>';
+            return;
+        }
+        const maxCount = Math.max(...sorted.map(p => p.count), 1);
+        el.innerHTML = sorted.map(p => `
+    <div style="padding:9px 0;border-bottom:.5px solid rgba(245,245,240,.04);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+        <span style="font-size:13px;font-weight:500;">${
+
+        escH(p.name)}</span>
+        <span style="font-size:12px;color:var(--gold);">${p.count}x</span>
+      </div>
+      <div style="background:var(--bg2);border-radius:3px;height:4px;overflow:hidden;">
+        <div style="background:var(--gold);height:100%;width:${
+
+        p.count / maxCount * 100}%;border-radius:3px;"></div>
+      </div>
+      <div style="font-size:11px;color:var(--t3);margin-top:4px;">${
+        fmtRp(p.revenue)} pendapatan</div>
+    </div>`
+        ).join('');
+    }
+
+    // ============================================================
+    // TIPE BOOKING
+    // ============================================================
+    function renderTypeStats(bk) {
+        const el = document.getElementById('typeStats');
+        const online = bk.filter(b => b.type === 'online');
+        const walkin = bk.filter(b => b.type === 'walkin');
+        const total = bk.length || 1;
+        el.innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+          <span style="font-size:13px;display:flex;align-items:center;gap:6px;"><span class="badge bbl">Booking Online</span></span>
+          <span style="font-size:13px;color:var(--gold);">${
+
+
+
+        online.length} (${Math.round(online.length / total * 100)}%)</span>
+        </div>
+        <div style="background:var(--bg2);border-radius:3px;height:6px;overflow:hidden;">
+          <div style="background:#60a5fa;height:100%;width:${
+
+        online.length / total * 100}%;border-radius:3px;"></div>
+        </div>
+        <div style="font-size:11px;color:var(--t3);margin-top:4px;">${
+        fmtRp(online.filter(b => b.status === 'done').reduce((s, b) => s + (b.total_price || 0), 0))} pendapatan</div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+          <span style="font-size:13px;display:flex;align-items:center;gap:6px;"><span class="badge bpr">Walk-in</span></span>
+          <span style="font-size:13px;color:var(--gold);">${
+
+
+
+        walkin.length} (${Math.round(walkin.length / total * 100)}%)</span>
+        </div>
+        <div style="background:var(--bg2);border-radius:3px;height:6px;overflow:hidden;">
+          <div style="background:#c084fc;height:100%;width:${
+
+        walkin.length / total * 100}%;border-radius:3px;"></div>
+        </div>
+        <div style="font-size:11px;color:var(--t3);margin-top:4px;">${
+        fmtRp(walkin.filter(b => b.status === 'done').reduce((s, b) => s + (b.total_price || 0), 0))} pendapatan</div>
+      </div>
+    </div>`
+
+        ;
+    }
+
+    // ============================================================
+    // TABEL BOOKING
+    // ============================================================
+    function renderTable(bk) {
+        const tbody = document.getElementById('bookingTable');
+        const empty = document.getElementById('tableEmpty');
+        document.getElementById('tableCount').textContent = `${bk.length} data`;
+
+        if (!bk.length) {
+            tbody.innerHTML = '';
+            empty.classList.remove('hidden');
+            return;
+        }
+        empty.classList.add('hidden');
+        tbody.innerHTML = bk.map(b => {
+            const st = STATUS_LABEL[b.status] || STATUS_LABEL.pending;
+            return `<tr>
+      <td style="font-family:'Playfair Display',serif;color:var(--gold);font-size:12px;">${b.booking_code || '—'}</td>
+      <td>
+        <div style="font-weight:500;">${
+            escH(b.customer_name || '—')}</div>
+        <div style="font-size:11px;color:var(--t3);">${escH(b.customer_phone || '')}</div>
+      </td>
+      <td>${
+            escH(b.barbers?.name || '—')}</td>
+      <td>${escH(b.packages?.name || '—')}</td>
+      <td>${fmtDate(b.booking_date)}</td>
+      <td>${fmtTime(b.start_time)}–${fmtTime(b.end_time)}</td>
+      <td><span class="badge ${b.type === 'walkin' ? 'bpr' : 'bbl'}">${b.type === 'walkin' ? 'Walk-in' : 'Online'}</span></td>
+      <td style="color:var(--gold);font-weight:500;">${fmtRp(b.total_price)}</td>
+      <td style="font-size:12px;">${b.dp_amount ? fmtRp(b.dp_amount) + '<br><span style="color:var(--t4);">' + b.dp_status + '</span>' : '—'}</td>
+      <td><span class="badge ${st.cls}">${st.label}</span></td>
+    </tr>`
+            ;
+        }).join('');
+    }
+
+    // ============================================================
+    // EXPORT EXCEL
+    // ============================================================
+    function exportExcel() {
+        if (!STATE.bookings.length) {
+            showToast('Tidak ada data untuk di-export', 'warn');
+            return;
+        }
+
+        const btn = document.getElementById('btnExport');
+        btn.disabled = true;
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<div style="width:13px;height:13px;border:2px solid rgba(17,17,17,.3);border-top-color:#111;border-radius:50%;animation:spin .6s linear infinite;"></div>Mengexport...';
+
+        try {
+            const wb = XLSX.utils.book_new();
+
+            // ===== SHEET 1: DETAIL BOOKING =====
+            const bookingRows = STATE.bookings.map(b => ({
+                'Kode Booking': b.booking_code || '',
+                'Nama Customer': b.customer_name || '',
+                'No. WhatsApp': b.customer_phone || '',
+                'Barberman': b.barbers?.name || '',
+                'Paket': b.packages?.name || '',
+                'Tanggal': b.booking_date || '',
+                'Jam Mulai': fmtTime(b.start_time),
+                'Jam Selesai': fmtTime(b.end_time),
+                'Tipe': b.type === 'walkin' ? 'Walk-in' : 'Booking Online',
+                'Total Harga': b.total_price || 0,
+                'DP': b.dp_amount || 0,
+                'Status DP': b.dp_status || '',
+                'Status': STATUS_LABEL[b.status]?.label || b.status || '',
+                'Dibuat': b.created_at ? new Date(b.created_at).toLocaleString('id-ID') : '',
+            }));
+            const ws1 = XLSX.utils.json_to_sheet(bookingRows);
+            ws1['!cols'] = [{
+                wch: 15
+            }, {
+                wch: 20
+            }, {
+                wch: 16
+            }, {
+                wch: 16
+            }, {
+                wch: 18
+            }, {
+                wch: 14
+            }, {
+                wch: 10
+            }, {
+                wch: 10
+            }, {
+                wch: 14
+            }, {
+                wch: 14
+            }, {
+                wch: 12
+            }, {
+                wch: 12
+            }, {
+                wch: 14
+            }, {
+                wch: 20
+            }];
+            XLSX.utils.book_append_sheet(wb, ws1, 'Detail Booking');
+
+            // ===== SHEET 2: RINGKASAN =====
+            const done = STATE.bookings.filter(b => b.status === 'done');
+            const cancelled = STATE.bookings.filter(b => ['cancelled', 'noshow'].includes(b.status));
+            const revenue = done.reduce((s, b) => s + (b.total_price || 0), 0);
+
+            const summaryRows = [
+            ['Toko', STATE.store.name],
+            ['Periode', `${document.getElementById('dateFrom').value} s/d ${document.getElementById('dateTo').value}`],
+            ['Tanggal Export', new Date().toLocaleString('id-ID')],
+            [''],
+            ['RINGKASAN', ''],
+            ['Total Booking', STATE.bookings.length],
+            ['Selesai', done.length],
+            ['Dibatalkan/No-Show', cancelled.length],
+            ['Booking Online', STATE.bookings.filter(b => b.type === 'online').length],
+            ['Walk-in', STATE.bookings.filter(b => b.type === 'walkin').length],
+            [''],
+            ['PENDAPATAN', ''],
+            ['Total Pendapatan (dari yang Selesai)', revenue],
+            ['Rata-rata per Booking', done.length ? Math.round(revenue / done.length) : 0],
+            ];
+            const ws2 = XLSX.utils.aoa_to_sheet(summaryRows);
+            ws2['!cols'] = [{
+                wch: 30
+            }, {
+                wch: 30
+            }];
+            XLSX.utils.book_append_sheet(wb, ws2, 'Ringkasan');
+
+            // ===== SHEET 3: PERFORMA BARBERMAN =====
+            const barberMap = {};
+            STATE.bookings.forEach(b => {
+                const n = b.barbers?.name || 'Tidak Diketahui';
+                if (!barberMap[n])
+                    barberMap[n] = {
+                        barberman: n,
+                        total: 0,
+                        done: 0,
+                        cancelled: 0,
+                        revenue: 0
+                    };
+                barberMap[n].total++;
+                if (b.status === 'done') {
+                    barberMap[n].done++;
+                    barberMap[n].revenue += (b.total_price || 0);
+                }
+                if (['cancelled', 'noshow'].includes(b.status))
+                    barberMap[n].cancelled++;
+            });
+            const barberRows = Object.values(barberMap).sort((a, b) => b.done - a.done).map(p => ({
+                'Barberman': p.barberman,
+                'Total Booking': p.total,
+                'Selesai': p.done,
+                'Dibatalkan': p.cancelled,
+                'Total Pendapatan': p.revenue,
+                'Rata-rata': p.done ? Math.round(p.revenue / p.done) : 0,
+            }));
+            const ws3 = XLSX.utils.json_to_sheet(barberRows);
+            ws3['!cols'] = [{
+                wch: 20
+            }, {
+                wch: 14
+            }, {
+                wch: 10
+            }, {
+                wch: 12
+            }, {
+                wch: 18
+            }, {
+                wch: 14
+            }];
+            XLSX.utils.book_append_sheet(wb, ws3, 'Performa Barberman');
+
+            // ===== SHEET 4: PAKET TERLARIS =====
+            const pkgMap = {};
+            STATE.bookings.forEach(b => {
+                const n = b.packages?.name || 'Tanpa Paket';
+                if (!pkgMap[n])
+                    pkgMap[n] = {
+                        paket: n,
+                        total: 0,
+                        done: 0,
+                        revenue: 0
+                    };
+                pkgMap[n].total++;
+                if (b.status === 'done') {
+                    pkgMap[n].done++;
+                    pkgMap[n].revenue += (b.total_price || 0);
+                }
+            });
+            const pkgRows = Object.values(pkgMap).sort((a, b) => b.total - a.total).map(p => ({
+                'Nama Paket': p.paket,
+                'Total Dipilih': p.total,
+                'Selesai': p.done,
+                'Total Pendapatan': p.revenue,
+            }));
+            const ws4 = XLSX.utils.json_to_sheet(pkgRows);
+            ws4['!cols'] = [{
+                wch: 24
+            }, {
+                wch: 14
+            }, {
+                wch: 10
+            }, {
+                wch: 18
+            }];
+            XLSX.utils.book_append_sheet(wb, ws4, 'Paket Terlaris');
+
+            // Simpan file
+            const from = document.getElementById('dateFrom').value;
+            const to = document.getElementById('dateTo').value;
+            const filename = `BarberBook_${STATE.store.name.replace(/\s/g, '_')}_${from}_${to}.xlsx`;
+            XLSX.writeFile(wb, filename);
+
+            showToast('File Excel berhasil didownload!', 'ok');
+        } catch (e) {
+            console.error('exportExcel error:', e);
+            showToast('Gagal export. Coba lagi.', 'err');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = orig;
+        }
+    }
+
+    // ============================================================
+    // START
+    // ============================================================
+    initGuard();
+    </script>
+</body>
+</html>
