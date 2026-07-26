@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Antrian — BarberBook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Inter',sans-serif;background:#0A0A0A;color:#F5F5F0;}
+:root{
+  --gold:#C9A84C;--gold-l:#e0bc5a;--gold-d:rgba(201,168,76,0.1);--gold-b:rgba(201,168,76,0.22);
+  --bg:#0A0A0A;--bg2:#111;--bg3:#161616;--bg4:#1C1C1C;
+  --t:#F5F5F0;--t2:rgba(245,245,240,0.65);--t3:rgba(245,245,240,0.35);--t4:rgba(245,245,240,0.12);
+  --b:rgba(245,245,240,0.06);--b2:rgba(245,245,240,0.1);
+  --gr:#4ade80;--grd:rgba(74,222,128,0.1);
+  --rd:#f87171;
+}
+
+@keyframes spin{to{transform:rotate(360deg);}}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-16px);}to{opacity:1;transform:translateX(0);}}
+@keyframes glow{0%,100%{box-shadow:0 0 20px rgba(201,168,76,0.15);}50%{box-shadow:0 0 40px rgba(201,168,76,0.35);}}
+@keyframes tickerScroll{0%{transform:translateX(100%);}100%{transform:translateX(-100%);}}
+
+/* ===== LOADING ===== */
+#loading{
+  position:fixed;inset:0;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+  z-index:999;
+}
+
+/* ===== LAYOUT UTAMA ===== */
+.tv-wrap{
+  height:100vh;display:grid;
+  grid-template-rows:auto 1fr auto;
+  background:var(--bg);
+}
+
+/* ===== HEADER ===== */
+.tv-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 40px;
+  border-bottom:.5px solid var(--b2);
+  background:rgba(10,10,10,0.95);
+}
+.hd-logo{display:flex;align-items:center;gap:12px;}
+.hd-logo-ic{
+  width:44px;height:44px;
+  background:var(--gold-d);border:.5px solid var(--gold-b);
+  border-radius:10px;display:flex;align-items:center;justify-content:center;
+}
+.hd-logo-ic svg{width:20px;height:20px;fill:var(--gold);}
+.hd-store{font-family:'Playfair Display',serif;font-size:26px;color:var(--t);}
+.hd-store em{color:var(--gold);font-style:normal;}
+.hd-right{display:flex;align-items:center;gap:24px;}
+.hd-clock{font-size:28px;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums;letter-spacing:.02em;}
+.hd-date{font-size:13px;color:var(--t3);text-align:right;margin-top:2px;}
+.live-pill{display:flex;align-items:center;gap:7px;background:rgba(74,222,128,0.08);border:.5px solid rgba(74,222,128,0.2);padding:7px 14px;border-radius:40px;}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--gr);animation:pulse 2s infinite;}
+.live-text{font-size:12px;color:var(--gr);font-weight:500;letter-spacing:.06em;text-transform:uppercase;}
+
+/* ===== MAIN CONTENT ===== */
+.tv-main{
+  display:grid;
+  grid-template-columns:1fr 340px;
+  overflow:hidden;
+}
+
+/* ===== ANTRIAN GRID ===== */
+.queue-area{padding:28px 32px;overflow-y:auto;}
+.queue-area::-webkit-scrollbar{width:4px;}
+.queue-area::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px;}
+
+.qa-title{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);margin-bottom:20px;}
+.barber-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+
+/* KOLOM PER BARBERMAN */
+.bc{background:var(--bg2);border:.5px solid var(--b2);border-radius:14px;overflow:hidden;}
+.bc.has-active{border-color:var(--gold-b);animation:glow 3s ease-in-out infinite;}
+.bc-head{
+  padding:16px 18px;border-bottom:.5px solid var(--b);
+  display:flex;align-items:center;gap:12px;
+}
+.bc-av{
+  width:46px;height:46px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:18px;flex-shrink:0;
+}
+.bc-info{flex:1;min-width:0;}
+.bc-name{font-size:16px;font-weight:600;}
+.bc-spec{font-size:12px;color:var(--t3);margin-top:2px;}
+.bc-status-pill{font-size:11px;padding:4px 10px;border-radius:20px;font-weight:600;white-space:nowrap;}
+.bc-status-busy{background:rgba(201,168,76,.12);color:var(--gold);border:.5px solid var(--gold-b);}
+.bc-status-free{background:var(--grd);color:var(--gr);}
+
+.bc-body{padding:12px 16px;min-height:100px;}
+
+/* ITEM ANTRIAN */
+.qi{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 14px;border-radius:10px;margin-bottom:8px;
+  border:.5px solid var(--b);background:var(--bg3);
+  animation:slideIn .3s ease;
+}
+.qi:last-child{margin-bottom:0;}
+.qi.active{
+  background:linear-gradient(135deg,rgba(201,168,76,0.08) 0%,var(--bg3) 80%);
+  border-color:var(--gold-b);
+}
+.qi-num{
+  width:32px;height:32px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;flex-shrink:0;
+}
+.qi-num-active{background:var(--gold);color:#111;}
+.qi-num-wait{background:var(--bg4);color:var(--t3);border:.5px solid var(--b2);}
+.qi-info{flex:1;min-width:0;}
+.qi-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.qi-pkg{font-size:11px;color:var(--t3);margin-top:2px;}
+.qi-badge{font-size:10px;padding:3px 8px;border-radius:12px;font-weight:600;white-space:nowrap;flex-shrink:0;}
+.badge-active{background:var(--gold-d);color:var(--gold);border:.5px solid var(--gold-b);}
+.badge-wait{background:rgba(245,245,240,.05);color:var(--t3);}
+.badge-online{background:rgba(96,165,250,.1);color:#60a5fa;}
+.badge-walkin{background:rgba(192,132,252,.1);color:#c084fc;}
+
+.qi-eta{font-size:11px;color:var(--t3);margin-top:3px;display:flex;align-items:center;gap:4px;}
+
+.bc-empty{
+  text-align:center;padding:24px 12px;
+  font-size:13px;color:var(--t4);
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+}
+
+/* ===== PANEL KANAN ===== */
+.right-panel{
+  border-left:.5px solid var(--b2);
+  display:flex;flex-direction:column;
+  background:var(--bg2);overflow:hidden;
+}
+
+/* TOKEN SEDANG DILAYANI */
+.now-serving{
+  padding:24px 20px;border-bottom:.5px solid var(--b2);
+  text-align:center;
+}
+.ns-label{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--t3);margin-bottom:12px;}
+.ns-token{
+  font-family:'Playfair Display',serif;font-size:80px;font-weight:700;
+  color:var(--gold);line-height:1;
+  text-shadow:0 0 40px rgba(201,168,76,0.3);
+}
+.ns-name{font-size:16px;font-weight:600;margin-top:8px;}
+.ns-pkg{font-size:13px;color:var(--t3);margin-top:4px;}
+.ns-barber{font-size:12px;color:var(--t3);margin-top:6px;display:flex;align-items:center;justify-content:center;gap:6px;}
+.ns-empty{font-size:14px;color:var(--t4);padding:20px 0;}
+
+/* STATS PANEL */
+.panel-stats{
+  display:grid;grid-template-columns:1fr 1fr;gap:1px;
+  background:var(--b);border-top:.5px solid var(--b2);border-bottom:.5px solid var(--b2);
+}
+.ps-item{background:var(--bg2);padding:16px 14px;text-align:center;}
+.ps-val{font-size:28px;font-weight:700;color:var(--gold);line-height:1;}
+.ps-lbl{font-size:10px;color:var(--t3);margin-top:4px;text-transform:uppercase;letter-spacing:.08em;}
+
+/* ANTRIAN SELANJUTNYA */
+.next-up{padding:16px 20px;flex:1;overflow-y:auto;}
+.next-up::-webkit-scrollbar{width:3px;}
+.nu-title{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin-bottom:12px;}
+.nu-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:8px;
+  background:var(--bg3);border:.5px solid var(--b);
+  margin-bottom:8px;
+}
+.nu-num{font-size:11px;font-weight:700;color:var(--t3);min-width:24px;}
+.nu-info{flex:1;min-width:0;}
+.nu-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.nu-sub{font-size:11px;color:var(--t3);margin-top:1px;}
+.nu-time{font-size:11px;color:var(--gold);white-space:nowrap;}
+.nu-empty{font-size:13px;color:var(--t4);text-align:center;padding:16px 0;}
+
+/* ===== TICKER BAWAH ===== */
+.tv-ticker{
+  border-top:.5px solid var(--b2);
+  background:var(--bg2);
+  padding:0;height:42px;
+  display:flex;align-items:center;
+  overflow:hidden;position:relative;
+}
+.ticker-label{
+  background:var(--gold);color:#111;
+  font-size:12px;font-weight:700;letter-spacing:.08em;
+  padding:0 18px;height:100%;display:flex;align-items:center;
+  white-space:nowrap;flex-shrink:0;
+  text-transform:uppercase;
+}
+.ticker-track{flex:1;overflow:hidden;position:relative;height:100%;}
+.ticker-content{
+  display:flex;align-items:center;height:100%;
+  white-space:nowrap;
+  animation:tickerScroll 30s linear infinite;
+}
+.ticker-item{
+  font-size:13px;color:var(--t2);
+  padding:0 32px;display:inline-flex;align-items:center;gap:8px;
+}
+.ticker-sep{color:var(--gold);font-size:16px;}
+
+/* ===== NO STORE ===== */
+#noStore{
+  position:fixed;inset:0;background:var(--bg);
+  display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+  text-align:center;padding:24px;
+}
+
+@media(max-width:1100px){
+  .barber-cols{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:768px){
+  .tv-main{grid-template-columns:1fr;}
+  .right-panel{display:none;}
+  .barber-cols{grid-template-columns:1fr;}
+  .tv-header{padding:14px 20px;}
+  .hd-clock{font-size:22px;}
+  .queue-area{padding:16px;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="loading">
+  <div style="font-family:'Playfair Display',serif;font-size:28px;color:var(--gold);">BARBER<span style="color:var(--t);">BOOK</span></div>
+  <div style="width:28px;height:28px;border:3px solid rgba(201,168,76,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .6s linear infinite;"></div>
+  <div style="font-size:13px;color:var(--t3);">Memuat antrian...</div>
+</div>
+
+<!-- NO STORE -->
+<div id="noStore">
+  <div style="font-size:56px;color:var(--t4);">✂️</div>
+  <div style="font-family:'Playfair Display',serif;font-size:24px;">Toko Tidak Ditemukan</div>
+  <div style="font-size:14px;color:var(--t3);max-width:360px;line-height:1.7;">
+    Tambahkan parameter <code style="background:var(--bg3);padding:2px 8px;border-radius:4px;color:var(--gold);">?store=SLUG_TOKO</code> di URL ini.
+    <br>Contoh: <code style="color:var(--gold);">tv.html?store=vinbarber-sigli</code>
+  </div>
+</div>
+
+<!-- TV WRAP -->
+<div class="tv-wrap hidden" id="tvWrap">
+
+  <!-- HEADER -->
+  <header class="tv-header">
+    <div class="hd-logo">
+      <div class="hd-logo-ic">
+        <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0"/></svg>
+      </div>
+      <div>
+        <div class="hd-store" id="storeName">BARBER<em>BOOK</em></div>
+        <div style="font-size:12px;color:var(--t3);" id="storeCity">Memuat...</div>
+      </div>
+    </div>
+    <div class="hd-right">
+      <div class="live-pill">
+        <div class="live-dot"></div>
+        <div class="live-text">Live</div>
+      </div>
+      <div>
+        <div class="hd-clock" id="clock">--:--</div>
+        <div class="hd-date" id="dateDisplay">—</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <div class="tv-main">
+
+    <!-- KOLOM ANTRIAN BARBERMAN -->
+    <div class="queue-area">
+      <div class="qa-title">Antrian Saat Ini</div>
+      <div class="barber-cols" id="barberCols">
+        <!-- diisi JS -->
+      </div>
+    </div>
+
+    <!-- PANEL KANAN -->
+    <div class="right-panel">
+
+      <!-- SEDANG DILAYANI -->
+      <div class="now-serving">
+        <div class="ns-label">✂️ Sedang Dilayani</div>
+        <div id="nowServingContent">
+          <div class="ns-empty">Belum ada yang dilayani</div>
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <div class="panel-stats">
+        <div class="ps-item">
+          <div class="ps-val" id="statTotal">0</div>
+          <div class="ps-lbl">Total Antrian</div>
+        </div>
+        <div class="ps-item">
+          <div class="ps-val" id="statDone" style="color:var(--gr);">0</div>
+          <div class="ps-lbl">Selesai Hari Ini</div>
+        </div>
+        <div class="ps-item">
+          <div class="ps-val" id="statBusy">0</div>
+          <div class="ps-lbl">Sedang Melayani</div>
+        </div>
+        <div class="ps-item">
+          <div class="ps-val" id="statFree" style="color:var(--gr);">0</div>
+          <div class="ps-lbl">Barberman Bebas</div>
+        </div>
+      </div>
+
+      <!-- ANTRIAN BERIKUTNYA -->
+      <div class="next-up">
+        <div class="nu-title">📋 Antrian Berikutnya</div>
+        <div id="nextUpList">
+          <div class="nu-empty">Tidak ada antrian berikutnya</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TICKER -->
+  <div class="tv-ticker">
+    <div class="ticker-label">INFO</div>
+    <div class="ticker-track">
+      <div class="ticker-content" id="tickerContent">
+        <!-- diisi JS -->
+      </div>
+    </div>
+  </div>
+
+</div><!-- end tvWrap -->
+
+
+<script>
+// ============================================================
+// KONFIGURASI SUPABASE
+// ============================================================
+const SUPABASE_URL = 'https://rdhytutkjzgizluyvrus.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_FGCxIQUPfWUKtdGI52oFKw_XCmRWFWh';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ============================================================
+// STATE
+// ============================================================
+let STATE = {
+  store: null,
+  barbers: [],
+  packages: [],
+  bookings: [],    // booking aktif hari ini
+  doneToday: 0,
+};
+
+const AVATAR_COLORS = ['#C9A84C','#60a5fa','#4ade80','#c084fc','#f87171','#fb923c'];
+
+// ============================================================
+// UTILS
+// ============================================================
+function pad(n){ return n<10?'0'+n:''+n; }
+function fmtTime(t){ return (t||'').slice(0,5)||'—'; }
+function escH(s){ const d=document.createElement('div'); d.textContent=s??''; return d.innerHTML; }
+function avatarColor(str){
+  let h=0; for(let i=0;i<(str||'').length;i++) h=str.charCodeAt(i)+((h<<5)-h);
+  return AVATAR_COLORS[Math.abs(h)%AVATAR_COLORS.length];
+}
+function s2m(t){ const p=(t||'00:00').split(':'); return parseInt(p[0])*60+parseInt(p[1]); }
+function m2s(m){ return pad(Math.floor(m/60))+':'+pad(m%60); }
+
+// ============================================================
+// CLOCK
+// ============================================================
+function startClock(){
+  function tick(){
+    const now=new Date();
+    document.getElementById('clock').textContent=pad(now.getHours())+':'+pad(now.getMinutes());
+    document.getElementById('dateDisplay').textContent=now.toLocaleDateString('id-ID',{
+      weekday:'long',day:'numeric',month:'long',year:'numeric'
+    });
+  }
+  tick(); setInterval(tick,1000);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+async function init(){
+  const params=new URLSearchParams(window.location.search);
+  const slug=params.get('store');
+
+  if(!slug){
+    document.getElementById('loading').style.display='none';
+    document.getElementById('noStore').style.display='flex';
+    return;
+  }
+
+  const timeout=new Promise((_,r)=>setTimeout(()=>r(new Error('TIMEOUT')),10000));
+  try{
+    const {data:store,error}=await Promise.race([
+      sb.from('stores').select('*').eq('slug',slug).maybeSingle(),
+      timeout,
+    ]);
+    if(error||!store){
+      document.getElementById('loading').style.display='none';
+      document.getElementById('noStore').style.display='flex';
+      return;
+    }
+    STATE.store=store;
+
+    const [barbersRes,pkgsRes]=await Promise.all([
+      sb.from('barbers').select('*').eq('store_id',store.id).eq('is_active',true).order('sort_order'),
+      sb.from('packages').select('id,name,duration_min,buffer_min').eq('store_id',store.id).eq('is_active',true),
+    ]);
+
+    STATE.barbers=barbersRes.data||[];
+    STATE.packages=pkgsRes.data||[];
+
+    renderStoreInfo();
+    await loadBookings();
+    startClock();
+    setupRealtime();
+    startAutoRefresh();
+
+    document.getElementById('loading').style.display='none';
+    document.getElementById('tvWrap').classList.remove('hidden');
+  }catch(e){
+    console.error('init error:',e);
+    document.getElementById('loading').innerHTML=`
+      <div style="font-size:14px;color:var(--rd);">Gagal memuat. Cek koneksi internet.</div>
+      <button onclick="location.reload()" style="background:var(--gold);color:#111;border:none;padding:10px 24px;border-radius:8px;font-size:13px;cursor:pointer;margin-top:8px;">Coba Lagi</button>`;
+  }
+}
+
+function renderStoreInfo(){
+  const s=STATE.store;
+  document.title=s.name+' — Antrian Live';
+  document.getElementById('storeName').innerHTML=`${escH(s.name)}`;
+  document.getElementById('storeCity').textContent=s.city||'';
+}
+
+// ============================================================
+// LOAD BOOKINGS
+// ============================================================
+async function loadBookings(){
+  const today=new Date().toISOString().slice(0,10);
+  try{
+    const {data,error}=await sb.from('bookings')
+      .select('id,booking_code,customer_name,status,type,start_time,end_time,barber_id,package_id,total_price')
+      .eq('store_id',STATE.store.id)
+      .eq('booking_date',today)
+      .in('status',['confirmed','active','pending'])
+      .order('start_time');
+    if(error) throw error;
+
+    // Hitung yang sudah selesai hari ini
+    const {count}=await sb.from('bookings')
+      .select('id',{count:'exact',head:true})
+      .eq('store_id',STATE.store.id)
+      .eq('booking_date',today)
+      .eq('status','done');
+    STATE.doneToday=count||0;
+
+    STATE.bookings=data||[];
+    renderAll();
+  }catch(e){
+    console.error('loadBookings error:',e);
+  }
+}
+
+// ============================================================
+// RENDER SEMUA
+// ============================================================
+function renderAll(){
+  renderBarberCols();
+  renderNowServing();
+  renderStats();
+  renderNextUp();
+  renderTicker();
+}
+
+// ============================================================
+// RENDER KOLOM BARBERMAN
+// ============================================================
+function renderBarberCols(){
+  const container=document.getElementById('barberCols');
+
+  container.innerHTML=STATE.barbers.map(barber=>{
+    const color=barber.avatar_color||avatarColor(barber.name);
+    const queue=STATE.bookings.filter(b=>b.barber_id===barber.id);
+    const active=queue.find(b=>b.status==='active');
+    const hasActive=!!active;
+
+    let itemsHtml='';
+    if(!queue.length){
+      itemsHtml=`<div class="bc-empty">
+        <div style="font-size:28px;opacity:.3;">✂️</div>
+        <div>Antrian kosong</div>
+        <div style="font-size:11px;margin-top:2px;color:var(--gr);">Siap melayani</div>
+      </div>`;
+    } else {
+      let num=1;
+      itemsHtml=queue.map(b=>{
+        const pkg=STATE.packages.find(p=>p.id===b.package_id);
+        const isActive=b.status==='active';
+        const endMin=s2m(b.start_time.slice(0,5))+(pkg?.duration_min||30);
+        const eta=fmtTime(m2s(endMin)+':00');
+        const n=num++;
+        return `<div class="qi ${isActive?'active':''}">
+          <div class="qi-num ${isActive?'qi-num-active':'qi-num-wait'}">${n}</div>
+          <div class="qi-info">
+            <div class="qi-name">${escH(b.customer_name||'Tanpa Nama')}</div>
+            <div class="qi-pkg">${escH(pkg?.name||'—')} · ${fmtTime(b.start_time)}</div>
+            ${isActive?`<div class="qi-eta">⏱ Selesai ±${eta}</div>`:''}
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;">
+            <span class="qi-badge ${isActive?'badge-active':'badge-wait'}">${isActive?'Dilayani':'Menunggu'}</span>
+            <span class="qi-badge ${b.type==='walkin'?'badge-walkin':'badge-online'}">${b.type==='walkin'?'Walk-in':'Online'}</span>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    return `<div class="bc ${hasActive?'has-active':''}">
+      <div class="bc-head">
+        <div class="bc-av" style="background:${color}22;color:${color};">${barber.name[0]}</div>
+        <div class="bc-info">
+          <div class="bc-name">${escH(barber.name)}</div>
+          <div class="bc-spec">${escH(barber.specialty||'Barberman')}</div>
+        </div>
+        <div class="bc-status-pill ${hasActive?'bc-status-busy':'bc-status-free'}">
+          ${hasActive?'Melayani':'Bebas'}
+        </div>
+      </div>
+      <div class="bc-body">${itemsHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// SEDANG DILAYANI (panel kanan atas)
+// ============================================================
+function renderNowServing(){
+  const el=document.getElementById('nowServingContent');
+  const active=STATE.bookings.filter(b=>b.status==='active');
+
+  if(!active.length){
+    el.innerHTML='<div class="ns-empty">Belum ada yang dilayani</div>';
+    return;
+  }
+
+  // Tampilkan yang pertama aktif
+  const b=active[0];
+  const barber=STATE.barbers.find(x=>x.id===b.barber_id);
+  const pkg=STATE.packages.find(p=>p.id===b.package_id);
+  const color=barber?.avatar_color||avatarColor(barber?.name||'');
+  const num=STATE.bookings.filter(x=>x.barber_id===b.barber_id).findIndex(x=>x.id===b.id)+1;
+
+  el.innerHTML=`
+    <div class="ns-token">#${pad(num)}</div>
+    <div class="ns-name">${escH(b.customer_name||'—')}</div>
+    <div class="ns-pkg">${escH(pkg?.name||'—')}</div>
+    <div class="ns-barber">
+      <div style="width:22px;height:22px;border-radius:50%;background:${color}22;color:${color};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;">${(barber?.name||'?')[0]}</div>
+      ${escH(barber?.name||'—')}
+    </div>
+    ${active.length>1?`<div style="font-size:11px;color:var(--t3);margin-top:8px;">${active.length-1} lainnya sedang dilayani</div>`:''}
+  `;
+}
+
+// ============================================================
+// STATS
+// ============================================================
+function renderStats(){
+  const total=STATE.bookings.length;
+  const active=STATE.bookings.filter(b=>b.status==='active').length;
+  const busyBarbers=new Set(STATE.bookings.filter(b=>b.status==='active').map(b=>b.barber_id)).size;
+  const freeBarbers=STATE.barbers.length-busyBarbers;
+
+  document.getElementById('statTotal').textContent=total;
+  document.getElementById('statDone').textContent=STATE.doneToday;
+  document.getElementById('statBusy').textContent=active;
+  document.getElementById('statFree').textContent=Math.max(0,freeBarbers);
+}
+
+// ============================================================
+// ANTRIAN BERIKUTNYA (panel kanan bawah)
+// ============================================================
+function renderNextUp(){
+  const el=document.getElementById('nextUpList');
+  const waiting=STATE.bookings.filter(b=>b.status==='confirmed'||b.status==='pending');
+
+  if(!waiting.length){
+    el.innerHTML='<div class="nu-empty">Tidak ada antrian berikutnya</div>';
+    return;
+  }
+
+  el.innerHTML=waiting.slice(0,8).map((b,i)=>{
+    const barber=STATE.barbers.find(x=>x.id===b.barber_id);
+    const pkg=STATE.packages.find(p=>p.id===b.package_id);
+    return `<div class="nu-item">
+      <div class="nu-num">#${pad(i+1)}</div>
+      <div class="nu-info">
+        <div class="nu-name">${escH(b.customer_name||'—')}</div>
+        <div class="nu-sub">${escH(barber?.name||'—')} · ${escH(pkg?.name||'—')}</div>
+      </div>
+      <div class="nu-time">${fmtTime(b.start_time)}</div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// TICKER BAWAH
+// ============================================================
+function renderTicker(){
+  const total=STATE.bookings.length;
+  const done=STATE.doneToday;
+  const freeBarbers=STATE.barbers.filter(b=>{
+    return !STATE.bookings.some(bk=>bk.barber_id===b.id&&bk.status==='active');
+  });
+
+  const items=[
+    `✂️ ${STATE.store.name} — Platform Booking Digital`,
+    `📋 ${total} antrian aktif hari ini`,
+    `✅ ${done} customer sudah dilayani`,
+    freeBarbers.length?`🟢 Barberman bebas: ${freeBarbers.map(b=>b.name).join(', ')}`:`⏳ Semua barberman sedang melayani`,
+    `📱 Booking online: ${window.location.origin}/booking.html?store=${STATE.store.slug}`,
+    `⏰ Terima kasih sudah menunggu dengan sabar!`,
+  ];
+
+  // Duplikat untuk scroll seamless
+  const all=[...items,...items];
+  document.getElementById('tickerContent').innerHTML=all.map(item=>
+    `<span class="ticker-item"><span class="ticker-sep">✦</span>${escH(item)}</span>`
+  ).join('');
+}
+
+// ============================================================
+// REALTIME — update otomatis saat ada perubahan booking
+// ============================================================
+function setupRealtime(){
+  if(!STATE.store) return;
+  sb.channel('tv-bookings')
+    .on('postgres_changes',
+      {event:'*',schema:'public',table:'bookings',filter:`store_id=eq.${STATE.store.id}`},
+      ()=>{ loadBookings(); }
+    )
+    .subscribe();
+}
+
+// ============================================================
+// AUTO REFRESH setiap 60 detik (backup kalau realtime putus)
+// ============================================================
+function startAutoRefresh(){
+  setInterval(()=>{ loadBookings(); }, 60000);
+}
+
+// ============================================================
+// START
+// ============================================================
+init();
+</script>
+</body>
+</html>
