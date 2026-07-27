@@ -1017,6 +1017,7 @@ function renderTable() {
           <div class="row-actions">
             <button class="act-btn" title="Lihat detail" onclick="showDetail('${b.id}')"><i class="ti ti-eye" style="font-size:14px;"></i></button>
             <button class="act-btn" title="Ubah status" onclick="openStatusModal('${b.id}')"><i class="ti ti-edit" style="font-size:14px;"></i></button>
+            <button class="act-btn" title="Kirim WA" onclick="kirimWA('${b.id}')" style="background:rgba(74,222,128,.08);border-color:rgba(74,222,128,.25);color:#4ade80;"><i class="ti ti-brand-whatsapp" style="font-size:14px;"></i></button>
           </div>
         </td>
       </tr>`;
@@ -1089,6 +1090,26 @@ document.getElementById('newStatusSelect')?.addEventListener('change', toggleNos
 function toggleNoshowWarning() {
   const val = document.getElementById('newStatusSelect').value;
   document.getElementById('noshowWarning').classList.toggle('hidden', val !== 'noshow');
+}
+  function kirimWA(id) {
+  const b = STATE.bookings.find(x => x.id === id);
+  if (!b) return;
+  const toko = STATE.store?.name || 'Toko Kami';
+  const nama = b.customer_name || 'Pelanggan';
+  const barberman = b.barbers?.name || '—';
+  const paket = b.packages?.name || '—';
+  const tgl = b.booking_date ? new Date(b.booking_date + 'T00:00:00').toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric'}) : '—';
+  const jam = (b.start_time || '').slice(0, 5);
+  const kode = b.booking_code || '—';
+  const phone = (b.customer_phone || '').replace(/[^0-9]/g, '').replace(/^0/, '62');
+
+  const pesan = `Halo ${nama} 👋\n\nReminder booking kamu di *${toko}*:\n\n✂️ Barberman: ${barberman}\n📦 Paket: ${paket}\n📅 Tanggal: ${tgl}\n⏰ Waktu: ${jam}\n🎫 Kode Booking: ${kode}\n\nMohon hadir tepat waktu. Terima kasih! 🙏`;
+
+  if (!phone) {
+    showToast('Nomor WhatsApp customer tidak tersedia', 'warn');
+    return;
+  }
+  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(pesan)}`, '_blank');
 }
 async function confirmStatusChange() {
   const id = STATE.statusTarget;
