@@ -445,9 +445,15 @@ async function init(){
     });
 
     renderStoreInfo();
-    renderBarberGrid();
-    document.getElementById('page-loading').classList.add('hidden');
-    document.getElementById('app').classList.remove('hidden');
+
+// Cek apakah customer sudah pernah booking sebelumnya
+const hasExisting = checkExistingBooking(slug);
+if (!hasExisting) {
+  renderBarberGrid();
+}
+
+document.getElementById('page-loading').classList.add('hidden');
+document.getElementById('app').classList.remove('hidden');
   }catch(e){
     console.error('init error:',e);
     showNotFound(e.message==='TIMEOUT'?'Koneksi lambat. Refresh halaman untuk coba lagi.':'Gagal memuat data toko.');
@@ -800,12 +806,32 @@ async function confirmBooking(){
   }
 }
 
-function showConfirmation(booking){
-  for(let i=1;i<=5;i++) document.getElementById('bS'+i).classList.add('hidden');
+function showConfirmation(booking) {
+  for (let i = 1; i <= 5; i++) document.getElementById('bS' + i).classList.add('hidden');
   document.getElementById('bDone').classList.remove('hidden');
-  document.getElementById('cfCode').textContent=booking.booking_code;
-  const d=booking.booking_date?new Date(booking.booking_date+'T00:00:00').toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long'}):'—';
-  document.getElementById('ticketArea').innerHTML=`
+  document.getElementById('cfCode').textContent = booking.booking_code;
+
+  // Simpan kode booking di localStorage supaya customer bisa lihat lagi
+  try {
+    const slug = new URLSearchParams(window.location.search).get('store');
+    const key = 'bb_booking_' + slug;
+    const saved = {
+      code: booking.booking_code,
+      name: booking.customer_name,
+      date: booking.booking_date,
+      time: booking.start_time?.slice(0, 5),
+      barber: STATE.barber?.name,
+      pkg: STATE.pkg?.name,
+      total: booking.total_price,
+      dp: booking.dp_amount,
+      store: STATE.store?.name,
+      savedAt: new Date().toISOString(),
+    };
+    localStorage.setItem(key, JSON.stringify(saved));
+  } catch(e) {}
+
+  const d = booking.booking_date ? new Date(booking.booking_date + 'T00:00:00').toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long'}) : '—';
+  document.getElementById('ticketArea').innerHTML = `
     <div style="text-align:center;border-bottom:.5px dashed var(--b2);padding-bottom:10px;margin-bottom:10px;">
       <div style="font-family:'Playfair Display',serif;font-size:14px;color:var(--gold);">${escH(STATE.store.name.toUpperCase())}</div>
       <div style="font-size:10px;color:var(--t3);letter-spacing:.1em;margin-top:2px;">BOOKING TICKET</div>
@@ -814,18 +840,99 @@ function showConfirmation(booking){
     <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:var(--t3);">Barberman</span><span style="font-weight:500;">${escH(STATE.barber.name)}</span></div>
     <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:var(--t3);">Paket</span><span style="font-weight:500;">${escH(STATE.pkg.name)}</span></div>
     <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:var(--t3);">Tanggal</span><span style="font-weight:500;">${d}</span></div>
-    <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:var(--t3);">Waktu</span><span style="font-weight:500;">${booking.start_time.slice(0,5)}</span></div>
+    <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:var(--t3);">Waktu</span><span style="font-weight:500;">${booking.start_time?.slice(0,5)}</span></div>
     <div style="border-top:.5px dashed var(--b2);margin:8px 0;"></div>
     <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:var(--t3);">Total</span><span style="color:var(--gold);font-weight:500;">${fmtRp(booking.total_price)}</span></div>
-    ${booking.dp_amount?`<div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:var(--t3);">DP</span><span style="color:var(--gr);">${fmtRp(booking.dp_amount)}</span></div>`:''}`;
-  document.getElementById('bookSec').scrollIntoView({behavior:'smooth',block:'start'});
-  showToast('Booking berhasil dibuat!','ok');
+    ${booking.dp_amount ? `<div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:var(--t3);">DP</span><span style="color:var(--gr);">${fmtRp(booking.dp_amount)}</span></div>` : ''}`;
+
+  document.getElementById('bookSec').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  showToast('Booking berhasil dibuat!', 'ok');
 }
 
 // ============================================================
 // START — tidak butuh login, langsung load toko dari URL
 // ============================================================
-init();
+function checkExistingBooking(slug) {
+  try {
+    const key = 'bb_booking_' + slug;
+    const raw = localStorage.getItem(key);
+    if (!raw) return false;
+
+    const bk = JSON.parse(raw);
+
+    // Cek apakah booking masih relevan (maksimal 1 hari setelah tanggal booking)
+    if (bk.date) {
+      const bookingDate = new Date(bk.date + 'T23:59:59');
+      if (bookingDate < new Date()) {
+        localStorage.removeItem(key);
+        return false;
+      }
+    }
+
+    // Tampilkan halaman "sudah booking"
+    for (let i = 1; i <= 5; i++) document.getElementById('bS' + i)?.classList.add('hidden');
+    document.getElementById('bDone').classList.remove('hidden');
+    document.getElementById('cfCode').textContent = bk.code || '—';
+
+    const d = bk.date ? new Date(bk.date + 'T00:00:00').toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long'}) : '—';
+
+    document.getElementById('ticketArea').innerHTML = `
+      <div style="text-align:center;border-bottom:.5px dashed var(--b2);padding-bottom:10px;margin-bottom:10px;">
+        <div style="font-family:'Playfair Display',serif;font-size:14px;color:var(--gold);">${escH((bk.store||'').toUpperCase())}</div>
+        <div style="font-size:10px;color:var(--t3);letter-spacing:.1em;margin-top:2px;">BOOKING TICKET</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:var(--t3);">Nama</span><span style="font-weight:500;">${escH(bk.name||'—')}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:var(--t3);">Barberman</span><span style="font-weight:500;">${escH(bk.barber||'—')}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:var(--t3);">Paket</span><span style="font-weight:500;">${escH(bk.pkg||'—')}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:var(--t3);">Tanggal</span><span style="font-weight:500;">${d}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:var(--t3);">Waktu</span><span style="font-weight:500;">${escH(bk.time||'—')}</span></div>
+      <div style="border-top:.5px dashed var(--b2);margin:8px 0;"></div>
+      <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:var(--t3);">Total</span><span style="color:var(--gold);font-weight:500;">${fmtRp(bk.total||0)}</span></div>
+      ${bk.dp ? `<div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:var(--t3);">DP</span><span style="color:var(--gr);">${fmtRp(bk.dp)}</span></div>` : ''}`;
+
+    // Ganti tombol "Booking Lagi" menjadi opsi yang lebih jelas
+    const doneSection = document.getElementById('bDone');
+    doneSection.querySelector('.cfirm').innerHTML = `
+      <div class="cfirm-ic"><i class="ti ti-check"></i></div>
+      <h2 style="font-family:'Playfair Display',serif;font-size:24px;margin-bottom:8px;">Kamu Sudah Booking!</h2>
+      <p style="font-size:13px;color:var(--t2);line-height:1.7;max-width:360px;margin:0 auto 18px;">
+        Ini adalah booking aktifmu. Tunjukkan kode ini ke kasir saat datang.
+      </p>
+      <div class="cfirm-code" id="cfCode">${escH(bk.code||'—')}</div>
+      <div class="ticket" id="ticketArea"></div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn btn-g" onclick="newBooking('${slug}')"><i class="ti ti-plus"></i>Booking Baru</button>
+      </div>
+      <p style="font-size:11px;color:var(--t3);margin-top:12px;">Mau batalkan atau ubah? Hubungi toko langsung.</p>
+    `;
+
+    // Re-render ticket karena element sudah dibuat ulang
+    document.getElementById('ticketArea').innerHTML = `
+      <div style="text-align:center;border-bottom:.5px dashed var(--b2);padding-bottom:10px;margin-bottom:10px;">
+        <div style="font-family:'Playfair Display',serif;font-size:14px;color:var(--gold);">${escH((bk.store||'').toUpperCase())}</div>
+        <div style="font-size:10px;color:var(--t3);letter-spacing:.1em;margin-top:2px;">BOOKING TICKET</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:var(--t3);">Nama</span><span style="font-weight:500;">${escH(bk.name||'—')}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:var(--t3);">Barberman</span><span style="font-weight:500;">${escH(bk.barber||'—')}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:var(--t3);">Paket</span><span style="font-weight:500;">${escH(bk.pkg||'—')}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:var(--t3);">Tanggal</span><span style="font-weight:500;">${d}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:var(--t3);">Waktu</span><span style="font-weight:500;">${escH(bk.time||'—')}</span></div>
+      <div style="border-top:.5px dashed var(--b2);margin:8px 0;"></div>
+      <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:var(--t3);">Total</span><span style="color:var(--gold);font-weight:500;">${fmtRp(bk.total||0)}</span></div>
+      ${bk.dp ? `<div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:var(--t3);">DP</span><span style="color:var(--gr);">${fmtRp(bk.dp)}</span></div>` : ''}`;
+
+    return true;
+  } catch(e) {
+    return false;
+  }
+}
+
+function newBooking(slug) {
+  // Hapus booking lama dari localStorage dan mulai baru
+  try { localStorage.removeItem('bb_booking_' + slug); } catch(e) {}
+  location.reload();
+}
+  init();
 </script>
 </body>
 </html>
