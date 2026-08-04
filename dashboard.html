@@ -204,8 +204,32 @@ button,input,select,textarea{font-family:'Inter',sans-serif;}
   .layout{grid-template-columns:1fr;}
   .side{display:none;}
   .stat-grid{grid-template-columns:1fr 1fr;}
-  .bk-table{display:block;overflow-x:auto;white-space:nowrap;}
   .fr{grid-template-columns:1fr;}
+}
+
+@media(max-width:600px){
+  .nav{padding:10px 14px;gap:6px;flex-wrap:wrap;}
+  .store-pill{font-size:10px;padding:4px 8px;}
+  .btn-g{padding:8px 10px;font-size:11px;}
+  .btn-o{padding:7px 10px;font-size:11px;}
+  .content{padding:14px 16px;}
+  .stat-grid{grid-template-columns:1fr 1fr;gap:8px;}
+  .stat-val{font-size:20px;}
+  .filter-row{gap:6px;}
+  .fchip{padding:6px 10px;font-size:11px;}
+  .search-box{min-width:100%;order:10;}
+
+  /* Tabel booking jadi card di HP */
+  .bk-table thead{display:none;}
+  .bk-table tr{display:block;background:var(--bg2);border:.5px solid var(--b);border-radius:var(--r);margin-bottom:10px;padding:12px;}
+  .bk-table td{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:.5px solid rgba(245,245,240,.04);font-size:12px;}
+  .bk-table td:last-child{border-bottom:none;padding-top:8px;}
+  .bk-table td::before{content:attr(data-label);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-right:8px;flex-shrink:0;}
+  .code-pill{font-size:11px;}
+
+  /* List item barberman & paket */
+  .list-item{flex-wrap:wrap;gap:10px;}
+  .list-item-actions{width:100%;justify-content:flex-end;}
 }
 </style>
 </head>
