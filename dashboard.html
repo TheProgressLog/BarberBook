@@ -189,6 +189,38 @@
         padding: 5px 12px;
         border-radius: 20px;
         border: .5px solid var(--b);
+    }
+
+    .hamburger-btn {
+        display: none;
+        background: transparent;
+        border: .5px solid var(--b2);
+        color: var(--t2);
+        width: 36px;
+        height: 36px;
+        border-radius: var(--r);
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .hamburger-btn:hover {
+        border-color: var(--gold-b);
+        color: var(--gold);
+    }
+
+    .side-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, .6);
+        z-index: 199;
+    }
+
+    .side-backdrop.open {
+        display: block;
     }/* ===== LAYOUT ===== */
     .layout {
         display: grid;
@@ -937,8 +969,25 @@
             grid-template-columns: 1fr;
         }
 
+        .hamburger-btn {
+            display: flex;
+        }
+
         .side {
-            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 200;
+            width: 240px;
+            max-width: 80vw;
+            transform: translateX(-100%);
+            transition: transform .2s ease;
+            overflow-y: auto;
+        }
+
+        .side.open {
+            transform: translateX(0);
         }
 
         .stat-grid {
@@ -1099,6 +1148,9 @@
     <div id="app" class="hidden">
 
         <nav class="nav">
+            <button class="hamburger-btn" onclick="toggleSide()" aria-label="Menu">
+                <i class="ti ti-menu-2"></i>
+            </button>
             <div class="nav-logo">
                 <div class="nav-logo-ic">
                     <i class="ti ti-scissors"></i>
@@ -1123,8 +1175,10 @@
             </div>
         </nav>
 
+        <div class="side-backdrop" id="sideBackdrop" onclick="toggleSide(false)"></div>
+
         <div class="layout">
-            <div class="side">
+            <div class="side" id="sideMenu">
                 <div class="ssec">Menu Utama</div>
                 <div class="snav" id="navRingkasan" onclick="switchView('ringkasan')">
                     <i class="ti ti-layout-dashboard"></i>
@@ -1809,6 +1863,16 @@
             loadBarbers();
         if (view === 'packages' && STATE.packages.length === 0)
             loadPackages();
+
+        toggleSide(false);
+    }
+
+    function toggleSide(force) {
+        const side = document.getElementById('sideMenu');
+        const backdrop = document.getElementById('sideBackdrop');
+        const open = typeof force === 'boolean' ? force : !side.classList.contains('open');
+        side.classList.toggle('open', open);
+        backdrop.classList.toggle('open', open);
     }
 
     function refreshCurrentView() {
