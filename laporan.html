@@ -3,57 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan — BarberBook</title>
+    <title>CariCukur — Masuk</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500;0,600;1,500;1,600&family=Manrope:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
+
+    <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
     <style>
+    /* ===== RESET & BASE ===== */
     *, * ::before, * ::after {
         box-sizing: border-box;
         margin: 0;
         padding: 0;
     }
 
+    html {
+        scroll-behavior: smooth;
+    }
+
     body {
-        font-family: 'Inter', sans-serif;
-        background: #0E0E0E;
-        color: #F5F5F0;
+        font-family: 'Manrope', sans-serif;
+        background: #F7F7F4;
+        color: #14181B;
         min-height: 100vh;
     }
 
-    button, input, select {
-        font-family: 'Inter', sans-serif;
-    }
-
+    button, input, select, textarea {
+        font-family: 'Manrope', sans-serif;
+    }/* ===== TOKENS ===== */
     :root {
-        --gold: #C9A84C;
-        --gold-l: #e0bc5a;
-        --gold-d: rgba(201, 168, 76, 0.12);
-        --gold-b: rgba(201, 168, 76, 0.28);
-        --bg: #0E0E0E;
-        --bg2: #141414;
-        --bg3: #1A1A1A;
-        --bg4: #222;
-        --t: #F5F5F0;
-        --t2: rgba(245, 245, 240, 0.6);
-        --t3: rgba(245, 245, 240, 0.35);
-        --t4: rgba(245, 245, 240, 0.14);
-        --b: rgba(245, 245, 240, 0.07);
-        --b2: rgba(245, 245, 240, 0.12);
-        --gr: #4ade80;
+        --gold: #0E6B4F;
+        --gold-l: #12805F;
+        --gold-d: rgba(14, 107, 79, 0.07);
+        --gold-b: rgba(14, 107, 79, 0.28);
+        --bg: #F7F7F4;
+        --bg2: #FFFFFF;
+        --bg3: #F2F1EC;
+        --bg4: #EAE8E0;
+        --t: #14181B;
+        --t2: rgba(20, 24, 27, 0.62);
+        --t3: rgba(20, 24, 27, 0.4);
+        --t4: rgba(20, 24, 27, 0.12);
+        --b: rgba(20, 24, 27, 0.1);
+        --b2: rgba(20, 24, 27, 0.16);
+        --gr: #2F8F5B;
         --grd: rgba(74, 222, 128, 0.1);
-        --rd: #f87171;
+        --rd: #C23B2E;
         --rdd: rgba(248, 113, 113, 0.1);
         --r: 8px;
         --rl: 12px;
-    }
-
+        --rxl: 18px;
+    }/* ===== UTILITIES ===== */
     .hidden {
         display: none !important;
     }
 
+    .page {
+        display: none;
+        min-height: 100vh;
+    }
+
+    .page.active {
+        display: block;
+    }/* ===== SCROLLBAR ===== */
     ::-webkit-scrollbar {
         width: 5px;
     }
@@ -61,36 +75,7 @@
     ::-webkit-scrollbar-thumb {
         background: var(--b2);
         border-radius: 3px;
-    }
-
-    @keyframes spin {
-        to {
-            transform: rotate(360deg);
-        }
-    }
-
-    @keyframes tIn {
-        from {
-            opacity: 0;
-            transform: translateX(14px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-
-    @keyframes skel {
-        0% {
-            background-position: 100% 50%;
-        }
-
-        100% {
-            background-position: 0 50%;
-        }
-    }
-
+    }/* ===== BUTTONS ===== */
     .btn {
         display: inline-flex;
         align-items: center;
@@ -100,6 +85,7 @@
         cursor: pointer;
         font-weight: 500;
         transition: all .18s;
+        letter-spacing: .04em;
         font-size: 13px;
     }
 
@@ -110,8 +96,8 @@
 
     .btn-g {
         background: var(--gold);
-        color: #111;
-        padding: 10px 18px;
+        color: #fff;
+        padding: 11px 22px;
         font-weight: 600;
     }
 
@@ -119,11 +105,23 @@
         background: var(--gold-l);
     }
 
+    .btn-gl {
+        background: var(--gold);
+        color: #fff;
+        padding: 14px 28px;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .btn-gl:hover:not(:disabled) {
+        background: var(--gold-l);
+    }
+
     .btn-o {
         background: transparent;
         color: var(--t2);
         border: .5px solid var(--b2);
-        padding: 9px 16px;
+        padding: 10px 20px;
     }
 
     .btn-o:hover:not(:disabled) {
@@ -135,139 +133,33 @@
         background: transparent;
         color: var(--t3);
         border: none;
-        padding: 8px 12px;
+        padding: 9px 14px;
     }
 
     .btn-gh:hover:not(:disabled) {
         background: var(--bg3);
         color: var(--t);
-    }/* NAV */
-    .nav {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 14px 24px;
-        border-bottom: .5px solid var(--b);
-        background: var(--bg);
-        position: sticky;
-        top: 0;
-        z-index: 100;
     }
 
-    .nav-logo {
-        font-family: 'Playfair Display', serif;
-        font-size: 18px;
-        color: var(--gold);
-        display: flex;
-        align-items: center;
-        gap: 8px;
+    .btn-d {
+        background: var(--rdd);
+        color: var(--rd);
+        border: .5px solid rgba(248, 113, 113, .2);
+        padding: 8px 14px;
     }
 
-    .nav-logo span {
-        color: var(--t);
-    }
-
-    .nav-logo-ic {
-        width: 30px;
-        height: 30px;
-        background: var(--gold-d);
-        border: .5px solid var(--gold-b);
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
+    .w100 {
+        width: 100%;
         justify-content: center;
-        font-size: 14px;
-        color: var(--gold);
-    }/* CONTENT */
-    .content {
-        padding: 24px 28px;
-        max-width: 1200px;
-        margin: 0 auto;
-    }/* FILTER BAR */
-    .filter-bar {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        flex-wrap: wrap;
-        background: var(--bg3);
-        border: .5px solid var(--b);
-        border-radius: var(--rl);
-        padding: 14px 16px;
-        margin-bottom: 18px;
+        padding-left: 14px;
+        padding-right: 14px;
+    }/* ===== FORM ===== */
+    .field {
+        margin-bottom: 14px;
     }
 
-    .filter-bar label {
-        font-size: 10px;
-        letter-spacing: .08em;
-        text-transform: uppercase;
-        color: var(--t3);
-    }
-
-    .filter-bar input, .filter-bar select {
-        background: var(--bg2);
-        border: .5px solid var(--b2);
-        color: var(--t);
-        padding: 8px 11px;
-        border-radius: var(--r);
-        font-size: 13px;
-        outline: none;
-    }
-
-    .filter-bar input:focus, .filter-bar select:focus {
-        border-color: var(--gold-b);
-    }
-
-    .fgroup {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-    }
-
-    .filter-sep {
-        flex: 1;
-    }
-
-    .period-chips {
-        display: flex;
-        gap: 6px;
-    }
-
-    .pchip {
-        padding: 6px 12px;
-        border: .5px solid var(--b2);
-        border-radius: 20px;
-        font-size: 11px;
-        color: var(--t3);
-        cursor: pointer;
-        transition: all .15s;
-        background: var(--bg2);
-    }
-
-    .pchip:hover {
-        border-color: var(--gold-b);
-        color: var(--gold);
-    }
-
-    .pchip.active {
-        background: var(--gold-d);
-        border-color: var(--gold-b);
-        color: var(--gold);
-    }/* STATS */
-    .stat-grid {
-        display: grid;
-        grid-template-columns: repeat(5, 1fr);
-        gap: 10px;
-        margin-bottom: 18px;
-    }
-
-    .stat {
-        background: var(--bg3);
-        border: .5px solid var(--b);
-        border-radius: var(--rl);
-        padding: 14px 16px;
-    }
-
-    .stat-lbl {
+    .field label {
+        display: block;
         font-size: 10px;
         letter-spacing: .1em;
         text-transform: uppercase;
@@ -275,78 +167,92 @@
         margin-bottom: 6px;
     }
 
-    .stat-val {
-        font-size: 22px;
-        font-weight: 500;
-        line-height: 1;
+    .field input, .field select, .field textarea {
+        width: 100%;
+        background: var(--bg2);
+        border: .5px solid var(--b2);
+        color: var(--t);
+        padding: 11px 13px;
+        border-radius: var(--r);
+        font-size: 13px;
+        outline: none;
+        transition: border-color .2s;
     }
 
-    .stat-sub {
+    .field input:focus, .field select:focus, .field textarea:focus {
+        border-color: var(--gold-b);
+    }
+
+    .field input::placeholder, .field textarea::placeholder {
+        color: var(--t4);
+    }
+
+    .field select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(245,245,240,0.25)' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+    }
+
+    .field.error input, .field.error select {
+        border-color: rgba(248, 113, 113, .5);
+    }
+
+    .field-hint {
         font-size: 11px;
         color: var(--t3);
         margin-top: 4px;
     }
 
-    .skel {
-        background: linear-gradient(90deg, var(--bg3) 25%, var(--bg4) 37%, var(--bg3) 63%);
-        background-size: 400% 100%;
-        animation: skel 1.4s ease infinite;
-        border-radius: 6px;
-    }/* CARDS */
+    .field-err {
+        font-size: 11px;
+        color: var(--rd);
+        margin-top: 4px;
+        display: none;
+    }
+
+    .field.error .field-err {
+        display: block;
+    }
+
+    .fr {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .fr3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 12px;
+    }/* ===== CARDS ===== */
     .card {
         background: var(--bg3);
         border: .5px solid var(--b);
         border-radius: var(--rl);
         padding: 18px 20px;
-        margin-bottom: 14px;
     }
 
-    .card-title {
-        font-size: 14px;
-        font-weight: 500;
-        font-family: 'Playfair Display', serif;
-        margin-bottom: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }/* TABLE */
-    .rpt-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .rpt-table th {
-        text-align: left;
-        font-size: 10px;
-        letter-spacing: .08em;
-        text-transform: uppercase;
-        color: var(--t3);
-        padding: 10px 12px;
-        border-bottom: .5px solid var(--b);
-        font-weight: 500;
-    }
-
-    .rpt-table td {
-        padding: 11px 12px;
-        border-bottom: .5px solid rgba(245, 245, 240, .04);
-        font-size: 13px;
-        vertical-align: middle;
-    }
-
-    .rpt-table tr:last-child td {
-        border-bottom: none;
-    }
-
-    .rpt-table tr:hover td {
-        background: rgba(245, 245, 240, .015);
-    }/* BADGE */
+    .card-s {
+        background: var(--bg3);
+        border: .5px solid var(--b);
+        border-radius: var(--r);
+        padding: 13px 15px;
+    }/* ===== BADGES ===== */
     .badge {
         font-size: 10px;
-        padding: 3px 9px;
+        padding: 3px 8px;
         border-radius: 20px;
         font-weight: 500;
         display: inline-flex;
         align-items: center;
+        gap: 4px;
+    }
+
+    .bg {
+        background: var(--gold-d);
+        color: var(--gold);
+        border: .5px solid var(--gold-b);
     }
 
     .bgr {
@@ -359,151 +265,64 @@
         color: var(--rd);
     }
 
-    .bbl {
-        background: rgba(96, 165, 250, .1);
-        color: #60a5fa;
-    }
-
     .bgy {
         background: rgba(245, 245, 240, .05);
         color: var(--t3);
+    }/* ===== DIVIDER ===== */
+    .div {
+        height: .5px;
+        background: var(--b);
+        margin: 16px 0;
     }
 
-    .bg {
-        background: var(--gold-d);
-        color: var(--gold);
-        border: .5px solid var(--gold-b);
+    .div-g {
+        height: .5px;
+        background: linear-gradient(to right, transparent, var(--gold-b), transparent);
+        margin: 24px 0;
+    }/* ===== SWITCH ===== */
+    .sw {
+        position: relative;
+        width: 40px;
+        height: 22px;
+        flex-shrink: 0;
     }
 
-    .bpr {
-        background: rgba(192, 132, 252, .1);
-        color: #c084fc;
-    }/* CHART BAR */
-    .chart-wrap {
-        display: flex;
-        align-items: flex-end;
-        gap: 8px;
-        height: 160px;
-        padding: 10px 0 0;
+    .sw input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+        position: absolute;
     }
 
-    .chart-col {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
-        flex: 1;
+    .sw-t {
+        position: absolute;
+        inset: 0;
+        background: rgba(245, 245, 240, .1);
+        border-radius: 22px;
+        cursor: pointer;
+        transition: .2s;
     }
 
-    .chart-bar {
-        width: 100%;
-        border-radius: 3px 3px 0 0;
-        background: var(--gold-d);
-        border: .5px solid var(--gold-b);
-        min-height: 4px;
-        transition: height .4s;
-    }
-
-    .chart-bar.today {
-        background: rgba(201, 168, 76, .28);
-        border-color: var(--gold);
-    }
-
-    .chart-lbl {
-        font-size: 10px;
-        color: var(--t3);
-    }
-
-    .chart-val {
-        font-size: 10px;
-        color: var(--gold);
-    }/* BARBERMAN TABLE */
-    .barber-row {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 10px 0;
-        border-bottom: .5px solid rgba(245, 245, 240, .04);
-    }
-
-    .barber-row:last-child {
-        border-bottom: none;
-    }
-
-    .av {
+    .sw-t:before {
+        content: '';
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        left: 3px;
+        top: 3px;
+        background: var(--t3);
         border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 600;
-        flex-shrink: 0;
+        transition: .2s;
     }
 
-    .av-s {
-        width: 32px;
-        height: 32px;
-        font-size: 12px;
-    }
-
-    .bar-info {
-        flex: 1;
-        min-width: 0;
-    }
-
-    .bar-name {
-        font-size: 13px;
-        font-weight: 500;
-    }
-
-    .bar-meta {
-        font-size: 11px;
-        color: var(--t3);
-        margin-top: 2px;
-    }
-
-    .bar-prog {
-        background: var(--bg2);
-        border-radius: 3px;
-        height: 4px;
-        margin-top: 6px;
-        overflow: hidden;
-    }
-
-    .bar-prog-fill {
-        height: 100%;
+    .sw input:checked + .sw-t {
         background: var(--gold);
-        border-radius: 3px;
-        transition: width .4s;
     }
 
-    .bar-rev {
-        font-size: 13px;
-        color: var(--gold);
-        font-weight: 500;
-        text-align: right;
-        flex-shrink: 0;
-    }/* EMPTY */
-    .empty-state {
-        text-align: center;
-        padding: 48px 20px;
-    }
-
-    .empty-icon {
-        font-size: 36px;
-        color: var(--t4);
-        margin-bottom: 12px;
-    }
-
-    .empty-title {
-        font-size: 14px;
-        color: var(--t2);
-        margin-bottom: 5px;
-    }
-
-    .empty-sub {
-        font-size: 12px;
-        color: var(--t3);
-    }/* TOAST */
+    .sw input:checked + .sw-t:before {
+        transform: translateX(18px);
+        background: #111;
+    }/* ===== TOAST ===== */
     #TB {
         position: fixed;
         bottom: 24px;
@@ -512,6 +331,7 @@
         display: flex;
         flex-direction: column;
         gap: 8px;
+        pointer-events: none;
     }
 
     .toast {
@@ -523,10 +343,11 @@
         display: flex;
         align-items: center;
         gap: 9px;
+        animation: tIn .25s ease;
         min-width: 230px;
         max-width: 320px;
         box-shadow: 0 8px 32px rgba(0, 0, 0, .4);
-        animation: tIn .25s ease;
+        pointer-events: auto;
     }
 
     .tok {
@@ -553,223 +374,906 @@
         color: var(--rd);
     }
 
-    @media (max-width: 900px) {
-        .stat-grid {
-            grid-template-columns: 1fr 1fr;
+    @keyframes tIn {
+        from {
+            opacity: 0;
+            transform: translateX(14px);
         }
 
-        .filter-bar {
-            flex-direction: column;
-            align-items: flex-start;
+        to {
+            opacity: 1;
+            transform: translateX(0);
         }
+    }/* ===== LOADING ===== */
+    .spin {
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255, 255, 255, .35);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin .6s linear infinite;
+        display: inline-block;
+    }
 
-        .rpt-table {
-            display: block;
-            overflow-x: auto;
+    .spin-g {
+        border-color: rgba(201, 168, 76, .2);
+        border-top-color: var(--gold);
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
         }
+    }/* ===== AVATAR ===== */
+    .av {
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        flex-shrink: 0;
+    }
+
+    .av-s {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+
+    .av-m {
+        width: 42px;
+        height: 42px;
+        font-size: 16px;
+    }
+
+    .av-l {
+        width: 56px;
+        height: 56px;
+        font-size: 20px;
+    }/* ===== PROGRESS STEP ===== */
+    .steps {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        margin-bottom: 28px;
+    }
+
+    .step {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 11px;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        color: var(--t4);
+    }
+
+    .step.active {
+        color: var(--gold);
+    }
+
+    .step.done {
+        color: var(--t3);
+    }
+
+    .step-n {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: .5px solid currentColor;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        flex-shrink: 0;
+    }
+
+    .step.done .step-n {
+        background: var(--gold-d);
+        border-color: var(--gold-b);
+        color: var(--gold);
+    }
+
+    .step-arr {
+        color: var(--t4);
+        padding: 0 8px;
+        font-size: 16px;
+    }/* ===== AUTH PAGE ===== */
+    #page-auth {
+        background: var(--bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    .auth-wrap {
+        width: 100%;
+        max-width: 420px;
+    }
+
+    .auth-logo {
+        font-family: 'Newsreader', serif;
+        font-size: 26px;
+        color: var(--gold);
+        text-align: center;
+        margin-bottom: 4px;
+    }
+
+    .auth-logo span {
+        color: var(--t);
+    }
+
+    .auth-sub {
+        font-size: 13px;
+        color: var(--t3);
+        text-align: center;
+        margin-bottom: 28px;
+    }
+
+    .auth-card {
+        background: var(--bg3);
+        border: .5px solid var(--b);
+        border-radius: var(--rxl);
+        padding: 32px 28px;
+    }
+
+    .auth-div {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 18px 0;
+    }
+
+    .auth-div::before, .auth-div::after {
+        content: '';
+        flex: 1;
+        height: .5px;
+        background: var(--b);
+    }
+
+    .auth-div span {
+        font-size: 11px;
+        color: var(--t3);
+    }
+
+    .auth-ft {
+        font-size: 13px;
+        color: var(--t3);
+        text-align: center;
+        margin-top: 16px;
+    }
+
+    .auth-ft button {
+        background: none;
+        border: none;
+        color: var(--gold);
+        cursor: pointer;
+        font-size: 13px;
+        font-family: 'Manrope', sans-serif;
+    }
+
+    .auth-ft button:hover {
+        text-decoration: underline;
+    }/* ===== SETUP PAGE ===== */
+    #page-setup {
+        background: var(--bg);
+    }
+
+    .setup-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 32px;
+        border-bottom: .5px solid var(--b);
+    }
+
+    .setup-logo {
+        font-family: 'Newsreader', serif;
+        font-size: 19px;
+        color: var(--gold);
+    }
+
+    .setup-logo span {
+        color: var(--t);
+    }
+
+    .setup-body {
+        max-width: 640px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+
+    .setup-title {
+        font-family: 'Newsreader', serif;
+        font-size: 26px;
+        margin-bottom: 6px;
+    }
+
+    .setup-sub {
+        font-size: 14px;
+        color: var(--t3);
+        margin-bottom: 32px;
+        line-height: 1.6;
+    }/* JAM OPERASIONAL */
+    .jam-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 0;
+        border-bottom: .5px solid rgba(245, 245, 240, .04);
+    }
+
+    .jam-day {
+        font-size: 13px;
+        color: var(--t);
+        min-width: 72px;
+    }
+
+    .jam-in {
+        background: var(--bg2);
+        border: .5px solid var(--b2);
+        color: var(--t);
+        padding: 7px 10px;
+        border-radius: var(--r);
+        font-size: 12px;
+        width: 86px;
+        outline: none;
+        transition: border-color .2s;
+    }
+
+    .jam-in:focus {
+        border-color: var(--gold-b);
+    }
+
+    .jam-dash {
+        color: var(--t3);
+        font-size: 13px;
+    }/* ===== DASHBOARD REDIRECT ===== */
+    #page-loading.active {
+        background: var(--bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .loading-logo {
+        font-family: 'Newsreader', serif;
+        font-size: 28px;
+        color: var(--gold);
+    }
+
+    .loading-logo span {
+        color: var(--t);
     }
     </style>
 </head>
 <body>
     <div id="TB"></div>
 
-    <!-- LOADING GUARD -->
-    <div id="guard" style="display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:14px;">
-        <div style="font-family:'Playfair Display',serif;font-size:24px;color:var(--gold);">
-            BARBER
-            <span style="color:var(--t);">BOOK</span>
+    <!-- ===================================================
+         PAGE: LOADING (cek session)
+         =================================================== -->
+    <div id="page-loading" class="page active">
+        <div class="loading-logo">
+            CARI
+            <span>CUKUR</span>
         </div>
-        <div style="width:22px;height:22px;border:2px solid rgba(201,168,76,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .6s linear infinite;"></div>
+        <div class="spin spin-g" style="width:24px;height:24px;"></div>
+        <div style="font-size:12px;color:var(--t3);">Memuat...</div>
     </div>
 
-    <!-- APP -->
-    <div id="app" class="hidden">
-
-        <nav class="nav">
-            <div class="nav-logo">
-                <div class="nav-logo-ic">
+    <!-- ===================================================
+         PAGE: AUTH (Login / Register)
+         =================================================== -->
+    <div id="page-auth" class="page">
+        <div class="auth-wrap">
+            <!-- Logo -->
+            <div style="text-align:center;margin-bottom:24px;">
+                <div style="width:52px;height:52px;background:var(--gold-d);border:.5px solid var(--gold-b);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:24px;color:var(--gold);">
                     <i class="ti ti-scissors"></i>
                 </div>
-
-                    BARBER
-                <span>BOOK</span>
+                <div class="auth-logo">
+                    CARI
+                    <span>CUKUR</span>
+                </div>
+                <div style="font-size:12px;color:var(--t3);margin-top:4px;">Platform booking barber shop profesional</div>
             </div>
-            <div style="display:flex;gap:8px;">
-                <a href="dashboard.html" class="btn btn-gh" style="text-decoration:none;">
-                    <i class="ti ti-arrow-left"></i>
-                    Dashboard
-                </a>
-                <button class="btn btn-g" onclick="exportExcel()" id="btnExport">
-                    <i class="ti ti-file-spreadsheet"></i>
-                    Export Excel
-                        
+
+            <div class="auth-card">
+                <!-- LOGIN -->
+                <div id="viewLogin">
+                    <div style="font-size:16px;font-weight:600;margin-bottom:20px;font-family:'Newsreader',serif;">Selamat Datang Kembali</div>
+                    <div class="field" id="fEmail">
+                        <label>Email</label>
+                        <input type="email" id="iEmail" placeholder="nama@email.com" autocomplete="email">
+                        <div class="field-err">Email tidak valid</div>
+                    </div>
+                    <div class="field" id="fPass">
+                        <label>Password</label>
+                        <div style="position:relative;">
+                            <input type="password" id="iPass" placeholder="••••••••" autocomplete="current-password" style="padding-right:44px;">
+                            <button onclick="togglePass('iPass',this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--t3);cursor:pointer;font-size:16px;">
+                                <i class="ti ti-eye"></i>
+                            </button>
+                        </div>
+                        <div class="field-err">Password salah</div>
+                    </div>
+                    <button class="btn btn-g w100" id="btnLogin" onclick="doLogin()" style="margin-top:4px;">
+                        <i class="ti ti-login"></i>
+                        Masuk
+                                
+                    </button>
+                    <div class="auth-div">
+                        <span>atau</span>
+                    </div>
+                    <button class="btn btn-o w100" onclick="showView('viewReg')">
+                        <i class="ti ti-user-plus"></i>
+                        Daftar sebagai Owner Baru
+                                
+                    </button>
+                    <div class="auth-ft" style="margin-top:14px;">
+                        <button onclick="showView('viewForgot')">Lupa password?</button>
+                    </div>
+                </div>
+
+                <!-- REGISTER -->
+                <div id="viewReg" class="hidden">
+                    <div style="font-size:16px;font-weight:600;margin-bottom:6px;font-family:'Newsreader',serif;">Daftar Akun Baru</div>
+                    <div style="font-size:12px;color:var(--t3);margin-bottom:20px;">Gratis 30 hari pertama, tidak perlu kartu kredit.</div>
+                    <div class="fr">
+                        <div class="field" id="fRStore">
+                            <label>
+                                Nama Toko 
+                                <span style="color:var(--rd);">*</span>
+                            </label>
+                            <input type="text" id="iRStore" placeholder="Primocut Barber">
+                            <div class="field-err">Wajib diisi</div>
+                        </div>
+                        <div class="field" id="fRCity">
+                            <label>
+                                Kota 
+                                <span style="color:var(--rd);">*</span>
+                            </label>
+                            <input type="text" id="iRCity" placeholder="Banda Aceh">
+                            <div class="field-err">Wajib diisi</div>
+                        </div>
+                    </div>
+                    <div class="field" id="fREmail">
+                        <label>
+                            Email 
+                            <span style="color:var(--rd);">*</span>
+                        </label>
+                        <input type="email" id="iREmail" placeholder="nama@email.com" autocomplete="email">
+                        <div class="field-err">Email tidak valid</div>
+                    </div>
+                    <div class="field" id="fRPass">
+                        <label>
+                            Password 
+                            <span style="color:var(--rd);">*</span>
+                        </label>
+                        <div style="position:relative;">
+                            <input type="password" id="iRPass" placeholder="Min. 8 karakter" autocomplete="new-password" style="padding-right:44px;">
+                            <button onclick="togglePass('iRPass',this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--t3);cursor:pointer;font-size:16px;">
+                                <i class="ti ti-eye"></i>
+                            </button>
+                        </div>
+                        <div class="field-err" id="errRPass">Min. 8 karakter</div>
+                    </div>
+                    <div class="field" id="fRPass2">
+                        <label>
+                            Konfirmasi Password 
+                            <span style="color:var(--rd);">*</span>
+                        </label>
+                        <input type="password" id="iRPass2" placeholder="Ulangi password" autocomplete="new-password">
+                        <div class="field-err">Password tidak cocok</div>
+                    </div>
+                    <div style="font-size:11px;color:var(--t3);margin-bottom:16px;line-height:1.6;">
+
+                                  Dengan mendaftar kamu menyetujui 
+                        <a href="#" style="color:var(--gold);">Syarat & Ketentuan</a>
+                         dan 
+                        <a href="#" style="color:var(--gold);">Kebijakan Privasi</a>
+                         CariCukur.
+                                
+                    </div>
+                    <button class="btn btn-g w100" id="btnReg" onclick="doRegister()">
+                        <i class="ti ti-rocket"></i>
+                        Buat Akun
+                                
+                    </button>
+                    <div class="auth-ft" style="margin-top:14px;">
+
+                                  Sudah punya akun? 
+                        <button onclick="showView('viewLogin')">Masuk</button>
+                    </div>
+                </div>
+
+                <!-- FORGOT PASSWORD -->
+                <div id="viewForgot" class="hidden">
+                    <div style="font-size:16px;font-weight:600;margin-bottom:6px;font-family:'Newsreader',serif;">Reset Password</div>
+                    <div style="font-size:12px;color:var(--t3);margin-bottom:20px;">Masukkan email yang terdaftar. Kami kirim link reset.</div>
+                    <div class="field" id="fFEmail">
+                        <label>Email</label>
+                        <input type="email" id="iFEmail" placeholder="nama@email.com">
+                        <div class="field-err">Email tidak valid</div>
+                    </div>
+                    <button class="btn btn-g w100" id="btnForgot" onclick="doForgot()">
+                        <i class="ti ti-mail"></i>
+                        Kirim Link Reset
+                                
+                    </button>
+                    <div class="auth-ft" style="margin-top:14px;">
+                        <button onclick="showView('viewLogin')">
+                            <i class="ti ti-arrow-left" style="font-size:12px;"></i>
+                             Kembali ke Login
+                        </button>
+                    </div>
+                </div>
+
+                <!-- EMAIL SENT CONFIRM -->
+                <div id="viewEmailSent" class="hidden" style="text-align:center;padding:16px 0;">
+                    <div style="font-size:40px;color:var(--gold);margin-bottom:16px;">
+                        <i class="ti ti-mail-check"></i>
+                    </div>
+                    <div style="font-family:'Newsreader',serif;font-size:18px;margin-bottom:8px;">Cek Email Kamu!</div>
+                    <div style="font-size:13px;color:var(--t3);line-height:1.7;margin-bottom:20px;" id="emailSentMsg">Link verifikasi dikirim ke email kamu.</div>
+                    <button class="btn btn-o w100" onclick="showView('viewLogin')">Kembali ke Login</button>
+                </div>
+            </div>
+
+            <!-- Demo note -->
+            <div style="text-align:center;margin-top:16px;">
+                <button class="btn btn-gh" onclick="goDemo()" style="font-size:12px;color:var(--t3);">
+                    <i class="ti ti-eye" style="font-size:13px;"></i>
+                    Lihat Demo Toko Tanpa Login
+                          
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- ===================================================
+         PAGE: SETUP TOKO (setelah register pertama kali)
+         =================================================== -->
+    <div id="page-setup" class="page">
+        <nav class="setup-nav">
+            <div class="setup-logo">
+                CARI
+                <span>CUKUR</span>
+            </div>
+            <button class="btn btn-gh" onclick="doLogout()">
+                <i class="ti ti-logout"></i>
+                Keluar
+            </button>
         </nav>
 
-        <div class="content">
-
-            <div style="margin-bottom:20px;">
-                <h2 style="font-family:'Playfair Display',serif;font-size:22px;margin-bottom:4px;">Laporan & Analitik</h2>
-                <p style="font-size:13px;color:var(--t3);">Ringkasan performa toko dan data booking yang bisa di-export ke Excel</p>
+        <div class="setup-body">
+            <!-- Progress Steps -->
+            <div class="steps">
+                <div class="step active" id="stp1">
+                    <div class="step-n">1</div>
+                    Info Toko
+                </div>
+                <div class="step-arr">
+                    <i class="ti ti-chevron-right"></i>
+                </div>
+                <div class="step" id="stp2">
+                    <div class="step-n">2</div>
+                    Jam Buka
+                </div>
+                <div class="step-arr">
+                    <i class="ti ti-chevron-right"></i>
+                </div>
+                <div class="step" id="stp3">
+                    <div class="step-n">3</div>
+                    Barberman
+                </div>
+                <div class="step-arr">
+                    <i class="ti ti-chevron-right"></i>
+                </div>
+                <div class="step" id="stp4">
+                    <div class="step-n">4</div>
+                    Paket
+                </div>
             </div>
 
-            <!-- FILTER -->
-            <div class="filter-bar">
-                <div class="fgroup">
-                    <label>Periode Cepat</label>
-                    <div class="period-chips">
-                        <div class="pchip" onclick="setPeriod('today',this)">Hari Ini</div>
-                        <div class="pchip active" onclick="setPeriod('month',this)">Bulan Ini</div>
-                        <div class="pchip" onclick="setPeriod('lastmonth',this)">Bulan Lalu</div>
-                        <div class="pchip" onclick="setPeriod('year',this)">Tahun Ini</div>
-                        <div class="pchip" onclick="setPeriod('all',this)">Semua</div>
+            <!-- STEP 1: INFO TOKO -->
+            <div id="setup1">
+                <div class="setup-title">Informasi Toko</div>
+                <div class="setup-sub">Lengkapi info dasar toko kamu. Ini yang dilihat customer di halaman booking.</div>
+
+                <div class="card" style="margin-bottom:16px;">
+                    <div class="fr">
+                        <div class="field" id="fs1Name">
+                            <label>
+                                Nama Toko 
+                                <span style="color:var(--rd);">*</span>
+                            </label>
+                            <input type="text" id="s1Name" placeholder="Primocut Barber">
+                            <div class="field-err">Wajib diisi</div>
+                        </div>
+                        <div class="field">
+                            <label>
+                                Kota 
+                                <span style="color:var(--rd);">*</span>
+                            </label>
+                            <input type="text" id="s1City" placeholder="Banda Aceh">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>
+                            Tagline 
+                            <span style="color:var(--t4);font-size:10px;">(opsional)</span>
+                        </label>
+                        <input type="text" id="s1Tag" placeholder="cth: Tampil Terbaik, Mulai dari Sini">
+                    </div>
+                    <div class="field">
+                        <label>Alamat Lengkap</label>
+                        <input type="text" id="s1Addr" placeholder="Jl. Nama Jalan No. X, Kota">
+                    </div>
+                    <div class="field">
+                        <label>
+                            Deskripsi Singkat 
+                            <span style="color:var(--t4);font-size:10px;">(opsional)</span>
+                        </label>
+                        <textarea id="s1Desc" rows="3" placeholder="Ceritakan sedikit tentang toko kamu..."></textarea>
+                    </div>
+                    <div class="fr">
+                        <div class="field">
+                            <label>
+                                No. WhatsApp Toko 
+                                <span style="color:var(--rd);">*</span>
+                            </label>
+                            <input type="text" id="s1WA" placeholder="08xxxxxxxxxx">
+                            <div class="field-hint">Untuk notifikasi & kontak customer</div>
+                        </div>
+                        <div class="field">
+                            <label>
+                                Instagram 
+                                <span style="color:var(--t4);font-size:10px;">(opsional)</span>
+                            </label>
+                            <input type="text" id="s1IG" placeholder="@nama.toko">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>
+                            URL Toko (slug) 
+                            <span style="color:var(--rd);">*</span>
+                        </label>
+                        <div style="display:flex;align-items:center;gap:0;">
+                            <span style="background:var(--bg4);border:.5px solid var(--b2);border-right:none;padding:11px 12px;border-radius:var(--r) 0 0 var(--r);font-size:12px;color:var(--t3);white-space:nowrap;">caricukur.id/</span>
+                            <input type="text" id="s1Slug" placeholder="primocut-bna" style="border-radius:0 var(--r) var(--r) 0;">
+                        </div>
+                        <div class="field-hint">Huruf kecil, angka, dan tanda hubung saja. cth: primocut-bna</div>
+                        <div id="slugCheck" style="font-size:11px;margin-top:4px;"></div>
                     </div>
                 </div>
-                <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
-                    <div class="fgroup">
-                        <label>Dari Tanggal</label>
-                        <input type="date" id="dateFrom">
+
+                <!-- Pengaturan Booking -->
+                <div class="card" style="margin-bottom:24px;">
+                    <div style="font-size:14px;font-weight:500;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+                        <i class="ti ti-settings" style="color:var(--gold);"></i>
+                        Pengaturan Booking
                     </div>
-                    <div class="fgroup">
-                        <label>Sampai Tanggal</label>
-                        <input type="date" id="dateTo">
+                    <div class="fr">
+                        <div class="field">
+                            <label>DP Minimum (%)</label>
+                            <input type="number" id="s1DP" value="30" min="0" max="100">
+                            <div class="field-hint">0 = tidak pakai DP</div>
+                        </div>
+                        <div class="field">
+                            <label>Batas Cancel (jam sebelum)</label>
+                            <input type="number" id="s1Cancel" value="2" min="0">
+                        </div>
                     </div>
-                    <button class="btn btn-o" onclick="loadData()">
-                        <i class="ti ti-search"></i>
-                        Tampilkan
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:.5px solid var(--b);">
+                        <div>
+                            <div style="font-size:13px;">Terima Walk-in</div>
+                            <div style="font-size:11px;color:var(--t3);margin-top:2px;">Customer bisa datang langsung tanpa booking online</div>
+                        </div>
+                        <label class="sw">
+                            <input type="checkbox" id="s1Walkin" checked>
+                            <span class="sw-t"></span>
+                        </label>
+                    </div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;">
+                        <div>
+                            <div style="font-size:13px;">Notifikasi WhatsApp Otomatis</div>
+                            <div style="font-size:11px;color:var(--t3);margin-top:2px;">Kirim reminder ke customer secara otomatis</div>
+                        </div>
+                        <label class="sw">
+                            <input type="checkbox" id="s1WaNotif" checked>
+                            <span class="sw-t"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <button class="btn btn-g w100" id="btnS1" onclick="saveStep1()" style="padding:14px;">
+
+                            Lanjut ke Jam Operasional 
+                    <i class="ti ti-arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- STEP 2: JAM OPERASIONAL -->
+            <div id="setup2" class="hidden">
+                <div class="setup-title">Jam Operasional</div>
+                <div class="setup-sub">Atur hari dan jam buka toko. Slot booking akan otomatis disesuaikan.</div>
+
+                <div class="card" style="margin-bottom:24px;">
+                    <div id="jamRows"></div>
+                </div>
+
+                <div style="display:flex;gap:10px;">
+                    <button class="btn btn-gh" onclick="goSetupStep(1)">
+                        <i class="ti ti-arrow-left"></i>
+                        Kembali
+                    </button>
+                    <button class="btn btn-g" style="flex:1;padding:14px;justify-content:center;" id="btnS2" onclick="saveStep2()">
+
+                                  Lanjut ke Barberman 
+                        <i class="ti ti-arrow-right"></i>
                     </button>
                 </div>
-                <div class="filter-sep"></div>
-                <div class="fgroup">
-                    <label>Filter Status</label>
-                    <select id="statusFilter">
-                        <option value="all">Semua Status</option>
-                        <option value="done">Selesai</option>
-                        <option value="confirmed">Terkonfirmasi</option>
-                        <option value="pending">Menunggu</option>
-                        <option value="cancelled">Dibatalkan</option>
-                        <option value="noshow">No-Show</option>
-                    </select>
-                </div>
-                <div class="fgroup">
-                    <label>Filter Barberman</label>
-                    <select id="barberFilter">
-                        <option value="all">Semua Barberman</option>
-                    </select>
-                </div>
             </div>
 
-            <!-- STATS -->
-            <div class="stat-grid" id="statGrid">
-                <div class="stat">
-                    <div class="stat-lbl">Total Booking</div>
-                    <div class="stat-val skel" style="width:40px;height:22px;">&nbsp;</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-lbl">Selesai</div>
-                    <div class="stat-val skel" style="width:40px;height:22px;">&nbsp;</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-lbl">Dibatalkan</div>
-                    <div class="stat-val skel" style="width:40px;height:22px;">&nbsp;</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-lbl">Total Pendapatan</div>
-                    <div class="stat-val skel" style="width:80px;height:22px;">&nbsp;</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-lbl">Rata-rata/Booking</div>
-                    <div class="stat-val skel" style="width:60px;height:22px;">&nbsp;</div>
-                </div>
-            </div>
+            <!-- STEP 3: BARBERMAN -->
+            <div id="setup3" class="hidden">
+                <div class="setup-title">Tambah Barberman</div>
+                <div class="setup-sub">Tambah minimal 1 barberman. Kamu bisa tambah lebih banyak nanti di dashboard.</div>
 
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+                <div id="barberList" style="margin-bottom:16px;"></div>
 
-                <!-- GRAFIK HARIAN -->
-                <div class="card">
-                    <div class="card-title">
-
-                                Booking per Hari
+                <!-- Form tambah -->
+                <div class="card" style="margin-bottom:16px;" id="addBarberForm">
+                    <div style="font-size:13px;font-weight:500;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+                        <i class="ti ti-user-plus" style="color:var(--gold);font-size:16px;"></i>
+                        Tambah Barberman
                                 
-                        <span style="font-size:11px;color:var(--t3);font-family:'Inter',sans-serif;" id="chartPeriodLabel">—</span>
                     </div>
-                    <div class="chart-wrap" id="dailyChart">
-                        <div style="color:var(--t4);font-size:12px;align-self:center;margin:auto;">Memuat grafik...</div>
-                    </div>
-                </div>
-
-                <!-- PERFORMA BARBERMAN -->
-                <div class="card">
-                    <div class="card-title">Performa Barberman</div>
-                    <div id="barberPerfList">
-                        <div style="color:var(--t4);font-size:12px;">Memuat...</div>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- TABEL PAKET TERLARIS -->
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
-                <div class="card">
-                    <div class="card-title">Paket Terlaris</div>
-                    <div id="pkgStats"></div>
-                </div>
-                <div class="card">
-                    <div class="card-title">Ringkasan Tipe Booking</div>
-                    <div id="typeStats"></div>
-                </div>
-            </div>
-
-            <!-- TABEL BOOKING LENGKAP -->
-            <div class="card">
-                <div class="card-title">
-
-                          Detail Semua Booking
-                          
-                    <span style="font-size:12px;color:var(--t3);font-family:'Inter',sans-serif;" id="tableCount">—</span>
-                </div>
-                <div style="overflow-x:auto;">
-                    <table class="rpt-table">
-                        <thead>
-                            <tr>
-                                <th>Kode</th>
-                                <th>Customer</th>
-                                <th>Barberman</th>
-                                <th>Paket</th>
-                                <th>Tanggal</th>
-                                <th>Waktu</th>
-                                <th>Tipe</th>
-                                <th>Total</th>
-                                <th>DP</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="bookingTable"></tbody>
-                    </table>
-                </div>
-                <div id="tableEmpty" class="hidden">
-                    <div class="empty-state">
-                        <div class="empty-icon">
-                            <i class="ti ti-calendar-off"></i>
+                    <div class="fr">
+                        <div class="field" id="fbName">
+                            <label>
+                                Nama 
+                                <span style="color:var(--rd);">*</span>
+                            </label>
+                            <input type="text" id="ibName" placeholder="Nama barberman">
+                            <div class="field-err">Wajib diisi</div>
                         </div>
-                        <div class="empty-title">Tidak ada data</div>
-                        <div class="empty-sub">Coba ubah filter tanggal atau status</div>
+                        <div class="field">
+                            <label>Spesialisasi</label>
+                            <input type="text" id="ibSpec" placeholder="cth: Fade & Pompadour">
+                        </div>
                     </div>
+                    <div class="field">
+                        <label>
+                            No. WhatsApp 
+                            <span style="color:var(--t4);font-size:10px;">(opsional)</span>
+                        </label>
+                        <input type="text" id="ibWA" placeholder="08xxxxxxxxxx">
+                    </div>
+                    <div class="field">
+                        <label>Hari Libur Mingguan</label>
+                        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;" id="ibDays">
+                            <div class="day-btn" data-day="1" onclick="toggleDay(this)">Senin</div>
+                            <div class="day-btn" data-day="2" onclick="toggleDay(this)">Selasa</div>
+                            <div class="day-btn" data-day="3" onclick="toggleDay(this)">Rabu</div>
+                            <div class="day-btn" data-day="4" onclick="toggleDay(this)">Kamis</div>
+                            <div class="day-btn" data-day="5" onclick="toggleDay(this)">Jumat</div>
+                            <div class="day-btn" data-day="6" onclick="toggleDay(this)">Sabtu</div>
+                            <div class="day-btn" data-day="0" onclick="toggleDay(this)">Minggu</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-g" id="btnAddBarber" onclick="addBarber()">
+                        <i class="ti ti-plus"></i>
+                        Tambah ke Daftar
+                    </button>
+                </div>
+
+                <div style="display:flex;gap:10px;">
+                    <button class="btn btn-gh" onclick="goSetupStep(2)">
+                        <i class="ti ti-arrow-left"></i>
+                        Kembali
+                    </button>
+                    <button class="btn btn-g" style="flex:1;padding:14px;justify-content:center;" id="btnS3" onclick="saveStep3()">
+
+                                  Lanjut ke Paket 
+                        <i class="ti ti-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 4: PAKET LAYANAN -->
+            <div id="setup4" class="hidden">
+                <div class="setup-title">Paket Layanan</div>
+                <div class="setup-sub">Tambah paket yang kamu tawarkan beserta harga dan durasinya. Durasi ini dipakai untuk smart scheduling.</div>
+
+                <div id="pkgList" style="margin-bottom:16px;"></div>
+
+                <div class="card" style="margin-bottom:16px;" id="addPkgForm">
+                    <div style="font-size:13px;font-weight:500;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+                        <i class="ti ti-plus" style="color:var(--gold);font-size:16px;"></i>
+                        Tambah Paket
+                                
+                    </div>
+                    <div class="field" id="fpName">
+                        <label>
+                            Nama Paket 
+                            <span style="color:var(--rd);">*</span>
+                        </label>
+                        <input type="text" id="ipName" placeholder="cth: Potong Reguler">
+                        <div class="field-err">Wajib diisi</div>
+                    </div>
+                    <div class="field">
+                        <label>
+                            Deskripsi 
+                            <span style="color:var(--t4);font-size:10px;">(opsional)</span>
+                        </label>
+                        <input type="text" id="ipDesc" placeholder="cth: Potong rambut standar dengan gaya pilihan">
+                    </div>
+                    <div class="fr3">
+                        <div class="field" id="fpPrice">
+                            <label>
+                                Harga (Rp) 
+                                <span style="color:var(--rd);">*</span>
+                            </label>
+                            <input type="number" id="ipPrice" placeholder="35000" min="0">
+                            <div class="field-err">Wajib diisi</div>
+                        </div>
+                        <div class="field" id="fpDur">
+                            <label>
+                                Durasi Kerja (mnt) 
+                                <span style="color:var(--rd);">*</span>
+                            </label>
+                            <input type="number" id="ipDur" placeholder="30" min="5">
+                            <div class="field-hint">Lama pengerjaan</div>
+                            <div class="field-err">Wajib diisi</div>
+                        </div>
+                        <div class="field">
+                            <label>Buffer Bersih (mnt)</label>
+                            <input type="number" id="ipBuf" value="15" min="0">
+                            <div class="field-hint">Waktu bersih-bersih</div>
+                        </div>
+                    </div>
+                    <!-- Preview total blokir -->
+                    <div id="pkgPreview" style="background:rgba(201,168,76,.05);border:.5px solid var(--gold-b);border-radius:var(--r);padding:12px 14px;display:none;">
+                        <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:4px;">Total waktu diblokir per booking</div>
+                        <div style="font-size:14px;color:var(--gold);font-weight:500;" id="pkgPreviewVal">—</div>
+                    </div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;margin-top:8px;border-top:.5px solid var(--b);">
+                        <div style="font-size:13px;">Tampilkan sebagai "Terpopuler"</div>
+                        <label class="sw">
+                            <input type="checkbox" id="ipFeat">
+                            <span class="sw-t"></span>
+                        </label>
+                    </div>
+                    <button class="btn btn-g" id="btnAddPkg" onclick="addPkg()">
+                        <i class="ti ti-plus"></i>
+                        Tambah ke Daftar
+                    </button>
+                </div>
+
+                <div style="display:flex;gap:10px;">
+                    <button class="btn btn-gh" onclick="goSetupStep(3)">
+                        <i class="ti ti-arrow-left"></i>
+                        Kembali
+                    </button>
+                    <button class="btn btn-g" style="flex:1;padding:14px;justify-content:center;" id="btnS4" onclick="saveStep4()">
+                        <i class="ti ti-rocket"></i>
+                        Selesai & Buka Dashboard
+                                
+                    </button>
                 </div>
             </div>
 
         </div>
-        <!-- end content -->
+        <!-- end setup-body -->
     </div>
-    <!-- end app -->
+    <!-- end page-setup -->
+
+    <style>
+    /* Day button untuk hari libur */
+    .day-btn {
+        padding: 6px 12px;
+        border: .5px solid var(--b2);
+        border-radius: 6px;
+        font-size: 11px;
+        color: var(--t3);
+        cursor: pointer;
+        transition: all .15s;
+        user-select: none;
+    }
+
+    .day-btn:hover {
+        border-color: var(--gold-b);
+        color: var(--gold);
+    }
+
+    .day-btn.off {
+        background: var(--rdd);
+        border-color: rgba(248, 113, 113, .3);
+        color: var(--rd);
+    }/* Barber card di list */
+    .barber-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--bg3);
+        border: .5px solid var(--b);
+        border-radius: var(--r);
+        padding: 14px;
+        margin-bottom: 10px;
+    }
+
+    .barber-item-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .barber-item-name {
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .barber-item-sub {
+        font-size: 11px;
+        color: var(--t3);
+        margin-top: 2px;
+    }
+
+    .barber-item-days {
+        font-size: 10px;
+        color: var(--rd);
+        margin-top: 3px;
+    }/* Pkg card di list */
+    .pkg-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--bg3);
+        border: .5px solid var(--b);
+        border-radius: var(--r);
+        padding: 14px;
+        margin-bottom: 10px;
+    }
+
+    .pkg-item-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .pkg-item-name {
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .pkg-item-sub {
+        font-size: 11px;
+        color: var(--t3);
+        margin-top: 2px;
+    }
+
+    .pkg-item-price {
+        font-family: 'Newsreader', serif;
+        font-size: 16px;
+        color: var(--gold);
+        flex-shrink: 0;
+    }
+    </style>
 
     <script>
     // ============================================================
     // KONFIGURASI SUPABASE
+    // Ganti dengan URL dan ANON KEY Supabase project kamu
     // ============================================================
     const SUPABASE_URL = 'https://rdhytutkjzgizluyvrus.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_FGCxIQUPfWUKtdGI52oFKw_XCmRWFWh';
+
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // ============================================================
@@ -778,68 +1282,22 @@
     let STATE = {
         user: null,
         store: null,
-        barbers: [],
-        bookings: [],
-        filtered: []
+        setupStoreId: null,
+        setupBarbers: [],
+        // barberman yang ditambah di step 3 (sebelum save)
+        setupPkgs: [],
+        // paket yang ditambah di step 4 (sebelum save)
+        slugTimer: null,
     };
 
-    const STATUS_LABEL = {
-        pending: {
-            label: 'Menunggu',
-            cls: 'bgy'
-        },
-        confirmed: {
-            label: 'Terkonfirmasi',
-            cls: 'bbl'
-        },
-        active: {
-            label: 'Berlangsung',
-            cls: 'bg'
-        },
-        done: {
-            label: 'Selesai',
-            cls: 'bgr'
-        },
-        cancelled: {
-            label: 'Dibatalkan',
-            cls: 'brd'
-        },
-        noshow: {
-            label: 'No-Show',
-            cls: 'brd'
-        },
-    };
+    const DAYS = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const COLORS = ['#C9A84C', '#60a5fa', '#4ade80', '#c084fc', '#f87171', '#fb923c', '#34d399'];
 
     // ============================================================
     // UTILS
     // ============================================================
     function fmtRp(n) {
-        return 'Rp ' + Math.round(n || 0).toLocaleString('id-ID');
-    }
-    function fmtDate(s) {
-        if (!s)
-            return '—';
-        const d = new Date(s + 'T00:00:00');
-        return d.toLocaleDateString('id-ID', {
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric'
-        });
-    }
-    function fmtTime(t) {
-        return (t || '').slice(0, 5) || '—';
-    }
-    function escH(s) {
-        const d = document.createElement('div');
-        d.textContent = s ?? '';
-        return d.innerHTML;
-    }
-    function avatarColor(str) {
-        const cols = ['#C9A84C', '#60a5fa', '#4ade80', '#c084fc', '#f87171', '#fb923c'];
-        let h = 0;
-        for (let i = 0; i < (str || '').length; i++)
-            h = str.charCodeAt(i) + ((h << 5) - h);
-        return cols[Math.abs(h) % cols.length];
+        return 'Rp ' + Math.round(n).toLocaleString('id-ID');
     }
 
     function showToast(msg, type='ok') {
@@ -864,605 +1322,1006 @@
         }, 3500);
     }
 
+    function showPage(id) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        window.scrollTo(0, 0);
+    }
+
+    function showView(id) {
+        ['viewLogin', 'viewReg', 'viewForgot', 'viewEmailSent'].forEach(v => {
+            document.getElementById(v).classList.add('hidden');
+        });
+        document.getElementById(id).classList.remove('hidden');
+    }
+
+    function togglePass(inputId, btn) {
+        const inp = document.getElementById(inputId);
+        const icon = btn.querySelector('i');
+        if (inp.type === 'password') {
+            inp.type = 'text';
+            icon.className = 'ti ti-eye-off';
+        } else {
+            inp.type = 'password';
+            icon.className = 'ti ti-eye';
+        }
+    }
+
+    function setLoading(btnId, loading, label='') {
+        const btn = document.getElementById(btnId);
+        if (!btn)
+            return;
+        if (loading) {
+            btn._origHTML = btn.innerHTML;
+            btn.innerHTML = `<div class="spin"></div>Memproses...`;
+            btn.disabled = true;
+        } else {
+            btn.innerHTML = btn._origHTML || label;
+            btn.disabled = false;
+        }
+    }
+
+    function validateField(fieldId, valid, errMsg='') {
+        const f = document.getElementById(fieldId);
+        if (!f)
+            return;
+        f.classList.toggle('error', !valid);
+        if (!valid && errMsg) {
+            const errEl = f.querySelector('.field-err');
+            if (errEl)
+                errEl.textContent = errMsg;
+        }
+    }
+
+    function clearErrors() {
+        document.querySelectorAll('.field.error').forEach(f => f.classList.remove('error'));
+    }
+
     // ============================================================
-    // AUTH GUARD
+    // INIT — cek session saat load
     // ============================================================
-    async function initGuard() {
-        const timeout = new Promise((_, r) => setTimeout(() => r(new Error('TIMEOUT')), 8000));
+    let _initHandled = false; // pastikan proses redirect cuma jalan sekali
+
+    async function init() {
+        // Timeout pengaman: kalau proses cek session lebih dari 8 detik
+        // (misal koneksi internet lambat/putus), jangan macet selamanya —
+        // tampilkan halaman login dan beri tahu user.
+        const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('TIMEOUT')), 8000)
+        );
+
         try {
-            const {data: {session}} = await Promise.race([sb.auth.getSession(), timeout]);
-            if (!session?.user) {
-                window.location.href = 'auth.html';
+            const {data: {session}} = await Promise.race([
+            sb.auth.getSession(),
+            timeoutPromise,
+            ]);
+            if(session?.user) {
+                STATE.user = session.user;
+                if (!_initHandled) {
+                    _initHandled = true;
+                    await afterLogin();
+                }
+            } else {
+                if (!_initHandled) {
+                    _initHandled = true;
+                    showPage('page-auth');
+                }
+            }
+        } catch (e) {
+            console.error('Init error:', e);
+            if (_initHandled)
+                return; // listener lain sudah menangani, jangan timpa
+            _initHandled = true;
+            if (e.message === 'TIMEOUT') {
+                showToast('Koneksi lambat. Cek internet kamu dan coba lagi.', 'warn');
+            } else {
+                showToast('Gagal memuat. Cek koneksi internet kamu.', 'err');
+            }
+            showPage('page-auth');
+        }
+    }
+
+    // Setelah login: cek apakah sudah punya toko
+    async function afterLogin() {
+        const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('TIMEOUT')), 8000)
+        );
+
+        try {
+            const {data: store, error} = await Promise.race([
+            sb.from('stores').select('*').eq('owner_id', STATE.user.id).maybeSingle(),
+            timeoutPromise,
+            ]);
+
+            if (error) {
+                console.error('Gagal cek toko:', error);
+                showToast('Gagal memuat data toko. Coba refresh halaman.', 'err');
+                showPage('page-auth');
                 return;
             }
-            STATE.user = session.user;
 
-            const {data: store, error} = await sb.from('stores').select('*').eq('owner_id', STATE.user.id).maybeSingle();
-            if (error || !store) {
-                window.location.href = 'auth.html';
+            if (!store) {
+                // Belum punya toko sama sekali → mulai Setup dari awal
+                STATE.store = null;
+                STATE.setupStoreId = null;
+                initSetupForm();
+                showPage('page-setup');
+            } else {
+                STATE.store = store;
+                STATE.setupStoreId = store.id;
+                // Cek apakah setup toko sudah lengkap (punya barberman & paket)
+                const isComplete = await checkSetupComplete(store.id);
+                if (isComplete) {
+                    window.location.href = 'dashboard.html';
+                } else {
+                    // Toko ada tapi setup belum selesai → lanjutkan dari step yang sesuai
+                    initSetupForm();
+                    prefillSetupFromStore(store);
+                    await resumeSetupProgress(store.id);
+                    showPage('page-setup');
+                }
+            }
+        } catch (e) {
+            console.error('afterLogin error:', e);
+            showToast('Koneksi gagal. Cek internet kamu dan coba lagi.', 'err');
+            showPage('page-auth');
+        }
+    }
+
+    // Cek apakah toko sudah punya minimal 1 barberman dan 1 paket (artinya setup selesai)
+    async function checkSetupComplete(storeId) {
+        try {
+            const [{count: barberCount}, {count: pkgCount}] = await Promise.all([
+            sb.from('barbers').select('id', {
+                count: 'exact',
+                head: true
+            }).eq('store_id', storeId),
+            sb.from('packages').select('id', {
+                count: 'exact',
+                head: true
+            }).eq('store_id', storeId),
+            ]);
+            return (barberCount > 0) && (pkgCount > 0);
+        } catch (e) {
+            console.error('checkSetupComplete error:', e);
+            return false;
+        }
+    }
+
+    // Isi ulang form step 1 dengan data toko yang sudah ada (kalau user kembali setelah setup terputus)
+    function prefillSetupFromStore(store) {
+        const fields = {
+            s1Name: store.name,
+            s1City: store.city,
+            s1Tag: store.tagline,
+            s1Addr: store.address,
+            s1Desc: store.description,
+            s1WA: store.phone_wa,
+            s1IG: store.instagram,
+            s1Slug: store.slug,
+            s1DP: store.dp_percent,
+            s1Cancel: store.cancel_hours,
+        };
+        Object.entries(fields).forEach(([id, val]) => {
+            const el = document.getElementById(id);
+            if (el && val !== null && val !== undefined)
+                el.value = val;
+        });
+        const walkinEl = document.getElementById('s1Walkin');
+        const notifEl = document.getElementById('s1WaNotif');
+        if (walkinEl)
+            walkinEl.checked = !!store.accept_walkin;
+        if (notifEl)
+            notifEl.checked = !!store.wa_notif;
+    }
+
+    // Lanjutkan ke step setup yang sesuai berdasarkan progress yang sudah tersimpan
+    async function resumeSetupProgress(storeId) {
+        try {
+            const {count: barberCount} = await sb.from('barbers')
+            .select('id', {
+                count: 'exact',
+                head: true
+            }).eq('store_id', storeId);
+            if (barberCount > 0) {
+                goSetupStep(4);
                 return;
             }
-            STATE.store = store;
+            const {data: hours} = await sb.from('store_hours')
+            .select('id').eq('store_id', storeId).limit(1);
+            if (hours && hours.length > 0) {
+                await loadJamFromDB();
+                goSetupStep(3);
+                return;
+            }
+            await loadJamFromDB();
+            goSetupStep(2);
+        } catch (e) {
+            console.error('resumeSetupProgress error:', e);
+            goSetupStep(1);
+        }
+    }
 
-            // Load barberman untuk filter
-            const {data: barbers} = await sb.from('barbers').select('id,name').eq('store_id', store.id).order('sort_order');
-            STATE.barbers = barbers || [];
-            const bSel = document.getElementById('barberFilter');
-            STATE.barbers.forEach(b => {
-                bSel.add(new Option(b.name, b.id));
+    // ============================================================
+    // AUTH FUNCTIONS
+    // ============================================================
+    async function doLogin() {
+        clearErrors();
+        const email = document.getElementById('iEmail').value.trim();
+        const pass = document.getElementById('iPass').value;
+        let valid = true;
+
+        if (!email || !email.includes('@')) {
+            validateField('fEmail', false);
+            valid = false;
+        }
+        if (!pass) {
+            validateField('fPass', false);
+            valid = false;
+        }
+        if (!valid)
+            return;
+
+        setLoading('btnLogin', true);
+        try {
+            const {data, error} = await sb.auth.signInWithPassword({
+                email,
+                password: pass
+            });
+            if (error) {
+                if (error.message.includes('Invalid')) {
+                    validateField('fPass', false, 'Email atau password salah');
+                } else {
+                    showToast(error.message, 'err');
+                }
+                setLoading('btnLogin', false);
+                return;
+            }
+            STATE.user = data.user;
+            showToast('Selamat datang kembali!', 'ok');
+            await afterLogin();
+        } catch (e) {
+            showToast('Terjadi kesalahan. Coba lagi.', 'err');
+            setLoading('btnLogin', false);
+        }
+    }
+
+    async function doRegister() {
+        clearErrors();
+        const store = document.getElementById('iRStore').value.trim();
+        const city = document.getElementById('iRCity').value.trim();
+        const email = document.getElementById('iREmail').value.trim();
+        const pass = document.getElementById('iRPass').value;
+        const pass2 = document.getElementById('iRPass2').value;
+        let valid = true;
+
+        if (!store) {
+            validateField('fRStore', false);
+            valid = false;
+        }
+        if (!city) {
+            validateField('fRCity', false);
+            valid = false;
+        }
+        if (!email || !email.includes('@')) {
+            validateField('fREmail', false);
+            valid = false;
+        }
+        if (pass.length < 8) {
+            validateField('fRPass', false, 'Password minimal 8 karakter');
+            valid = false;
+        }
+        if (pass !== pass2) {
+            validateField('fRPass2', false, 'Password tidak cocok');
+            valid = false;
+        }
+        if (!valid)
+            return;
+
+        setLoading('btnReg', true);
+        try {
+            const {data, error} = await sb.auth.signUp({
+                email,
+                password: pass,
+                options: {
+                    data: {
+                        store_name: store,
+                        city
+                    }
+                }
             });
 
-            document.getElementById('guard').classList.add('hidden');
-            document.getElementById('app').classList.remove('hidden');
+            if (error) {
+                if (error.message.includes('already registered')) {
+                    validateField('fREmail', false, 'Email sudah terdaftar');
+                } else {
+                    showToast(error.message, 'err');
+                }
+                setLoading('btnReg', false);
+                return;
+            }
 
-            // Default: bulan ini
-            setPeriod('month', document.querySelector('.pchip.active'));
-            await loadData();
+            // Simpan data untuk setup awal
+            if (data.user) {
+                STATE.user = data.user;
+                // Pre-fill setup form dengan nama toko dari register
+                document.getElementById('s1Name').value = store;
+                document.getElementById('s1City').value = city;
+                // Auto-generate slug
+                document.getElementById('s1Slug').value = slugify(store + '-' + city);
+            }
+
+            const msg = data.session
+            ? 'Akun berhasil dibuat!'
+            : 'Cek email untuk verifikasi akun.';
+
+            document.getElementById('emailSentMsg').textContent =
+            data.session
+            ? 'Akun berhasil dibuat! Melanjutkan setup toko...'
+            : `Link verifikasi dikirim ke ${email}. Setelah verifikasi, login kembali untuk melanjutkan setup.`;
+
+            showView('viewEmailSent');
+            showToast(msg, 'ok');
+            setLoading('btnReg', false);
+
+            if (data.session) {
+                setTimeout(() => {
+                    initSetupForm();
+                    showPage('page-setup');
+                }, 1500);
+            }
         } catch (e) {
-            console.error('Guard error:', e);
-            window.location.href = 'auth.html';
+            showToast('Terjadi kesalahan. Coba lagi.', 'err');
+            setLoading('btnReg', false);
         }
     }
 
-    // ============================================================
-    // PERIODE CEPAT
-    // ============================================================
-    function setPeriod(period, el) {
-        document.querySelectorAll('.pchip').forEach(c => c.classList.remove('active'));
-        el?.classList.add('active');
-
-        const today = new Date();
-        const fmt = d => d.toISOString().slice(0, 10);
-
-        let from,
-            to = fmt(today);
-        if (period === 'today') {
-            from = fmt(today);
-        } else if (period === 'month') {
-            from = fmt(new Date(today.getFullYear(), today.getMonth(), 1));
-        } else if (period === 'lastmonth') {
-            const f = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-            const t = new Date(today.getFullYear(), today.getMonth(), 0);
-            from = fmt(f);
-            to = fmt(t);
-        } else if (period === 'year') {
-            from = fmt(new Date(today.getFullYear(), 0, 1));
-        } else {
-            from = '2020-01-01';
-        }
-
-        document.getElementById('dateFrom').value = from;
-        document.getElementById('dateTo').value = to;
-    }
-
-    // ============================================================
-    // LOAD DATA
-    // ============================================================
-    async function loadData() {
-        const from = document.getElementById('dateFrom').value;
-        const to = document.getElementById('dateTo').value;
-        const statusF = document.getElementById('statusFilter').value;
-        const barberF = document.getElementById('barberFilter').value;
-
-        if (!from || !to) {
-            showToast('Pilih tanggal dari dan sampai', 'warn');
+    async function doForgot() {
+        clearErrors();
+        const email = document.getElementById('iFEmail').value.trim();
+        if (!email || !email.includes('@')) {
+            validateField('fFEmail', false);
             return;
         }
 
-        // Reset UI
-        document.getElementById('bookingTable').innerHTML = '<tr><td colspan="10" style="text-align:center;padding:24px;color:var(--t4);">Memuat data...</td></tr>';
-        document.getElementById('tableEmpty').classList.add('hidden');
-
+        setLoading('btnForgot', true);
         try {
-            let query = sb.from('bookings')
-            .select(`
-        id,booking_code,type,status,customer_name,customer_phone,
-        booking_date,start_time,end_time,total_price,dp_amount,dp_status,created_at,
-        barbers(name,avatar_color),
-        packages(name)
-      `
+            const {error} = await sb.auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.origin + '/reset-password.html'
+            });
+            if (error) {
+                showToast(error.message, 'err');
+                setLoading('btnForgot', false);
+                return;
+            }
+
+            document.getElementById('emailSentMsg').textContent =
+            `Link reset password dikirim ke ${email}. Cek inbox (dan folder spam) kamu.`;
+            showView('viewEmailSent');
+            setLoading('btnForgot', false);
+        } catch (e) {
+            showToast('Terjadi kesalahan.', 'err');
+            setLoading('btnForgot', false);
+        }
+    }
+
+    async function doLogout() {
+        await sb.auth.signOut();
+        STATE.user = null;
+        STATE.store = null;
+        showPage('page-auth');
+        showView('viewLogin');
+        showToast('Berhasil keluar', 'ok');
+    }
+
+    function goDemo() {
+        window.location.href = 'booking.html?store=demo';
+    }
+
+    // ============================================================
+    // SETUP TOKO
+    // ============================================================
+    function initSetupForm() {
+        goSetupStep(1);
+        renderJamRows();
+        renderBarberList();
+        renderPkgList();
+
+        // Auto-generate slug dari nama toko
+        document.getElementById('s1Name').addEventListener('input', function() {
+            const city = document.getElementById('s1City').value;
+            document.getElementById('s1Slug').value = slugify(this.value + (city ? '-' + city : ''));
+            checkSlug();
+        });
+        document.getElementById('s1City').addEventListener('input', function() {
+            const name = document.getElementById('s1Name').value;
+            document.getElementById('s1Slug').value = slugify(name + '-' + this.value);
+            checkSlug();
+        });
+        document.getElementById('s1Slug').addEventListener('input', function() {
+            this.value = slugify(this.value);
+            checkSlug();
+        });
+
+        // Preview total blokir paket
+        ['ipDur', 'ipBuf'].forEach(id => {
+            document.getElementById(id).addEventListener('input', updatePkgPreview);
+        });
+    }
+
+    function slugify(text) {
+        return text
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
+    }
+
+    async function checkSlug() {
+        const slug = document.getElementById('s1Slug').value;
+        const el = document.getElementById('slugCheck');
+        if (!slug || slug.length < 3) {
+            el.textContent = '';
+            return;
+        }
+
+        clearTimeout(STATE.slugTimer);
+        STATE.slugTimer = setTimeout(async () => {
+            el.innerHTML = '<span style="color:var(--t3);">Mengecek ketersediaan...</span>';
+            try {
+                const {data} = await sb.from('stores').select('id').eq('slug', slug).maybeSingle();
+                if (data) {
+                    el.innerHTML = '<span style="color:var(--rd);"><i class="ti ti-x" style="font-size:12px;vertical-align:-1px;"></i> URL sudah dipakai</span>';
+                } else {
+                    el.innerHTML = '<span style="color:var(--gr);"><i class="ti ti-check" style="font-size:12px;vertical-align:-1px;"></i> URL tersedia</span>';
+                }
+            } catch (e) {
+                el.textContent = '';
+            }
+        }, 500);
+    }
+
+    function goSetupStep(n) {
+        for (let i = 1; i <= 4; i++) {
+            document.getElementById(`setup${i}`).classList.toggle('hidden', i !== n);
+            const s = document.getElementById(`stp${i}`);
+            s.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+        }
+    }
+
+    // JAM OPERASIONAL
+    function renderJamRows() {
+        const defaultHours = [
+        {
+            day: 0,
+            name: 'Minggu',
+            open: '09:00',
+            close: '17:00',
+            on: false
+        },
+        {
+            day: 1,
+            name: 'Senin',
+            open: '08:00',
+            close: '20:00',
+            on: true
+        },
+        {
+            day: 2,
+            name: 'Selasa',
+            open: '08:00',
+            close: '20:00',
+            on: true
+        },
+        {
+            day: 3,
+            name: 'Rabu',
+            open: '08:00',
+            close: '20:00',
+            on: true
+        },
+        {
+            day: 4,
+            name: 'Kamis',
+            open: '08:00',
+            close: '20:00',
+            on: true
+        },
+        {
+            day: 5,
+            name: 'Jumat',
+            open: '08:00',
+            close: '20:00',
+            on: true
+        },
+        {
+            day: 6,
+            name: 'Sabtu',
+            open: '08:00',
+            close: '20:00',
+            on: true
+        },
+        ];
+
+        const container = document.getElementById('jamRows');
+        container.innerHTML = defaultHours.map(h => `
+    <div class="jam-row">
+      <div class="jam-day">${
+        h.name}</div>
+      <label class="sw" style="margin-right:12px;">
+        <input type="checkbox" ${
+        h.on ? 'checked' : ''} id="jamon${h.day}"
+          onchange="toggleJamRow(${h.day}, this.checked)">
+        <span class="sw-t"></span>
+      </label>
+      <div id="jamtimes${
+
+        h.day}" style="${h.on ? '' : 'opacity:.25;pointer-events:none;'}">
+        <input class="jam-in" type="time" id="jamopen${h.day}" value="${h.open}">
+        <span class="jam-dash">–</span>
+        <input class="jam-in" type="time" id="jamclose${
+        h.day}" value="${h.close}">
+      </div>
+    </div>
+  `
 
 
+        ).join('');
+    }
 
+    function toggleJamRow(day, on) {
+        const el = document.getElementById(`jamtimes${day}`);
+        el.style.opacity = on ? '1' : '.25';
+        el.style.pointerEvents = on ? 'auto' : 'none';
+    }
 
-            )
-            .eq('store_id', STATE.store.id)
-            .gte('booking_date', from)
-            .lte('booking_date', to)
-            .order('booking_date', {
-                ascending: false
-            })
-            .order('start_time', {
-                ascending: false
+    function getJamData() {
+        return [0, 1, 2, 3, 4, 5, 6].map(d => ({
+            day_of_week: d,
+            is_open: document.getElementById(`jamon${d}`)?.checked ?? false,
+            open_time: document.getElementById(`jamopen${d}`)?.value || '08:00',
+            close_time: document.getElementById(`jamclose${d}`)?.value || '20:00',
+        }));
+    }
+
+    // BARBERMAN
+    function toggleDay(el) {
+        el.classList.toggle('off');
+    }
+
+    function addBarber() {
+        clearErrors();
+        const name = document.getElementById('ibName').value.trim();
+        const spec = document.getElementById('ibSpec').value.trim();
+        const wa = document.getElementById('ibWA').value.trim();
+        if (!name) {
+            validateField('fbName', false);
+            return;
+        }
+
+        const daysOff = [...document.querySelectorAll('#ibDays .day-btn.off')]
+        .map(el => parseInt(el.dataset.day));
+
+        const color = COLORS[STATE.setupBarbers.length % COLORS.length];
+
+        STATE.setupBarbers.push({
+            name,
+            spec,
+            wa,
+            daysOff,
+            color,
+            sort_order: STATE.setupBarbers.length
+        });
+
+        // Reset form
+        document.getElementById('ibName').value = '';
+        document.getElementById('ibSpec').value = '';
+        document.getElementById('ibWA').value = '';
+        document.querySelectorAll('#ibDays .day-btn').forEach(b => b.classList.remove('off'));
+
+        renderBarberList();
+        showToast(name + ' ditambahkan!', 'ok');
+    }
+
+    function removeBarber(i) {
+        STATE.setupBarbers.splice(i, 1);
+        renderBarberList();
+    }
+
+    function renderBarberList() {
+        const el = document.getElementById('barberList');
+        if (!STATE.setupBarbers.length) {
+            el.innerHTML = '<div style="font-size:12px;color:var(--t3);margin-bottom:10px;">Belum ada barberman ditambahkan.</div>';
+            return;
+        }
+        el.innerHTML = STATE.setupBarbers.map((b, i) => `
+    <div class="barber-item">
+      <div class="av av-m" style="background:rgba(201,168,76,.15);color:${
+        b.color};font-size:16px;">${b.name[0]}</div>
+      <div class="barber-item-info">
+        <div class="barber-item-name">${
+        b.name}</div>
+        <div class="barber-item-sub">${b.spec || 'Spesialisasi belum diisi'} ${b.wa ? '· ' + b.wa : ''}</div>
+        ${b.daysOff.length ? `<div class="barber-item-days">Libur: ${b.daysOff.map(d => DAYS[d]).join(', ')}</div>` : ''}
+      </div>
+      <button class="btn btn-d" style="padding:6px 10px;" onclick="removeBarber(${
+        i})"><i class="ti ti-trash" style="font-size:14px;"></i></button>
+    </div>
+  `
+
+        ).join('');
+    }
+
+    // PAKET
+    function updatePkgPreview() {
+        const dur = parseInt(document.getElementById('ipDur').value) || 0;
+        const buf = parseInt(document.getElementById('ipBuf').value) || 0;
+        const prev = document.getElementById('pkgPreview');
+        const val = document.getElementById('pkgPreviewVal');
+        if (dur > 0) {
+            prev.style.display = 'block';
+            val.textContent = `${dur + buf} menit total (${dur} mnt kerja + ${buf} mnt buffer bersih)`;
+        } else {
+            prev.style.display = 'none';
+        }
+    }
+
+    function addPkg() {
+        clearErrors();
+        const name = document.getElementById('ipName').value.trim();
+        const desc = document.getElementById('ipDesc').value.trim();
+        const price = parseInt(document.getElementById('ipPrice').value) || 0;
+        const dur = parseInt(document.getElementById('ipDur').value) || 0;
+        const buf = parseInt(document.getElementById('ipBuf').value) || 15;
+        const feat = document.getElementById('ipFeat').checked;
+        let valid = true;
+
+        if (!name) {
+            validateField('fpName', false);
+            valid = false;
+        }
+        if (!price) {
+            validateField('fpPrice', false, 'Masukkan harga yang valid');
+            valid = false;
+        }
+        if (!dur) {
+            validateField('fpDur', false, 'Masukkan durasi yang valid');
+            valid = false;
+        }
+        if (!valid)
+            return;
+
+        STATE.setupPkgs.push({
+            name,
+            description: desc,
+            price,
+            duration_min: dur,
+            buffer_min: buf,
+            is_featured: feat,
+            sort_order: STATE.setupPkgs.length
+        });
+
+        // Reset form
+        document.getElementById('ipName').value = '';
+        document.getElementById('ipDesc').value = '';
+        document.getElementById('ipPrice').value = '';
+        document.getElementById('ipDur').value = '';
+        document.getElementById('ipBuf').value = '15';
+        document.getElementById('ipFeat').checked = false;
+        document.getElementById('pkgPreview').style.display = 'none';
+
+        renderPkgList();
+        showToast(name + ' ditambahkan!', 'ok');
+    }
+
+    function removePkg(i) {
+        STATE.setupPkgs.splice(i, 1);
+        renderPkgList();
+    }
+
+    function renderPkgList() {
+        const el = document.getElementById('pkgList');
+        if (!STATE.setupPkgs.length) {
+            el.innerHTML = '<div style="font-size:12px;color:var(--t3);margin-bottom:10px;">Belum ada paket ditambahkan.</div>';
+            return;
+        }
+        el.innerHTML = STATE.setupPkgs.map((p, i) => `
+    <div class="pkg-item">
+      <div class="pkg-item-info">
+        <div class="pkg-item-name">${
+
+        p.name} ${p.is_featured ? '<span class="badge bg" style="margin-left:6px;">Terpopuler</span>' : ''}</div>
+        <div class="pkg-item-sub">${p.duration_min} mnt kerja + ${p.buffer_min} mnt buffer · ${p.desc || 'Tanpa deskripsi'}</div>
+      </div>
+      <div class="pkg-item-price">${
+        fmtRp(p.price)}</div>
+      <button class="btn btn-d" style="padding:6px 10px;" onclick="removePkg(${i})"><i class="ti ti-trash" style="font-size:14px;"></i></button>
+    </div>
+  `
+
+        ).join('');
+    }
+
+    // ============================================================
+    // SAVE STEPS
+    // ============================================================
+    async function saveStep1() {
+        clearErrors();
+        const name = document.getElementById('s1Name').value.trim();
+        const slug = document.getElementById('s1Slug').value.trim();
+        const wa = document.getElementById('s1WA').value.trim();
+        let valid = true;
+
+        if (!name) {
+            validateField('fs1Name', false);
+            valid = false;
+        }
+        if (!slug || slug.length < 3) {
+            showToast('URL toko minimal 3 karakter', 'err');
+            valid = false;
+        }
+        if (!wa) {
+            showToast('Nomor WhatsApp wajib diisi', 'err');
+            valid = false;
+        }
+        if (!valid)
+            return;
+
+        setLoading('btnS1', true);
+        try {
+            // Cek slug unik
+            const {data: existing} = await sb.from('stores').select('id').eq('slug', slug).maybeSingle();
+            if (existing && existing.id !== STATE.setupStoreId) {
+                showToast('URL toko sudah dipakai, coba yang lain', 'err');
+                setLoading('btnS1', false);
+                return;
+            }
+
+            const storeData = {
+                owner_id: STATE.user.id,
+                name: name,
+                tagline: document.getElementById('s1Tag').value.trim() || null,
+                description: document.getElementById('s1Desc').value.trim() || null,
+                address: document.getElementById('s1Addr').value.trim() || null,
+                city: document.getElementById('s1City').value.trim() || null,
+                phone_wa: wa,
+                instagram: document.getElementById('s1IG').value.trim() || null,
+                slug: slug,
+                dp_percent: parseInt(document.getElementById('s1DP').value) || 30,
+                cancel_hours: parseInt(document.getElementById('s1Cancel').value) || 2,
+                accept_walkin: document.getElementById('s1Walkin').checked,
+                wa_notif: document.getElementById('s1WaNotif').checked,
+            };
+
+            let storeResult;
+            if (STATE.setupStoreId) {
+                // Update existing
+                const {data, error} = await sb.from('stores')
+                .update(storeData)
+                .eq('id', STATE.setupStoreId)
+                .select()
+                .single();
+                if (error)
+                    throw error;
+                storeResult = data;
+            } else {
+                // Insert baru
+                const {data, error} = await sb.from('stores')
+                .insert(storeData)
+                .select()
+                .single();
+                if (error)
+                    throw error;
+                storeResult = data;
+                STATE.setupStoreId = storeResult.id;
+
+                // Seed jam default
+                await sb.rpc('seed_store_hours', {
+                    p_store_id: storeResult.id
+                });
+            }
+
+            STATE.store = storeResult;
+            setLoading('btnS1', false);
+            goSetupStep(2);
+            // Refresh jam rows dengan data yang sudah ada
+            await loadJamFromDB();
+        } catch (e) {
+            console.error('saveStep1 error:', e);
+            showToast(e.message || 'Gagal menyimpan. Coba lagi.', 'err');
+            setLoading('btnS1', false);
+        }
+    }
+
+    async function loadJamFromDB() {
+        if (!STATE.setupStoreId)
+            return;
+        try {
+            const {data} = await sb.from('store_hours')
+            .select('*')
+            .eq('store_id', STATE.setupStoreId)
+            .order('day_of_week');
+
+            if(data?.length) {
+                data.forEach(h => {
+                    const cb = document.getElementById(`jamon${h.day_of_week}`);
+                    const op = document.getElementById(`jamopen${h.day_of_week}`);
+                    const cl = document.getElementById(`jamclose${h.day_of_week}`);
+                    if (cb)
+                        cb.checked = h.is_open;
+                    if (op)
+                        op.value = h.open_time?.slice(0, 5) || '08:00';
+                    if (cl)
+                        cl.value = h.close_time?.slice(0, 5) || '20:00';
+                    toggleJamRow(h.day_of_week, h.is_open);
+                });
+            }
+        } catch (e) {
+            console.error('loadJam error:', e);
+        }
+    }
+
+    async function saveStep2() {
+        if (!STATE.setupStoreId) {
+            showToast('Simpan info toko dulu', 'err');
+            return;
+        }
+
+        setLoading('btnS2', true);
+        try {
+            const jamData = getJamData().map(j => ({
+                ...j,
+                store_id: STATE.setupStoreId,
+            }));
+
+            // Upsert jam operasional
+            const {error} = await sb.from('store_hours')
+            .upsert(jamData, {
+                onConflict: 'store_id,day_of_week'
             });
 
-            if (statusF !== 'all')
-                query = query.eq('status', statusF);
-            if (barberF !== 'all')
-                query = query.eq('barber_id', barberF);
-
-            const {data, error} = await query.limit(2000);
             if (error)
                 throw error;
 
-            STATE.bookings = data || [];
-            renderAll(from, to);
+            setLoading('btnS2', false);
+            showToast('Jam operasional disimpan!', 'ok');
+            goSetupStep(3);
         } catch (e) {
-            console.error('loadData error:', e);
-            showToast('Gagal memuat data. Coba lagi.', 'err');
+            console.error('saveStep2 error:', e);
+            showToast(e.message || 'Gagal menyimpan jam.', 'err');
+            setLoading('btnS2', false);
         }
     }
 
-    // ============================================================
-    // RENDER SEMUA
-    // ============================================================
-    function renderAll(from, to) {
-        const bk = STATE.bookings;
-        renderStats(bk);
-        renderDailyChart(bk, from, to);
-        renderBarberPerf(bk);
-        renderPkgStats(bk);
-        renderTypeStats(bk);
-        renderTable(bk);
-    }
-
-    // ============================================================
-    // STATS
-    // ============================================================
-    function renderStats(bk) {
-        const total = bk.length;
-        const done = bk.filter(b => b.status === 'done');
-        const cancelled = bk.filter(b => ['cancelled', 'noshow'].includes(b.status));
-        const revenue = done.reduce((s, b) => s + (b.total_price || 0), 0);
-        const avg = done.length > 0 ? Math.round(revenue / done.length) : 0;
-
-        document.getElementById('statGrid').innerHTML = `
-    <div class="stat"><div class="stat-lbl">Total Booking</div><div class="stat-val">${total}</div></div>
-    <div class="stat"><div class="stat-lbl">Selesai</div><div class="stat-val" style="color:var(--gr);">${done.length}</div></div>
-    <div class="stat"><div class="stat-lbl">Dibatalkan/No-Show</div><div class="stat-val" style="color:var(--rd);">${cancelled.length}</div></div>
-    <div class="stat"><div class="stat-lbl">Total Pendapatan</div><div class="stat-val" style="color:var(--gold);font-size:18px;">${fmtRp(revenue)}</div></div>
-    <div class="stat"><div class="stat-lbl">Rata-rata/Booking</div><div class="stat-val" style="font-size:18px;">${done.length ? fmtRp(avg) : '—'}</div></div>
-  `
-        ;
-    }
-
-    // ============================================================
-    // GRAFIK HARIAN
-    // ============================================================
-    function renderDailyChart(bk, from, to) {
-        const el = document.getElementById('dailyChart');
-        const todayStr = new Date().toISOString().slice(0, 10);
-
-        // Buat map tanggal
-        const dateMap = {};
-        const start = new Date(from),
-            end = new Date(to);
-        const diff = Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1;
-        const maxDays = 30;
-
-        if (diff > maxDays) {
-            // Tampilkan per bulan kalau range > 30 hari
-            document.getElementById('chartPeriodLabel').textContent = 'Per Bulan';
-            const monthMap = {};
-            bk.forEach(b => {
-                const m=b.booking_date?.slice(0, 7);
-                if (m)
-                    monthMap[m] = (monthMap[m] || 0) + 1;
-            });
-            const months = Object.keys(monthMap).sort().slice(-12);
-            const maxVal = Math.max(...months.map(m => monthMap[m]), 1);
-            el.innerHTML = months.map(m => {
-                const count = monthMap[m] || 0;
-                const label = new Date(m + '-01').toLocaleDateString('id-ID', {
-                    month: 'short',
-                    year: '2-digit'
-                });
-                return `<div class="chart-col">
-        <div class="chart-val">${count > 0 ? count : ''}</div>
-        <div class="chart-bar" style="height:${count / maxVal * 120}px;"></div>
-        <div class="chart-lbl">${label}</div>
-      </div>`
-                ;
-            }).join('');
-        } else {
-            document.getElementById('chartPeriodLabel').textContent = `${diff} hari`;
-            for (let i = 0; i < diff; i++) {
-                const d = new Date(start);
-                d.setDate(start.getDate() + i);
-                dateMap[d.toISOString().slice(0, 10)] = 0;
-            }
-            bk.forEach(b => {
-                if (b.booking_date && dateMap[b.booking_date] !== undefined)
-                    dateMap[b.booking_date]++;
-            });
-            const dates = Object.keys(dateMap);
-            const maxVal = Math.max(...Object.values(dateMap), 1);
-            el.innerHTML = dates.map(d => {
-                const count = dateMap[d];
-                const isToday = d === todayStr;
-                const label = new Date(d + 'T00:00:00').toLocaleDateString('id-ID', {
-                    day: 'numeric',
-                    month: 'short'
-                });
-                return `<div class="chart-col">
-        <div class="chart-val">${count > 0 ? count : ''}</div>
-        <div class="chart-bar ${isToday ? 'today' : ''}" style="height:${count / maxVal * 120}px;"></div>
-        <div class="chart-lbl" style="${isToday ? 'color:var(--gold);' : ''}">${label}</div>
-      </div>`
-                ;
-            }).join('');
-        }
-    }
-
-    // ============================================================
-    // PERFORMA BARBERMAN
-    // ============================================================
-    function renderBarberPerf(bk) {
-        const el = document.getElementById('barberPerfList');
-        const map = {};
-        bk.forEach(b => {
-            if (!b.barbers)
-                return;
-            const name = b.barbers.name;
-            if (!map[name])
-                map[name] = {
-                    name,
-                    color: b.barbers.avatar_color || avatarColor(name),
-                    total: 0,
-                    done: 0,
-                    revenue: 0
-                };
-            map[name].total++;
-            if (b.status === 'done') {
-                map[name].done++;
-                map[name].revenue += (b.total_price || 0);
-            }
-        });
-        const sorted = Object.values(map).sort((a, b) => b.done - a.done);
-        if (!sorted.length) {
-            el.innerHTML = '<div style="color:var(--t4);font-size:12px;">Tidak ada data</div>';
+    async function saveStep3() {
+        if (!STATE.setupStoreId)
             return;
-        }
-        const maxTotal = Math.max(...sorted.map(p => p.total), 1);
-        el.innerHTML = sorted.map(p => `
-    <div class="barber-row">
-      <div class="av av-s" style="background:${
-        p.color}22;color:${p.color};">${p.name[0]}</div>
-      <div class="bar-info">
-        <div class="bar-name">${
-        escH(p.name)}</div>
-        <div class="bar-meta">${p.total} booking · ${p.done} selesai</div>
-        <div class="bar-prog"><div class="bar-prog-fill" style="width:${p.total / maxTotal * 100}%;"></div></div>
-      </div>
-      <div class="bar-rev">${
-        fmtRp(p.revenue)}</div>
-    </div>`
-        ).join('');
-    }
-
-    // ============================================================
-    // PAKET TERLARIS
-    // ============================================================
-    function renderPkgStats(bk) {
-        const el = document.getElementById('pkgStats');
-        const map = {};
-        bk.forEach(b => {
-            const n = b.packages?.name || 'Tanpa Paket';
-            if (!map[n])
-                map[n] = {
-                    name: n,
-                    count: 0,
-                    revenue: 0
-                };
-            map[n].count++;
-            if (b.status === 'done')
-                map[n].revenue += (b.total_price || 0);
-        });
-        const sorted = Object.values(map).sort((a, b) => b.count - a.count);
-        if (!sorted.length) {
-            el.innerHTML = '<div style="color:var(--t4);font-size:12px;">Tidak ada data</div>';
-            return;
-        }
-        const maxCount = Math.max(...sorted.map(p => p.count), 1);
-        el.innerHTML = sorted.map(p => `
-    <div style="padding:9px 0;border-bottom:.5px solid rgba(245,245,240,.04);">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-        <span style="font-size:13px;font-weight:500;">${
-
-        escH(p.name)}</span>
-        <span style="font-size:12px;color:var(--gold);">${p.count}x</span>
-      </div>
-      <div style="background:var(--bg2);border-radius:3px;height:4px;overflow:hidden;">
-        <div style="background:var(--gold);height:100%;width:${
-
-        p.count / maxCount * 100}%;border-radius:3px;"></div>
-      </div>
-      <div style="font-size:11px;color:var(--t3);margin-top:4px;">${
-        fmtRp(p.revenue)} pendapatan</div>
-    </div>`
-        ).join('');
-    }
-
-    // ============================================================
-    // TIPE BOOKING
-    // ============================================================
-    function renderTypeStats(bk) {
-        const el = document.getElementById('typeStats');
-        const online = bk.filter(b => b.type === 'online');
-        const walkin = bk.filter(b => b.type === 'walkin');
-        const total = bk.length || 1;
-        el.innerHTML = `
-    <div style="display:flex;flex-direction:column;gap:14px;">
-      <div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-          <span style="font-size:13px;display:flex;align-items:center;gap:6px;"><span class="badge bbl">Booking Online</span></span>
-          <span style="font-size:13px;color:var(--gold);">${
-
-
-
-        online.length} (${Math.round(online.length / total * 100)}%)</span>
-        </div>
-        <div style="background:var(--bg2);border-radius:3px;height:6px;overflow:hidden;">
-          <div style="background:#60a5fa;height:100%;width:${
-
-        online.length / total * 100}%;border-radius:3px;"></div>
-        </div>
-        <div style="font-size:11px;color:var(--t3);margin-top:4px;">${
-        fmtRp(online.filter(b => b.status === 'done').reduce((s, b) => s + (b.total_price || 0), 0))} pendapatan</div>
-      </div>
-      <div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-          <span style="font-size:13px;display:flex;align-items:center;gap:6px;"><span class="badge bpr">Walk-in</span></span>
-          <span style="font-size:13px;color:var(--gold);">${
-
-
-
-        walkin.length} (${Math.round(walkin.length / total * 100)}%)</span>
-        </div>
-        <div style="background:var(--bg2);border-radius:3px;height:6px;overflow:hidden;">
-          <div style="background:#c084fc;height:100%;width:${
-
-        walkin.length / total * 100}%;border-radius:3px;"></div>
-        </div>
-        <div style="font-size:11px;color:var(--t3);margin-top:4px;">${
-        fmtRp(walkin.filter(b => b.status === 'done').reduce((s, b) => s + (b.total_price || 0), 0))} pendapatan</div>
-      </div>
-    </div>`
-
-        ;
-    }
-
-    // ============================================================
-    // TABEL BOOKING
-    // ============================================================
-    function renderTable(bk) {
-        const tbody = document.getElementById('bookingTable');
-        const empty = document.getElementById('tableEmpty');
-        document.getElementById('tableCount').textContent = `${bk.length} data`;
-
-        if (!bk.length) {
-            tbody.innerHTML = '';
-            empty.classList.remove('hidden');
-            return;
-        }
-        empty.classList.add('hidden');
-        tbody.innerHTML = bk.map(b => {
-            const st = STATUS_LABEL[b.status] || STATUS_LABEL.pending;
-            return `<tr>
-      <td style="font-family:'Playfair Display',serif;color:var(--gold);font-size:12px;">${b.booking_code || '—'}</td>
-      <td>
-        <div style="font-weight:500;">${
-            escH(b.customer_name || '—')}</div>
-        <div style="font-size:11px;color:var(--t3);">${escH(b.customer_phone || '')}</div>
-      </td>
-      <td>${
-            escH(b.barbers?.name || '—')}</td>
-      <td>${escH(b.packages?.name || '—')}</td>
-      <td>${fmtDate(b.booking_date)}</td>
-      <td>${fmtTime(b.start_time)}–${fmtTime(b.end_time)}</td>
-      <td><span class="badge ${b.type === 'walkin' ? 'bpr' : 'bbl'}">${b.type === 'walkin' ? 'Walk-in' : 'Online'}</span></td>
-      <td style="color:var(--gold);font-weight:500;">${fmtRp(b.total_price)}</td>
-      <td style="font-size:12px;">${b.dp_amount ? fmtRp(b.dp_amount) + '<br><span style="color:var(--t4);">' + b.dp_status + '</span>' : '—'}</td>
-      <td><span class="badge ${st.cls}">${st.label}</span></td>
-    </tr>`
-            ;
-        }).join('');
-    }
-
-    // ============================================================
-    // EXPORT EXCEL
-    // ============================================================
-    function exportExcel() {
-        if (!STATE.bookings.length) {
-            showToast('Tidak ada data untuk di-export', 'warn');
+        if (!STATE.setupBarbers.length) {
+            showToast('Tambah minimal 1 barberman dulu', 'warn');
             return;
         }
 
-        const btn = document.getElementById('btnExport');
-        btn.disabled = true;
-        const orig = btn.innerHTML;
-        btn.innerHTML = '<div style="width:13px;height:13px;border:2px solid rgba(17,17,17,.3);border-top-color:#111;border-radius:50%;animation:spin .6s linear infinite;"></div>Mengexport...';
-
+        setLoading('btnS3', true);
         try {
-            const wb = XLSX.utils.book_new();
+            for (const b of STATE.setupBarbers) {
+                // Insert barberman
+                const {data: barber, error: bErr} = await sb.from('barbers').insert({
+                    store_id: STATE.setupStoreId,
+                    name: b.name,
+                    specialty: b.spec || null,
+                    phone_wa: b.wa || null,
+                    avatar_color: b.color,
+                    sort_order: b.sort_order,
+                }).select().single();
 
-            // ===== SHEET 1: DETAIL BOOKING =====
-            const bookingRows = STATE.bookings.map(b => ({
-                'Kode Booking': b.booking_code || '',
-                'Nama Customer': b.customer_name || '',
-                'No. WhatsApp': b.customer_phone || '',
-                'Barberman': b.barbers?.name || '',
-                'Paket': b.packages?.name || '',
-                'Tanggal': b.booking_date || '',
-                'Jam Mulai': fmtTime(b.start_time),
-                'Jam Selesai': fmtTime(b.end_time),
-                'Tipe': b.type === 'walkin' ? 'Walk-in' : 'Booking Online',
-                'Total Harga': b.total_price || 0,
-                'DP': b.dp_amount || 0,
-                'Status DP': b.dp_status || '',
-                'Status': STATUS_LABEL[b.status]?.label || b.status || '',
-                'Dibuat': b.created_at ? new Date(b.created_at).toLocaleString('id-ID') : '',
-            }));
-            const ws1 = XLSX.utils.json_to_sheet(bookingRows);
-            ws1['!cols'] = [{
-                wch: 15
-            }, {
-                wch: 20
-            }, {
-                wch: 16
-            }, {
-                wch: 16
-            }, {
-                wch: 18
-            }, {
-                wch: 14
-            }, {
-                wch: 10
-            }, {
-                wch: 10
-            }, {
-                wch: 14
-            }, {
-                wch: 14
-            }, {
-                wch: 12
-            }, {
-                wch: 12
-            }, {
-                wch: 14
-            }, {
-                wch: 20
-            }];
-            XLSX.utils.book_append_sheet(wb, ws1, 'Detail Booking');
+                if (bErr)
+                    throw bErr;
 
-            // ===== SHEET 2: RINGKASAN =====
-            const done = STATE.bookings.filter(b => b.status === 'done');
-            const cancelled = STATE.bookings.filter(b => ['cancelled', 'noshow'].includes(b.status));
-            const revenue = done.reduce((s, b) => s + (b.total_price || 0), 0);
-
-            const summaryRows = [
-            ['Toko', STATE.store.name],
-            ['Periode', `${document.getElementById('dateFrom').value} s/d ${document.getElementById('dateTo').value}`],
-            ['Tanggal Export', new Date().toLocaleString('id-ID')],
-            [''],
-            ['RINGKASAN', ''],
-            ['Total Booking', STATE.bookings.length],
-            ['Selesai', done.length],
-            ['Dibatalkan/No-Show', cancelled.length],
-            ['Booking Online', STATE.bookings.filter(b => b.type === 'online').length],
-            ['Walk-in', STATE.bookings.filter(b => b.type === 'walkin').length],
-            [''],
-            ['PENDAPATAN', ''],
-            ['Total Pendapatan (dari yang Selesai)', revenue],
-            ['Rata-rata per Booking', done.length ? Math.round(revenue / done.length) : 0],
-            ];
-            const ws2 = XLSX.utils.aoa_to_sheet(summaryRows);
-            ws2['!cols'] = [{
-                wch: 30
-            }, {
-                wch: 30
-            }];
-            XLSX.utils.book_append_sheet(wb, ws2, 'Ringkasan');
-
-            // ===== SHEET 3: PERFORMA BARBERMAN =====
-            const barberMap = {};
-            STATE.bookings.forEach(b => {
-                const n = b.barbers?.name || 'Tidak Diketahui';
-                if (!barberMap[n])
-                    barberMap[n] = {
-                        barberman: n,
-                        total: 0,
-                        done: 0,
-                        cancelled: 0,
-                        revenue: 0
-                    };
-                barberMap[n].total++;
-                if (b.status === 'done') {
-                    barberMap[n].done++;
-                    barberMap[n].revenue += (b.total_price || 0);
+                // Insert hari libur
+                if (b.daysOff.length) {
+                    const {error: dErr} = await sb.from('barber_days_off').insert(
+                    b.daysOff.map(day => ({
+                        barber_id: barber.id,
+                        day_of_week: day
+                    }))
+                    );
+                    if (dErr)
+                        throw dErr;
                 }
-                if (['cancelled', 'noshow'].includes(b.status))
-                    barberMap[n].cancelled++;
-            });
-            const barberRows = Object.values(barberMap).sort((a, b) => b.done - a.done).map(p => ({
-                'Barberman': p.barberman,
-                'Total Booking': p.total,
-                'Selesai': p.done,
-                'Dibatalkan': p.cancelled,
-                'Total Pendapatan': p.revenue,
-                'Rata-rata': p.done ? Math.round(p.revenue / p.done) : 0,
-            }));
-            const ws3 = XLSX.utils.json_to_sheet(barberRows);
-            ws3['!cols'] = [{
-                wch: 20
-            }, {
-                wch: 14
-            }, {
-                wch: 10
-            }, {
-                wch: 12
-            }, {
-                wch: 18
-            }, {
-                wch: 14
-            }];
-            XLSX.utils.book_append_sheet(wb, ws3, 'Performa Barberman');
+            }
 
-            // ===== SHEET 4: PAKET TERLARIS =====
-            const pkgMap = {};
-            STATE.bookings.forEach(b => {
-                const n = b.packages?.name || 'Tanpa Paket';
-                if (!pkgMap[n])
-                    pkgMap[n] = {
-                        paket: n,
-                        total: 0,
-                        done: 0,
-                        revenue: 0
-                    };
-                pkgMap[n].total++;
-                if (b.status === 'done') {
-                    pkgMap[n].done++;
-                    pkgMap[n].revenue += (b.total_price || 0);
-                }
-            });
-            const pkgRows = Object.values(pkgMap).sort((a, b) => b.total - a.total).map(p => ({
-                'Nama Paket': p.paket,
-                'Total Dipilih': p.total,
-                'Selesai': p.done,
-                'Total Pendapatan': p.revenue,
-            }));
-            const ws4 = XLSX.utils.json_to_sheet(pkgRows);
-            ws4['!cols'] = [{
-                wch: 24
-            }, {
-                wch: 14
-            }, {
-                wch: 10
-            }, {
-                wch: 18
-            }];
-            XLSX.utils.book_append_sheet(wb, ws4, 'Paket Terlaris');
-
-            // Simpan file
-            const from = document.getElementById('dateFrom').value;
-            const to = document.getElementById('dateTo').value;
-            const filename = `BarberBook_${STATE.store.name.replace(/\s/g, '_')}_${from}_${to}.xlsx`;
-            XLSX.writeFile(wb, filename);
-
-            showToast('File Excel berhasil didownload!', 'ok');
+            STATE.setupBarbers = []; // clear setelah save
+            setLoading('btnS3', false);
+            showToast('Barberman berhasil disimpan!', 'ok');
+            goSetupStep(4);
         } catch (e) {
-            console.error('exportExcel error:', e);
-            showToast('Gagal export. Coba lagi.', 'err');
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = orig;
+            console.error('saveStep3 error:', e);
+            showToast(e.message || 'Gagal menyimpan barberman.', 'err');
+            setLoading('btnS3', false);
         }
     }
+
+    async function saveStep4() {
+        if (!STATE.setupStoreId)
+            return;
+        if (!STATE.setupPkgs.length) {
+            showToast('Tambah minimal 1 paket dulu', 'warn');
+            return;
+        }
+
+        setLoading('btnS4', true);
+        try {
+            const {error} = await sb.from('packages').insert(
+            STATE.setupPkgs.map(p => ({
+                ...p,
+                store_id: STATE.setupStoreId,
+            }))
+            );
+
+            if (error)
+                throw error;
+
+            showToast('Setup selesai! Membuka dashboard...', 'ok');
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1200);
+        } catch (e) {
+            console.error('saveStep4 error:', e);
+            showToast(e.message || 'Gagal menyimpan paket.', 'err');
+            setLoading('btnS4', false);
+        }
+    }
+
+    // ============================================================
+    // AUTH STATE LISTENER
+    // ============================================================
+    sb.auth.onAuthStateChange(async (event, session) => {
+        console.log('Auth event:', event);
+
+        if (event === 'INITIAL_SESSION') {
+            // Event ini dipicu Supabase sekali di awal load, dengan info session
+            // yang sudah final (lebih dapat diandalkan daripada getSession() manual).
+            if (_initHandled)
+                return; // init() sudah lebih dulu menangani, skip
+            _initHandled = true;
+            if(session?.user) {
+                STATE.user = session.user;
+                await afterLogin();
+            } else {
+                showPage('page-auth');
+            }
+        } else if (event === 'SIGNED_IN' && session) {
+            STATE.user = session.user;
+        } else if (event === 'SIGNED_OUT') {
+            STATE.user = null;
+            STATE.store = null;
+        } else if (event === 'PASSWORD_RECOVERY') {
+            // Handle reset password
+            window.location.href = 'reset-password.html';
+        }
+    });
+
+    // ============================================================
+    // KEYBOARD SHORTCUTS
+    // ============================================================
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const loginBtn = document.getElementById('btnLogin');
+            const regBtn = document.getElementById('btnReg');
+            const viewLogin = document.getElementById('viewLogin');
+            const viewReg = document.getElementById('viewReg');
+            if (!viewLogin.classList.contains('hidden') && loginBtn)
+                loginBtn.click();
+            if (!viewReg.classList.contains('hidden') && regBtn)
+                regBtn.click();
+        }
+    });
 
     // ============================================================
     // START
     // ============================================================
-    initGuard();
+    init();
     </script>
 </body>
 </html>
