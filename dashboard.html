@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BarberBook — Dashboard</title>
+    <title>CariCukur — Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500;0,600;1,500;1,600&family=Manrope:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -17,34 +17,34 @@
     }
 
     body {
-        font-family: 'Inter', sans-serif;
-        background: #0E0E0E;
-        color: #F5F5F0;
+        font-family:'Manrope',sans-serif;
+        background:#F7F7F4;
+        color:#14181B;
         min-height: 100vh;
     }
 
     button, input, select, textarea {
-        font-family: 'Inter', sans-serif;
+        font-family:'Manrope',sans-serif;
     }
 
     :root {
-        --gold: #C9A84C;
-        --gold-l: #e0bc5a;
-        --gold-d: rgba(201, 168, 76, 0.12);
-        --gold-b: rgba(201, 168, 76, 0.28);
-        --bg: #0E0E0E;
-        --bg2: #141414;
-        --bg3: #1A1A1A;
-        --bg4: #222;
-        --t: #F5F5F0;
-        --t2: rgba(245, 245, 240, 0.6);
-        --t3: rgba(245, 245, 240, 0.35);
-        --t4: rgba(245, 245, 240, 0.14);
-        --b: rgba(245, 245, 240, 0.07);
-        --b2: rgba(245, 245, 240, 0.12);
-        --gr: #4ade80;
+        --gold:#0E6B4F;
+        --gold-l:#12805F;
+        --gold-d:rgba(14,107,79,0.07);
+        --gold-b:rgba(14,107,79,0.28);
+        --bg:#F7F7F4;
+        --bg2:#FFFFFF;
+        --bg3:#F2F1EC;
+        --bg4:#EAE8E0;
+        --t:#14181B;
+        --t2:rgba(20,24,27,0.62);
+        --t3:rgba(20,24,27,0.4);
+        --t4:rgba(20,24,27,0.12);
+        --b:rgba(20,24,27,0.1);
+        --b2:rgba(20,24,27,0.16);
+        --gr:#2F8F5B;
         --grd: rgba(74, 222, 128, 0.1);
-        --rd: #f87171;
+        --rd:#C23B2E;
         --rdd: rgba(248, 113, 113, 0.1);
         --bl: #60a5fa;
         --bld: rgba(96, 165, 250, 0.1);
@@ -107,7 +107,7 @@
 
     .btn-g {
         background: var(--gold);
-        color: #111;
+        color: #fff;
         padding: 10px 18px;
         font-weight: 600;
     }
@@ -157,7 +157,7 @@
     }
 
     .nav-logo {
-        font-family: 'Playfair Display', serif;
+        font-family:'Newsreader',serif;
         font-size: 18px;
         color: var(--gold);
         display: flex;
@@ -477,7 +477,7 @@
     }
 
     .code-pill {
-        font-family: 'Playfair Display', serif;
+        font-family:'Newsreader',serif;
         font-size: 12px;
         color: var(--gold);
         letter-spacing: .05em;
@@ -595,7 +595,7 @@
     }
 
     .mtitle {
-        font-family: 'Playfair Display', serif;
+        font-family:'Newsreader',serif;
         font-size: 17px;
     }
 
@@ -1135,9 +1135,9 @@
          GUARD
          =================================================== -->
     <div id="loadingGuard" style="display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:14px;">
-        <div style="font-family:'Playfair Display',serif;font-size:24px;color:var(--gold);">
-            BARBER
-            <span style="color:var(--t);">BOOK</span>
+        <div style="font-family:'Newsreader',serif;font-size:24px;color:var(--gold);">
+            CARI
+            <span style="color:var(--t);">CUKUR</span>
         </div>
         <div style="width:22px;height:22px;border:2px solid rgba(201,168,76,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .6s linear infinite;"></div>
     </div>
@@ -1156,8 +1156,8 @@
                     <i class="ti ti-scissors"></i>
                 </div>
 
-                    BARBER
-                <span>BOOK</span>
+                    CARI
+                <span>CUKUR</span>
             </div>
             <div class="store-pill" id="storeNamePill">Memuat toko...</div>
             <div style="display:flex;gap:8px;align-items:center;">
@@ -1216,7 +1216,7 @@
                 <!-- ===== RINGKASAN MINI ===== -->
                 <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;">
                     <div>
-                        <h2 style="font-family:'Playfair Display',serif;font-size:22px;" id="greetText">Selamat datang, Owner</h2>
+                        <h2 style="font-family:'Newsreader',serif;font-size:22px;" id="greetText">Selamat datang, Owner</h2>
                         <p style="font-size:13px;color:var(--t3);margin-top:4px;" id="dateText">Memuat tanggal...</p>
                     </div>
                     <button class="btn btn-g" id="refreshBtn" onclick="refreshCurrentView()">
@@ -1250,7 +1250,7 @@
                     <!-- Grafik booking 7 hari terakhir -->
                     <div class="card" style="margin-bottom:14px;">
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-                            <div style="font-size:16px;font-weight:500;font-family:'Playfair Display',serif;">Booking 7 Hari Terakhir</div>
+                            <div style="font-size:16px;font-weight:500;font-family:'Newsreader',serif;">Booking 7 Hari Terakhir</div>
                             <div style="font-size:12px;color:var(--t3);" id="chartSubtitle">Memuat...</div>
                         </div>
                         <div style="display:flex;align-items:flex-end;gap:6px;height:140px;padding-top:10px;" id="barChart"></div>
@@ -1272,7 +1272,7 @@
 
                         <!-- Booking terbaru -->
                         <div class="card">
-                            <div style="font-size:14px;font-weight:500;font-family:'Playfair Display',serif;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+                            <div style="font-size:14px;font-weight:500;font-family:'Newsreader',serif;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
                                 <i class="ti ti-calendar" style="color:var(--gold);font-size:16px;"></i>
                                 Booking Terbaru
                                           
@@ -1291,7 +1291,7 @@
 
                         <!-- Performa barberman -->
                         <div class="card">
-                            <div style="font-size:14px;font-weight:500;font-family:'Playfair Display',serif;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+                            <div style="font-size:14px;font-weight:500;font-family:'Newsreader',serif;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
                                 <i class="ti ti-trophy" style="color:var(--gold);font-size:16px;"></i>
                                 Performa Barberman
                                           
@@ -1305,7 +1305,7 @@
 
                     <!-- Ringkasan bulan ini -->
                     <div class="card">
-                        <div style="font-size:14px;font-weight:500;font-family:'Playfair Display',serif;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+                        <div style="font-size:14px;font-weight:500;font-family:'Newsreader',serif;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
                             <i class="ti ti-calendar-month" style="color:var(--gold);font-size:16px;"></i>
                             Ringkasan Bulan Ini
                                     
@@ -1337,7 +1337,7 @@
                 <div class="view-panel" id="view-booking">
                     <div class="card">
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
-                            <div style="font-size:16px;font-weight:500;font-family:'Playfair Display',serif;">Semua Booking</div>
+                            <div style="font-size:16px;font-weight:500;font-family:'Newsreader',serif;">Semua Booking</div>
                             <div style="font-size:12px;color:var(--t3);" id="bkCountText">Memuat...</div>
                         </div>
 
@@ -1392,7 +1392,7 @@
                 <div class="view-panel hidden" id="view-barbers">
                     <div class="card">
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-                            <div style="font-size:16px;font-weight:500;font-family:'Playfair Display',serif;">Barberman</div>
+                            <div style="font-size:16px;font-weight:500;font-family:'Newsreader',serif;">Barberman</div>
                             <button class="btn btn-g" onclick="openBarberModal()">
                                 <i class="ti ti-plus" style="font-size:14px;"></i>
                                 Tambah Barberman
@@ -1406,7 +1406,7 @@
                 <div class="view-panel hidden" id="view-packages">
                     <div class="card">
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-                            <div style="font-size:16px;font-weight:500;font-family:'Playfair Display',serif;">Paket & Harga</div>
+                            <div style="font-size:16px;font-weight:500;font-family:'Newsreader',serif;">Paket & Harga</div>
                             <button class="btn btn-g" onclick="openPkgModal()">
                                 <i class="ti ti-plus" style="font-size:14px;"></i>
                                 Tambah Paket
@@ -2535,7 +2535,7 @@
         const btn = document.getElementById('btnSaveBarber');
         btn.disabled = true;
         const origHtml = btn.innerHTML;
-        btn.innerHTML = '<div style="width:13px;height:13px;border:2px solid rgba(17,17,17,.3);border-top-color:#111;border-radius:50%;animation:spin .6s linear infinite;"></div>Menyimpan...';
+        btn.innerHTML = '<div style="width:13px;height:13px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;"></div>Menyimpan...';
 
         try {
             let barberId = editId;
@@ -2720,7 +2720,7 @@
         const btn = document.getElementById('btnSavePkg');
         btn.disabled = true;
         const origHtml = btn.innerHTML;
-        btn.innerHTML = '<div style="width:13px;height:13px;border:2px solid rgba(17,17,17,.3);border-top-color:#111;border-radius:50%;animation:spin .6s linear infinite;"></div>Menyimpan...';
+        btn.innerHTML = '<div style="width:13px;height:13px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;"></div>Menyimpan...';
 
         try {
             const payload = {
