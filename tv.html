@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Antrian — BarberBook</title>
+<title>Antrian — CariCukur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500;0,600;1,500;1,600&family=Manrope:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;overflow:hidden;}
-body{font-family:'Inter',sans-serif;background:#0A0A0A;color:#F5F5F0;}
+body{font-family:'Manrope',sans-serif;background:#F7F7F4;color:#14181B;}
 :root{
-  --gold:#C9A84C;--gold-l:#e0bc5a;--gold-d:rgba(201,168,76,0.1);--gold-b:rgba(201,168,76,0.22);
-  --bg:#0A0A0A;--bg2:#111;--bg3:#161616;--bg4:#1C1C1C;
-  --t:#F5F5F0;--t2:rgba(245,245,240,0.65);--t3:rgba(245,245,240,0.35);--t4:rgba(245,245,240,0.12);
-  --b:rgba(245,245,240,0.06);--b2:rgba(245,245,240,0.1);
-  --gr:#4ade80;--grd:rgba(74,222,128,0.1);
-  --rd:#f87171;
+  --gold:#0E6B4F;--gold-l:#12805F;--gold-d:rgba(14,107,79,0.07);--gold-b:rgba(201,168,76,0.22);
+  --bg:#F7F7F4;--bg2:#FFFFFF;--bg3:#F2F1EC;--bg4:#EAE8E0;
+  --t:#14181B;--t2:rgba(245,245,240,0.65);--t3:rgba(20,24,27,0.4);--t4:rgba(20,24,27,0.12);
+  --b:rgba(20,24,27,0.1);--b2:rgba(20,24,27,0.16);
+  --gr:#2F8F5B;--grd:rgba(74,222,128,0.1);
+  --rd:#C23B2E;
 }
 
 @keyframes spin{to{transform:rotate(360deg);}}
@@ -55,7 +55,7 @@ body{font-family:'Inter',sans-serif;background:#0A0A0A;color:#F5F5F0;}
   border-radius:10px;display:flex;align-items:center;justify-content:center;
 }
 .hd-logo-ic svg{width:20px;height:20px;fill:var(--gold);}
-.hd-store{font-family:'Playfair Display',serif;font-size:26px;color:var(--t);}
+.hd-store{font-family:'Newsreader',serif;font-size:26px;color:var(--t);}
 .hd-store em{color:var(--gold);font-style:normal;}
 .hd-right{display:flex;align-items:center;gap:24px;}
 .hd-clock{font-size:28px;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums;letter-spacing:.02em;}
@@ -117,7 +117,7 @@ body{font-family:'Inter',sans-serif;background:#0A0A0A;color:#F5F5F0;}
   display:flex;align-items:center;justify-content:center;
   font-size:13px;font-weight:700;flex-shrink:0;
 }
-.qi-num-active{background:var(--gold);color:#111;}
+.qi-num-active{background:var(--gold);color:#fff;}
 .qi-num-wait{background:var(--bg4);color:var(--t3);border:.5px solid var(--b2);}
 .qi-info{flex:1;min-width:0;}
 .qi-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -150,7 +150,7 @@ body{font-family:'Inter',sans-serif;background:#0A0A0A;color:#F5F5F0;}
 }
 .ns-label{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--t3);margin-bottom:12px;}
 .ns-token{
-  font-family:'Playfair Display',serif;font-size:80px;font-weight:700;
+  font-family:'Newsreader',serif;font-size:80px;font-weight:700;
   color:var(--gold);line-height:1;
   text-shadow:0 0 40px rgba(201,168,76,0.3);
 }
@@ -194,7 +194,7 @@ body{font-family:'Inter',sans-serif;background:#0A0A0A;color:#F5F5F0;}
   overflow:hidden;position:relative;
 }
 .ticker-label{
-  background:var(--gold);color:#111;
+  background:var(--gold);color:#fff;
   font-size:12px;font-weight:700;letter-spacing:.08em;
   padding:0 18px;height:100%;display:flex;align-items:center;
   white-space:nowrap;flex-shrink:0;
@@ -236,7 +236,7 @@ body{font-family:'Inter',sans-serif;background:#0A0A0A;color:#F5F5F0;}
 
 <!-- LOADING -->
 <div id="loading">
-  <div style="font-family:'Playfair Display',serif;font-size:28px;color:var(--gold);">BARBER<span style="color:var(--t);">BOOK</span></div>
+  <div style="font-family:'Newsreader',serif;font-size:28px;color:var(--gold);">CARI<span style="color:var(--t);">CUKUR</span></div>
   <div style="width:28px;height:28px;border:3px solid rgba(201,168,76,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .6s linear infinite;"></div>
   <div style="font-size:13px;color:var(--t3);">Memuat antrian...</div>
 </div>
@@ -244,7 +244,7 @@ body{font-family:'Inter',sans-serif;background:#0A0A0A;color:#F5F5F0;}
 <!-- NO STORE -->
 <div id="noStore">
   <div style="font-size:56px;color:var(--t4);">✂️</div>
-  <div style="font-family:'Playfair Display',serif;font-size:24px;">Toko Tidak Ditemukan</div>
+  <div style="font-family:'Newsreader',serif;font-size:24px;">Toko Tidak Ditemukan</div>
   <div style="font-size:14px;color:var(--t3);max-width:360px;line-height:1.7;">
     Tambahkan parameter <code style="background:var(--bg3);padding:2px 8px;border-radius:4px;color:var(--gold);">?store=SLUG_TOKO</code> di URL ini.
     <br>Contoh: <code style="color:var(--gold);">tv.html?store=vinbarber-sigli</code>
@@ -261,7 +261,7 @@ body{font-family:'Inter',sans-serif;background:#0A0A0A;color:#F5F5F0;}
         <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0"/></svg>
       </div>
       <div>
-        <div class="hd-store" id="storeName">BARBER<em>BOOK</em></div>
+        <div class="hd-store" id="storeName">CARI<em>CUKUR</em></div>
         <div style="font-size:12px;color:var(--t3);" id="storeCity">Memuat...</div>
       </div>
     </div>
@@ -437,7 +437,7 @@ async function init(){
     console.error('init error:',e);
     document.getElementById('loading').innerHTML=`
       <div style="font-size:14px;color:var(--rd);">Gagal memuat. Cek koneksi internet.</div>
-      <button onclick="location.reload()" style="background:var(--gold);color:#111;border:none;padding:10px 24px;border-radius:8px;font-size:13px;cursor:pointer;margin-top:8px;">Coba Lagi</button>`;
+      <button onclick="location.reload()" style="background:var(--gold);color:#fff;border:none;padding:10px 24px;border-radius:8px;font-size:13px;cursor:pointer;margin-top:8px;">Coba Lagi</button>`;
   }
 }
 
