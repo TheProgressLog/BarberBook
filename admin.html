@@ -3,61 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin — BarberBook</title>
+    <title>CariCukur — Masuk</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500;0,600;1,500;1,600&family=Manrope:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
+
+    <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
+    /* ===== RESET & BASE ===== */
     *, * ::before, * ::after {
         box-sizing: border-box;
         margin: 0;
         padding: 0;
     }
 
+    html {
+        scroll-behavior: smooth;
+    }
+
     body {
-        font-family: 'Inter', sans-serif;
-        background: #0E0E0E;
-        color: #F5F5F0;
+        font-family: 'Manrope', sans-serif;
+        background: #F7F7F4;
+        color: #14181B;
         min-height: 100vh;
     }
 
     button, input, select, textarea {
-        font-family: 'Inter', sans-serif;
-    }
-
+        font-family: 'Manrope', sans-serif;
+    }/* ===== TOKENS ===== */
     :root {
-        --gold: #C9A84C;
-        --gold-l: #e0bc5a;
-        --gold-d: rgba(201, 168, 76, 0.12);
-        --gold-b: rgba(201, 168, 76, 0.28);
-        --bg: #0E0E0E;
-        --bg2: #141414;
-        --bg3: #1A1A1A;
-        --bg4: #222;
-        --t: #F5F5F0;
-        --t2: rgba(245, 245, 240, 0.6);
-        --t3: rgba(245, 245, 240, 0.35);
-        --t4: rgba(245, 245, 240, 0.14);
-        --b: rgba(245, 245, 240, 0.07);
-        --b2: rgba(245, 245, 240, 0.12);
-        --gr: #4ade80;
+        --gold: #0E6B4F;
+        --gold-l: #12805F;
+        --gold-d: rgba(14, 107, 79, 0.07);
+        --gold-b: rgba(14, 107, 79, 0.28);
+        --bg: #F7F7F4;
+        --bg2: #FFFFFF;
+        --bg3: #F2F1EC;
+        --bg4: #EAE8E0;
+        --t: #14181B;
+        --t2: rgba(20, 24, 27, 0.62);
+        --t3: rgba(20, 24, 27, 0.4);
+        --t4: rgba(20, 24, 27, 0.12);
+        --b: rgba(20, 24, 27, 0.1);
+        --b2: rgba(20, 24, 27, 0.16);
+        --gr: #2F8F5B;
         --grd: rgba(74, 222, 128, 0.1);
-        --rd: #f87171;
+        --rd: #C23B2E;
         --rdd: rgba(248, 113, 113, 0.1);
-        --bl: #60a5fa;
-        --bld: rgba(96, 165, 250, 0.1);
-        --or: #fb923c;
-        --ord: rgba(251, 146, 60, 0.1);
         --r: 8px;
         --rl: 12px;
         --rxl: 18px;
-    }
-
+    }/* ===== UTILITIES ===== */
     .hidden {
         display: none !important;
     }
 
+    .page {
+        display: none;
+        min-height: 100vh;
+    }
+
+    .page.active {
+        display: block;
+    }/* ===== SCROLLBAR ===== */
     ::-webkit-scrollbar {
         width: 5px;
     }
@@ -65,36 +75,7 @@
     ::-webkit-scrollbar-thumb {
         background: var(--b2);
         border-radius: 3px;
-    }
-
-    @keyframes spin {
-        to {
-            transform: rotate(360deg);
-        }
-    }
-
-    @keyframes tIn {
-        from {
-            opacity: 0;
-            transform: translateX(14px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-
-    @keyframes skel {
-        0% {
-            background-position: 100% 50%;
-        }
-
-        100% {
-            background-position: 0 50%;
-        }
-    }
-
+    }/* ===== BUTTONS ===== */
     .btn {
         display: inline-flex;
         align-items: center;
@@ -104,6 +85,7 @@
         cursor: pointer;
         font-weight: 500;
         transition: all .18s;
+        letter-spacing: .04em;
         font-size: 13px;
     }
 
@@ -114,8 +96,8 @@
 
     .btn-g {
         background: var(--gold);
-        color: #111;
-        padding: 10px 18px;
+        color: #fff;
+        padding: 11px 22px;
         font-weight: 600;
     }
 
@@ -123,11 +105,23 @@
         background: var(--gold-l);
     }
 
+    .btn-gl {
+        background: var(--gold);
+        color: #fff;
+        padding: 14px 28px;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .btn-gl:hover:not(:disabled) {
+        background: var(--gold-l);
+    }
+
     .btn-o {
         background: transparent;
         color: var(--t2);
         border: .5px solid var(--b2);
-        padding: 9px 16px;
+        padding: 10px 20px;
     }
 
     .btn-o:hover:not(:disabled) {
@@ -139,7 +133,7 @@
         background: transparent;
         color: var(--t3);
         border: none;
-        padding: 8px 12px;
+        padding: 9px 14px;
     }
 
     .btn-gh:hover:not(:disabled) {
@@ -147,96 +141,25 @@
         color: var(--t);
     }
 
-    .btn-sm {
-        padding: 5px 10px;
-        font-size: 11px;
-    }
-
-    .btn-gr {
-        background: var(--grd);
-        color: var(--gr);
-        border: .5px solid rgba(74, 222, 128, .25);
-    }
-
-    .btn-rd {
+    .btn-d {
         background: var(--rdd);
         color: var(--rd);
-        border: .5px solid rgba(248, 113, 113, .25);
+        border: .5px solid rgba(248, 113, 113, .2);
+        padding: 8px 14px;
     }
 
-    .btn-or {
-        background: var(--ord);
-        color: var(--or);
-        border: .5px solid rgba(251, 146, 60, .25);
-    }/* NAV */
-    .nav {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 14px 24px;
-        border-bottom: .5px solid var(--b);
-        background: var(--bg);
-        position: sticky;
-        top: 0;
-        z-index: 100;
-    }
-
-    .nav-logo {
-        font-family: 'Playfair Display', serif;
-        font-size: 18px;
-        color: var(--gold);
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .nav-logo span {
-        color: var(--t);
-    }
-
-    .nav-logo-ic {
-        width: 30px;
-        height: 30px;
-        background: var(--gold-d);
-        border: .5px solid var(--gold-b);
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
+    .w100 {
+        width: 100%;
         justify-content: center;
-        font-size: 14px;
-        color: var(--gold);
+        padding-left: 14px;
+        padding-right: 14px;
+    }/* ===== FORM ===== */
+    .field {
+        margin-bottom: 14px;
     }
 
-    .admin-badge {
-        background: rgba(248, 113, 113, .12);
-        color: var(--rd);
-        border: .5px solid rgba(248, 113, 113, .25);
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 600;
-        letter-spacing: .06em;
-    }/* LAYOUT */
-    .content {
-        padding: 24px 28px;
-        max-width: 1300px;
-        margin: 0 auto;
-    }/* STATS */
-    .stat-grid {
-        display: grid;
-        grid-template-columns: repeat(5, 1fr);
-        gap: 10px;
-        margin-bottom: 20px;
-    }
-
-    .stat {
-        background: var(--bg3);
-        border: .5px solid var(--b);
-        border-radius: var(--rl);
-        padding: 14px 16px;
-    }
-
-    .stat-lbl {
+    .field label {
+        display: block;
         font-size: 10px;
         letter-spacing: .1em;
         text-transform: uppercase;
@@ -244,138 +167,123 @@
         margin-bottom: 6px;
     }
 
-    .stat-val {
-        font-size: 22px;
-        font-weight: 500;
-        line-height: 1;
+    .field input, .field select, .field textarea {
+        width: 100%;
+        background: var(--bg2);
+        border: .5px solid var(--b2);
+        color: var(--t);
+        padding: 11px 13px;
+        border-radius: var(--r);
+        font-size: 13px;
+        outline: none;
+        transition: border-color .2s;
     }
 
-    .stat-sub {
+    .field input:focus, .field select:focus, .field textarea:focus {
+        border-color: var(--gold-b);
+    }
+
+    .field input::placeholder, .field textarea::placeholder {
+        color: var(--t4);
+    }
+
+    .field select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(245,245,240,0.25)' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+    }
+
+    .field.error input, .field.error select {
+        border-color: rgba(248, 113, 113, .5);
+    }
+
+    .field-hint {
         font-size: 11px;
         color: var(--t3);
         margin-top: 4px;
     }
 
-    .skel {
-        background: linear-gradient(90deg, var(--bg3) 25%, var(--bg4) 37%, var(--bg3) 63%);
-        background-size: 400% 100%;
-        animation: skel 1.4s ease infinite;
-        border-radius: 6px;
-    }/* CARD */
+    .field-err {
+        font-size: 11px;
+        color: var(--rd);
+        margin-top: 4px;
+        display: none;
+    }
+
+    .field.error .field-err {
+        display: block;
+    }
+
+    .fr {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .fr3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 12px;
+    }/* ===== CARDS ===== */
     .card {
         background: var(--bg3);
         border: .5px solid var(--b);
         border-radius: var(--rl);
         padding: 18px 20px;
-        margin-bottom: 14px;
     }
 
-    .card-title {
-        font-size: 15px;
-        font-weight: 500;
-        font-family: 'Playfair Display', serif;
-        margin-bottom: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-        flex-wrap: wrap;
-    }/* FILTER */
-    .filter-bar {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        flex-wrap: wrap;
-        margin-bottom: 14px;
-    }
-
-    .filter-bar input, .filter-bar select {
-        background: var(--bg2);
-        border: .5px solid var(--b2);
-        color: var(--t);
-        padding: 8px 12px;
+    .card-s {
+        background: var(--bg3);
+        border: .5px solid var(--b);
         border-radius: var(--r);
-        font-size: 13px;
-        outline: none;
-    }
-
-    .filter-bar input:focus, .filter-bar select:focus {
-        border-color: var(--gold-b);
-    }
-
-    .filter-bar input {
-        min-width: 220px;
-    }/* TABLE */
-    .adm-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .adm-table th {
-        text-align: left;
-        font-size: 10px;
-        letter-spacing: .08em;
-        text-transform: uppercase;
-        color: var(--t3);
-        padding: 10px 12px;
-        border-bottom: .5px solid var(--b);
-        font-weight: 500;
-    }
-
-    .adm-table td {
-        padding: 12px 12px;
-        border-bottom: .5px solid rgba(245, 245, 240, .04);
-        font-size: 13px;
-        vertical-align: middle;
-    }
-
-    .adm-table tr:last-child td {
-        border-bottom: none;
-    }
-
-    .adm-table tr:hover td {
-        background: rgba(245, 245, 240, .015);
-    }/* BADGE */
+        padding: 13px 15px;
+    }/* ===== BADGES ===== */
     .badge {
         font-size: 10px;
-        padding: 3px 9px;
+        padding: 3px 8px;
         border-radius: 20px;
         font-weight: 500;
         display: inline-flex;
         align-items: center;
         gap: 4px;
-        white-space: nowrap;
     }
 
-    .b-trial {
-        background: var(--bld);
-        color: var(--bl);
+    .bg {
+        background: var(--gold-d);
+        color: var(--gold);
+        border: .5px solid var(--gold-b);
     }
 
-    .b-active {
+    .bgr {
         background: var(--grd);
         color: var(--gr);
     }
 
-    .b-expired {
+    .brd {
         background: var(--rdd);
         color: var(--rd);
     }
 
-    .b-free {
+    .bgy {
         background: rgba(245, 245, 240, .05);
         color: var(--t3);
+    }/* ===== DIVIDER ===== */
+    .div {
+        height: .5px;
+        background: var(--b);
+        margin: 16px 0;
     }
 
-    .b-pro {
-        background: var(--gold-d);
-        color: var(--gold);
-        border: .5px solid var(--gold-b);
-    }/* SWITCH */
+    .div-g {
+        height: .5px;
+        background: linear-gradient(to right, transparent, var(--gold-b), transparent);
+        margin: 24px 0;
+    }/* ===== SWITCH ===== */
     .sw {
         position: relative;
-        width: 38px;
-        height: 21px;
+        width: 40px;
+        height: 22px;
         flex-shrink: 0;
     }
 
@@ -390,7 +298,7 @@
         position: absolute;
         inset: 0;
         background: rgba(245, 245, 240, .1);
-        border-radius: 21px;
+        border-radius: 22px;
         cursor: pointer;
         transition: .2s;
     }
@@ -398,8 +306,8 @@
     .sw-t:before {
         content: '';
         position: absolute;
-        width: 15px;
-        height: 15px;
+        width: 16px;
+        height: 16px;
         left: 3px;
         top: 3px;
         background: var(--t3);
@@ -412,207 +320,9 @@
     }
 
     .sw input:checked + .sw-t:before {
-        transform: translateX(17px);
+        transform: translateX(18px);
         background: #111;
-    }/* MODAL */
-    .ov {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, .78);
-        z-index: 500;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-    }
-
-    .ov.open {
-        display: flex;
-    }
-
-    .mbox {
-        background: var(--bg3);
-        border: .5px solid var(--b2);
-        border-radius: var(--rxl);
-        width: 100%;
-        max-width: 480px;
-        max-height: 90vh;
-        overflow-y: auto;
-    }
-
-    .mhd {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 16px 20px;
-        border-bottom: .5px solid var(--b);
-        position: sticky;
-        top: 0;
-        background: var(--bg3);
-    }
-
-    .mtitle {
-        font-family: 'Playfair Display', serif;
-        font-size: 17px;
-    }
-
-    .mclose {
-        background: none;
-        border: none;
-        color: var(--t3);
-        font-size: 20px;
-        cursor: pointer;
-    }
-
-    .mclose:hover {
-        color: var(--t);
-    }
-
-    .mbody {
-        padding: 20px;
-    }
-
-    .mfoot {
-        padding: 14px 20px;
-        border-top: .5px solid var(--b);
-        display: flex;
-        gap: 10px;
-        justify-content: flex-end;
-    }
-
-    .field {
-        margin-bottom: 14px;
-    }
-
-    .field label {
-        display: block;
-        font-size: 10px;
-        letter-spacing: .08em;
-        text-transform: uppercase;
-        color: var(--t3);
-        margin-bottom: 6px;
-    }
-
-    .field input, .field select, .field textarea {
-        width: 100%;
-        background: var(--bg2);
-        border: .5px solid var(--b2);
-        color: var(--t);
-        padding: 10px 12px;
-        border-radius: var(--r);
-        font-size: 13px;
-        outline: none;
-    }
-
-    .field input:focus, .field select:focus {
-        border-color: var(--gold-b);
-    }
-
-    .field-hint {
-        font-size: 11px;
-        color: var(--t3);
-        margin-top: 4px;
-    }/* INFO BOX */
-    .info-box {
-        background: rgba(201, 168, 76, .04);
-        border: .5px solid var(--gold-b);
-        border-radius: var(--r);
-        padding: 12px 14px;
-        margin-bottom: 14px;
-        font-size: 12px;
-        color: var(--t2);
-        line-height: 1.6;
-    }/* DETAIL ROW */
-    .dr {
-        display: flex;
-        justify-content: space-between;
-        padding: 8px 0;
-        border-bottom: .5px solid rgba(245, 245, 240, .04);
-        font-size: 13px;
-    }
-
-    .dr:last-child {
-        border-bottom: none;
-    }
-
-    .dr-k {
-        color: var(--t3);
-    }
-
-    .dr-v {
-        color: var(--t);
-        font-weight: 500;
-    }/* TABS */
-    .tabs {
-        display: flex;
-        gap: 0;
-        border-bottom: .5px solid var(--b);
-        margin-bottom: 16px;
-    }
-
-    .tab-btn {
-        padding: 10px 18px;
-        font-size: 13px;
-        color: var(--t3);
-        cursor: pointer;
-        border: none;
-        background: none;
-        border-bottom: 2px solid transparent;
-        transition: all .2s;
-    }
-
-    .tab-btn.active {
-        color: var(--gold);
-        border-bottom-color: var(--gold);
-    }
-
-    .tab-btn:hover:not(.active) {
-        color: var(--t2);
-    }
-
-    .tab-panel {
-        display: none;
-    }
-
-    .tab-panel.active {
-        display: block;
-    }/* ACTIVITY LOG */
-    .log-item {
-        display: flex;
-        gap: 10px;
-        padding: 10px 0;
-        border-bottom: .5px solid rgba(245, 245, 240, .04);
-    }
-
-    .log-item:last-child {
-        border-bottom: none;
-    }
-
-    .log-ic {
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 13px;
-        flex-shrink: 0;
-    }
-
-    .log-info {
-        flex: 1;
-        min-width: 0;
-    }
-
-    .log-msg {
-        font-size: 13px;
-    }
-
-    .log-time {
-        font-size: 11px;
-        color: var(--t3);
-        margin-top: 2px;
-    }/* TOAST */
+    }/* ===== TOAST ===== */
     #TB {
         position: fixed;
         bottom: 24px;
@@ -621,6 +331,7 @@
         display: flex;
         flex-direction: column;
         gap: 8px;
+        pointer-events: none;
     }
 
     .toast {
@@ -632,10 +343,11 @@
         display: flex;
         align-items: center;
         gap: 9px;
+        animation: tIn .25s ease;
         min-width: 230px;
         max-width: 320px;
         box-shadow: 0 8px 32px rgba(0, 0, 0, .4);
-        animation: tIn .25s ease;
+        pointer-events: auto;
     }
 
     .tok {
@@ -662,290 +374,932 @@
         color: var(--rd);
     }
 
-    @media (max-width: 900px) {
-        .stat-grid {
-            grid-template-columns: 1fr 1fr;
+    @keyframes tIn {
+        from {
+            opacity: 0;
+            transform: translateX(14px);
         }
 
-        .adm-table {
-            display: block;
-            overflow-x: auto;
+        to {
+            opacity: 1;
+            transform: translateX(0);
         }
+    }/* ===== LOADING ===== */
+    .spin {
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255, 255, 255, .35);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin .6s linear infinite;
+        display: inline-block;
+    }
+
+    .spin-g {
+        border-color: rgba(201, 168, 76, .2);
+        border-top-color: var(--gold);
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }/* ===== AVATAR ===== */
+    .av {
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        flex-shrink: 0;
+    }
+
+    .av-s {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+
+    .av-m {
+        width: 42px;
+        height: 42px;
+        font-size: 16px;
+    }
+
+    .av-l {
+        width: 56px;
+        height: 56px;
+        font-size: 20px;
+    }/* ===== PROGRESS STEP ===== */
+    .steps {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        margin-bottom: 28px;
+    }
+
+    .step {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 11px;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        color: var(--t4);
+    }
+
+    .step.active {
+        color: var(--gold);
+    }
+
+    .step.done {
+        color: var(--t3);
+    }
+
+    .step-n {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: .5px solid currentColor;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        flex-shrink: 0;
+    }
+
+    .step.done .step-n {
+        background: var(--gold-d);
+        border-color: var(--gold-b);
+        color: var(--gold);
+    }
+
+    .step-arr {
+        color: var(--t4);
+        padding: 0 8px;
+        font-size: 16px;
+    }/* ===== AUTH PAGE ===== */
+    #page-auth {
+        background: var(--bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    .auth-wrap {
+        width: 100%;
+        max-width: 420px;
+    }
+
+    .auth-logo {
+        font-family: 'Newsreader', serif;
+        font-size: 26px;
+        color: var(--gold);
+        text-align: center;
+        margin-bottom: 4px;
+    }
+
+    .auth-logo span {
+        color: var(--t);
+    }
+
+    .auth-sub {
+        font-size: 13px;
+        color: var(--t3);
+        text-align: center;
+        margin-bottom: 28px;
+    }
+
+    .auth-card {
+        background: var(--bg3);
+        border: .5px solid var(--b);
+        border-radius: var(--rxl);
+        padding: 32px 28px;
+    }
+
+    .auth-div {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 18px 0;
+    }
+
+    .auth-div::before, .auth-div::after {
+        content: '';
+        flex: 1;
+        height: .5px;
+        background: var(--b);
+    }
+
+    .auth-div span {
+        font-size: 11px;
+        color: var(--t3);
+    }
+
+    .auth-ft {
+        font-size: 13px;
+        color: var(--t3);
+        text-align: center;
+        margin-top: 16px;
+    }
+
+    .auth-ft button {
+        background: none;
+        border: none;
+        color: var(--gold);
+        cursor: pointer;
+        font-size: 13px;
+        font-family: 'Manrope', sans-serif;
+    }
+
+    .auth-ft button:hover {
+        text-decoration: underline;
+    }/* ===== SETUP PAGE ===== */
+    #page-setup {
+        background: var(--bg);
+    }
+
+    .setup-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 32px;
+        border-bottom: .5px solid var(--b);
+    }
+
+    .setup-logo {
+        font-family: 'Newsreader', serif;
+        font-size: 19px;
+        color: var(--gold);
+    }
+
+    .setup-logo span {
+        color: var(--t);
+    }
+
+    .setup-body {
+        max-width: 640px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+
+    .setup-title {
+        font-family: 'Newsreader', serif;
+        font-size: 26px;
+        margin-bottom: 6px;
+    }
+
+    .setup-sub {
+        font-size: 14px;
+        color: var(--t3);
+        margin-bottom: 32px;
+        line-height: 1.6;
+    }/* JAM OPERASIONAL */
+    .jam-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 0;
+        border-bottom: .5px solid rgba(245, 245, 240, .04);
+    }
+
+    .jam-day {
+        font-size: 13px;
+        color: var(--t);
+        min-width: 72px;
+    }
+
+    .jam-in {
+        background: var(--bg2);
+        border: .5px solid var(--b2);
+        color: var(--t);
+        padding: 7px 10px;
+        border-radius: var(--r);
+        font-size: 12px;
+        width: 86px;
+        outline: none;
+        transition: border-color .2s;
+    }
+
+    .jam-in:focus {
+        border-color: var(--gold-b);
+    }
+
+    .jam-dash {
+        color: var(--t3);
+        font-size: 13px;
+    }/* ===== DASHBOARD REDIRECT ===== */
+    #page-loading.active {
+        background: var(--bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .loading-logo {
+        font-family: 'Newsreader', serif;
+        font-size: 28px;
+        color: var(--gold);
+    }
+
+    .loading-logo span {
+        color: var(--t);
     }
     </style>
 </head>
 <body>
     <div id="TB"></div>
 
-    <!-- LOADING -->
-    <div id="guard" style="display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:14px;">
-        <div style="font-family:'Playfair Display',serif;font-size:24px;color:var(--gold);">
-            BARBER
-            <span style="color:var(--t);">BOOK</span>
+    <!-- ===================================================
+         PAGE: LOADING (cek session)
+         =================================================== -->
+    <div id="page-loading" class="page active">
+        <div class="loading-logo">
+            CARI
+            <span>CUKUR</span>
         </div>
-        <div style="width:22px;height:22px;border:2px solid rgba(201,168,76,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .6s linear infinite;"></div>
-        <div style="font-size:12px;color:var(--t3);">Memeriksa akses admin...</div>
+        <div class="spin spin-g" style="width:24px;height:24px;"></div>
+        <div style="font-size:12px;color:var(--t3);">Memuat...</div>
     </div>
 
-    <!-- ACCESS DENIED -->
-    <div id="denied" class="hidden" style="display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:14px;text-align:center;padding:20px;">
-        <div style="font-size:48px;">🚫</div>
-        <div style="font-family:'Playfair Display',serif;font-size:22px;">Akses Ditolak</div>
-        <div style="font-size:13px;color:var(--t3);max-width:340px;">Halaman ini hanya bisa diakses oleh admin BarberBook.</div>
-        <a href="auth.html" style="background:var(--gold);color:#111;padding:10px 24px;border-radius:var(--r);text-decoration:none;font-weight:600;font-size:13px;">Kembali ke Login</a>
-    </div>
-
-    <!-- APP -->
-    <div id="app" class="hidden">
-
-        <nav class="nav">
-            <div class="nav-logo">
-                <div class="nav-logo-ic">
+    <!-- ===================================================
+         PAGE: AUTH (Login / Register)
+         =================================================== -->
+    <div id="page-auth" class="page">
+        <div class="auth-wrap">
+            <!-- Logo -->
+            <div style="text-align:center;margin-bottom:24px;">
+                <div style="width:52px;height:52px;background:var(--gold-d);border:.5px solid var(--gold-b);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:24px;color:var(--gold);">
                     <i class="ti ti-scissors"></i>
                 </div>
-
-                    BARBER
-                <span>BOOK</span>
-                <div class="admin-badge">ADMIN</div>
+                <div class="auth-logo">
+                    CARI
+                    <span>CUKUR</span>
+                </div>
+                <div style="font-size:12px;color:var(--t3);margin-top:4px;">Platform booking barber shop profesional</div>
             </div>
-            <div style="display:flex;gap:8px;align-items:center;">
-                <span style="font-size:12px;color:var(--t3);" id="adminEmail">—</span>
-                <button class="btn btn-gh" onclick="doLogout()">
-                    <i class="ti ti-logout" style="font-size:15px;"></i>
+
+            <div class="auth-card">
+                <!-- LOGIN -->
+                <div id="viewLogin">
+                    <div style="font-size:16px;font-weight:600;margin-bottom:20px;font-family:'Newsreader',serif;">Selamat Datang Kembali</div>
+                    <div class="field" id="fEmail">
+                        <label>Email</label>
+                        <input type="email" id="iEmail" placeholder="nama@email.com" autocomplete="email">
+                        <div class="field-err">Email tidak valid</div>
+                    </div>
+                    <div class="field" id="fPass">
+                        <label>Password</label>
+                        <div style="position:relative;">
+                            <input type="password" id="iPass" placeholder="••••••••" autocomplete="current-password" style="padding-right:44px;">
+                            <button onclick="togglePass('iPass',this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--t3);cursor:pointer;font-size:16px;">
+                                <i class="ti ti-eye"></i>
+                            </button>
+                        </div>
+                        <div class="field-err">Password salah</div>
+                    </div>
+                    <button class="btn btn-g w100" id="btnLogin" onclick="doLogin()" style="margin-top:4px;">
+                        <i class="ti ti-login"></i>
+                        Masuk
+                                
+                    </button>
+                    <div class="auth-div">
+                        <span>atau</span>
+                    </div>
+                    <button class="btn btn-o w100" onclick="showView('viewReg')">
+                        <i class="ti ti-user-plus"></i>
+                        Daftar sebagai Owner Baru
+                                
+                    </button>
+                    <div class="auth-ft" style="margin-top:14px;">
+                        <button onclick="showView('viewForgot')">Lupa password?</button>
+                    </div>
+                </div>
+
+                <!-- REGISTER -->
+                <div id="viewReg" class="hidden">
+                    <div style="font-size:16px;font-weight:600;margin-bottom:6px;font-family:'Newsreader',serif;">Daftar Akun Baru</div>
+                    <div style="font-size:12px;color:var(--t3);margin-bottom:20px;">Gratis 30 hari pertama, tidak perlu kartu kredit.</div>
+                    <div class="fr">
+                        <div class="field" id="fRStore">
+                            <label>
+                                Nama Toko 
+                                <span style="color:var(--rd);">*</span>
+                            </label>
+                            <input type="text" id="iRStore" placeholder="Primocut Barber">
+                            <div class="field-err">Wajib diisi</div>
+                        </div>
+                        <div class="field" id="fRCity">
+                            <label>
+                                Kota 
+                                <span style="color:var(--rd);">*</span>
+                            </label>
+                            <input type="text" id="iRCity" placeholder="Banda Aceh">
+                            <div class="field-err">Wajib diisi</div>
+                        </div>
+                    </div>
+                    <div class="field" id="fREmail">
+                        <label>
+                            Email 
+                            <span style="color:var(--rd);">*</span>
+                        </label>
+                        <input type="email" id="iREmail" placeholder="nama@email.com" autocomplete="email">
+                        <div class="field-err">Email tidak valid</div>
+                    </div>
+                    <div class="field" id="fRPass">
+                        <label>
+                            Password 
+                            <span style="color:var(--rd);">*</span>
+                        </label>
+                        <div style="position:relative;">
+                            <input type="password" id="iRPass" placeholder="Min. 8 karakter" autocomplete="new-password" style="padding-right:44px;">
+                            <button onclick="togglePass('iRPass',this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--t3);cursor:pointer;font-size:16px;">
+                                <i class="ti ti-eye"></i>
+                            </button>
+                        </div>
+                        <div class="field-err" id="errRPass">Min. 8 karakter</div>
+                    </div>
+                    <div class="field" id="fRPass2">
+                        <label>
+                            Konfirmasi Password 
+                            <span style="color:var(--rd);">*</span>
+                        </label>
+                        <input type="password" id="iRPass2" placeholder="Ulangi password" autocomplete="new-password">
+                        <div class="field-err">Password tidak cocok</div>
+                    </div>
+                    <div style="font-size:11px;color:var(--t3);margin-bottom:16px;line-height:1.6;">
+
+                                  Dengan mendaftar kamu menyetujui 
+                        <a href="#" style="color:var(--gold);">Syarat & Ketentuan</a>
+                         dan 
+                        <a href="#" style="color:var(--gold);">Kebijakan Privasi</a>
+                         CariCukur.
+                                
+                    </div>
+                    <button class="btn btn-g w100" id="btnReg" onclick="doRegister()">
+                        <i class="ti ti-rocket"></i>
+                        Buat Akun
+                                
+                    </button>
+                    <div class="auth-ft" style="margin-top:14px;">
+
+                                  Sudah punya akun? 
+                        <button onclick="showView('viewLogin')">Masuk</button>
+                    </div>
+                </div>
+
+                <!-- FORGOT PASSWORD -->
+                <div id="viewForgot" class="hidden">
+                    <div style="font-size:16px;font-weight:600;margin-bottom:6px;font-family:'Newsreader',serif;">Reset Password</div>
+                    <div style="font-size:12px;color:var(--t3);margin-bottom:20px;">Masukkan email yang terdaftar. Kami kirim link reset.</div>
+                    <div class="field" id="fFEmail">
+                        <label>Email</label>
+                        <input type="email" id="iFEmail" placeholder="nama@email.com">
+                        <div class="field-err">Email tidak valid</div>
+                    </div>
+                    <button class="btn btn-g w100" id="btnForgot" onclick="doForgot()">
+                        <i class="ti ti-mail"></i>
+                        Kirim Link Reset
+                                
+                    </button>
+                    <div class="auth-ft" style="margin-top:14px;">
+                        <button onclick="showView('viewLogin')">
+                            <i class="ti ti-arrow-left" style="font-size:12px;"></i>
+                             Kembali ke Login
+                        </button>
+                    </div>
+                </div>
+
+                <!-- EMAIL SENT CONFIRM -->
+                <div id="viewEmailSent" class="hidden" style="text-align:center;padding:16px 0;">
+                    <div style="font-size:40px;color:var(--gold);margin-bottom:16px;">
+                        <i class="ti ti-mail-check"></i>
+                    </div>
+                    <div style="font-family:'Newsreader',serif;font-size:18px;margin-bottom:8px;">Cek Email Kamu!</div>
+                    <div style="font-size:13px;color:var(--t3);line-height:1.7;margin-bottom:20px;" id="emailSentMsg">Link verifikasi dikirim ke email kamu.</div>
+                    <button class="btn btn-o w100" onclick="showView('viewLogin')">Kembali ke Login</button>
+                </div>
+            </div>
+
+            <!-- Demo note -->
+            <div style="text-align:center;margin-top:16px;">
+                <button class="btn btn-gh" onclick="goDemo()" style="font-size:12px;color:var(--t3);">
+                    <i class="ti ti-eye" style="font-size:13px;"></i>
+                    Lihat Demo Toko Tanpa Login
+                          
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- ===================================================
+         PAGE: SETUP TOKO (setelah register pertama kali)
+         =================================================== -->
+    <div id="page-setup" class="page">
+        <nav class="setup-nav">
+            <div class="setup-logo">
+                CARI
+                <span>CUKUR</span>
+            </div>
+            <button class="btn btn-gh" onclick="doLogout()">
+                <i class="ti ti-logout"></i>
+                Keluar
+            </button>
         </nav>
 
-        <div class="content">
-
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
-                <div>
-                    <h2 style="font-family:'Playfair Display',serif;font-size:22px;margin-bottom:4px;">Platform Overview</h2>
-                    <p style="font-size:13px;color:var(--t3);" id="lastUpdated">Memuat data...</p>
+        <div class="setup-body">
+            <!-- Progress Steps -->
+            <div class="steps">
+                <div class="step active" id="stp1">
+                    <div class="step-n">1</div>
+                    Info Toko
                 </div>
-                <button class="btn btn-g" onclick="loadAll()">
-                    <i class="ti ti-refresh" style="font-size:14px;"></i>
-                    Refresh
-                </button>
-            </div>
-
-            <!-- STATS PLATFORM -->
-            <div class="stat-grid" id="platformStats">
-                <div class="stat">
-                    <div class="stat-lbl">Total Toko</div>
-                    <div class="stat-val skel" style="width:40px;height:22px;">&nbsp;</div>
+                <div class="step-arr">
+                    <i class="ti ti-chevron-right"></i>
                 </div>
-                <div class="stat">
-                    <div class="stat-lbl">Trial</div>
-                    <div class="stat-val skel" style="width:40px;height:22px;">&nbsp;</div>
+                <div class="step" id="stp2">
+                    <div class="step-n">2</div>
+                    Jam Buka
                 </div>
-                <div class="stat">
-                    <div class="stat-lbl">Aktif (Berbayar)</div>
-                    <div class="stat-val skel" style="width:40px;height:22px;">&nbsp;</div>
+                <div class="step-arr">
+                    <i class="ti ti-chevron-right"></i>
                 </div>
-                <div class="stat">
-                    <div class="stat-lbl">Expired</div>
-                    <div class="stat-val skel" style="width:40px;height:22px;">&nbsp;</div>
+                <div class="step" id="stp3">
+                    <div class="step-n">3</div>
+                    Barberman
                 </div>
-                <div class="stat">
-                    <div class="stat-lbl">Estimasi MRR</div>
-                    <div class="stat-val skel" style="width:80px;height:22px;">&nbsp;</div>
+                <div class="step-arr">
+                    <i class="ti ti-chevron-right"></i>
+                </div>
+                <div class="step" id="stp4">
+                    <div class="step-n">4</div>
+                    Paket
                 </div>
             </div>
 
-            <!-- TABS -->
-            <div class="card">
-                <div class="tabs">
-                    <button class="tab-btn active" onclick="switchTab('stores',this)">Semua Toko</button>
-                    <button class="tab-btn" onclick="switchTab('activity',this)">Aktivitas Terbaru</button>
-                    <button class="tab-btn" onclick="switchTab('revenue',this)">Pendapatan</button>
-                </div>
+            <!-- STEP 1: INFO TOKO -->
+            <div id="setup1">
+                <div class="setup-title">Informasi Toko</div>
+                <div class="setup-sub">Lengkapi info dasar toko kamu. Ini yang dilihat customer di halaman booking.</div>
 
-                <!-- TAB: SEMUA TOKO -->
-                <div class="tab-panel active" id="tab-stores">
-                    <div class="filter-bar">
-                        <input type="text" id="searchStore" placeholder="Cari nama toko atau email..." oninput="filterStores()">
-                        <select id="filterStatus" onchange="filterStores()">
-                            <option value="all">Semua Status</option>
-                            <option value="trial">Trial</option>
-                            <option value="active">Aktif</option>
-                            <option value="expired">Expired</option>
-                            <option value="free">Free</option>
-                        </select>
-                        <div style="flex:1;"></div>
-                        <span style="font-size:12px;color:var(--t3);" id="storeCount">—</span>
+                <div class="card" style="margin-bottom:16px;">
+                    <div class="fr">
+                        <div class="field" id="fs1Name">
+                            <label>
+                                Nama Toko 
+                                <span style="color:var(--rd);">*</span>
+                            </label>
+                            <input type="text" id="s1Name" placeholder="Primocut Barber">
+                            <div class="field-err">Wajib diisi</div>
+                        </div>
+                        <div class="field">
+                            <label>
+                                Kota 
+                                <span style="color:var(--rd);">*</span>
+                            </label>
+                            <input type="text" id="s1City" placeholder="Banda Aceh">
+                        </div>
                     </div>
-
-                    <table class="adm-table">
-                        <thead>
-                            <tr>
-                                <th>Toko</th>
-                                <th>Owner</th>
-                                <th>Kota</th>
-                                <th>Plan</th>
-                                <th>Status</th>
-                                <th>Expires</th>
-                                <th>Booking Total</th>
-                                <th>Aktif</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="storeTable"></tbody>
-                    </table>
-                </div>
-
-                <!-- TAB: AKTIVITAS -->
-                <div class="tab-panel" id="tab-activity">
-                    <div id="activityLog">
-                        <div style="text-align:center;padding:32px;color:var(--t4);font-size:13px;">Memuat aktivitas...</div>
+                    <div class="field">
+                        <label>
+                            Tagline 
+                            <span style="color:var(--t4);font-size:10px;">(opsional)</span>
+                        </label>
+                        <input type="text" id="s1Tag" placeholder="cth: Tampil Terbaik, Mulai dari Sini">
+                    </div>
+                    <div class="field">
+                        <label>Alamat Lengkap</label>
+                        <input type="text" id="s1Addr" placeholder="Jl. Nama Jalan No. X, Kota">
+                    </div>
+                    <div class="field">
+                        <label>
+                            Deskripsi Singkat 
+                            <span style="color:var(--t4);font-size:10px;">(opsional)</span>
+                        </label>
+                        <textarea id="s1Desc" rows="3" placeholder="Ceritakan sedikit tentang toko kamu..."></textarea>
+                    </div>
+                    <div class="fr">
+                        <div class="field">
+                            <label>
+                                No. WhatsApp Toko 
+                                <span style="color:var(--rd);">*</span>
+                            </label>
+                            <input type="text" id="s1WA" placeholder="08xxxxxxxxxx">
+                            <div class="field-hint">Untuk notifikasi & kontak customer</div>
+                        </div>
+                        <div class="field">
+                            <label>
+                                Instagram 
+                                <span style="color:var(--t4);font-size:10px;">(opsional)</span>
+                            </label>
+                            <input type="text" id="s1IG" placeholder="@nama.toko">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>
+                            URL Toko (slug) 
+                            <span style="color:var(--rd);">*</span>
+                        </label>
+                        <div style="display:flex;align-items:center;gap:0;">
+                            <span style="background:var(--bg4);border:.5px solid var(--b2);border-right:none;padding:11px 12px;border-radius:var(--r) 0 0 var(--r);font-size:12px;color:var(--t3);white-space:nowrap;">caricukur.id/</span>
+                            <input type="text" id="s1Slug" placeholder="primocut-bna" style="border-radius:0 var(--r) var(--r) 0;">
+                        </div>
+                        <div class="field-hint">Huruf kecil, angka, dan tanda hubung saja. cth: primocut-bna</div>
+                        <div id="slugCheck" style="font-size:11px;margin-top:4px;"></div>
                     </div>
                 </div>
 
-                <!-- TAB: PENDAPATAN -->
-                <div class="tab-panel" id="tab-revenue">
-                    <div id="revenueContent">
-                        <div style="text-align:center;padding:32px;color:var(--t4);font-size:13px;">Memuat data pendapatan...</div>
+                <!-- Pengaturan Booking -->
+                <div class="card" style="margin-bottom:24px;">
+                    <div style="font-size:14px;font-weight:500;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+                        <i class="ti ti-settings" style="color:var(--gold);"></i>
+                        Pengaturan Booking
+                    </div>
+                    <div class="fr">
+                        <div class="field">
+                            <label>DP Minimum (%)</label>
+                            <input type="number" id="s1DP" value="30" min="0" max="100">
+                            <div class="field-hint">0 = tidak pakai DP</div>
+                        </div>
+                        <div class="field">
+                            <label>Batas Cancel (jam sebelum)</label>
+                            <input type="number" id="s1Cancel" value="2" min="0">
+                        </div>
+                    </div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:.5px solid var(--b);">
+                        <div>
+                            <div style="font-size:13px;">Terima Walk-in</div>
+                            <div style="font-size:11px;color:var(--t3);margin-top:2px;">Customer bisa datang langsung tanpa booking online</div>
+                        </div>
+                        <label class="sw">
+                            <input type="checkbox" id="s1Walkin" checked>
+                            <span class="sw-t"></span>
+                        </label>
+                    </div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;">
+                        <div>
+                            <div style="font-size:13px;">Notifikasi WhatsApp Otomatis</div>
+                            <div style="font-size:11px;color:var(--t3);margin-top:2px;">Kirim reminder ke customer secara otomatis</div>
+                        </div>
+                        <label class="sw">
+                            <input type="checkbox" id="s1WaNotif" checked>
+                            <span class="sw-t"></span>
+                        </label>
                     </div>
                 </div>
 
+                <button class="btn btn-g w100" id="btnS1" onclick="saveStep1()" style="padding:14px;">
+
+                            Lanjut ke Jam Operasional 
+                    <i class="ti ti-arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- STEP 2: JAM OPERASIONAL -->
+            <div id="setup2" class="hidden">
+                <div class="setup-title">Jam Operasional</div>
+                <div class="setup-sub">Atur hari dan jam buka toko. Slot booking akan otomatis disesuaikan.</div>
+
+                <div class="card" style="margin-bottom:24px;">
+                    <div id="jamRows"></div>
+                </div>
+
+                <div style="display:flex;gap:10px;">
+                    <button class="btn btn-gh" onclick="goSetupStep(1)">
+                        <i class="ti ti-arrow-left"></i>
+                        Kembali
+                    </button>
+                    <button class="btn btn-g" style="flex:1;padding:14px;justify-content:center;" id="btnS2" onclick="saveStep2()">
+
+                                  Lanjut ke Barberman 
+                        <i class="ti ti-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 3: BARBERMAN -->
+            <div id="setup3" class="hidden">
+                <div class="setup-title">Tambah Barberman</div>
+                <div class="setup-sub">Tambah minimal 1 barberman. Kamu bisa tambah lebih banyak nanti di dashboard.</div>
+
+                <div id="barberList" style="margin-bottom:16px;"></div>
+
+                <!-- Form tambah -->
+                <div class="card" style="margin-bottom:16px;" id="addBarberForm">
+                    <div style="font-size:13px;font-weight:500;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+                        <i class="ti ti-user-plus" style="color:var(--gold);font-size:16px;"></i>
+                        Tambah Barberman
+                                
+                    </div>
+                    <div class="fr">
+                        <div class="field" id="fbName">
+                            <label>
+                                Nama 
+                                <span style="color:var(--rd);">*</span>
+                            </label>
+                            <input type="text" id="ibName" placeholder="Nama barberman">
+                            <div class="field-err">Wajib diisi</div>
+                        </div>
+                        <div class="field">
+                            <label>Spesialisasi</label>
+                            <input type="text" id="ibSpec" placeholder="cth: Fade & Pompadour">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>
+                            No. WhatsApp 
+                            <span style="color:var(--t4);font-size:10px;">(opsional)</span>
+                        </label>
+                        <input type="text" id="ibWA" placeholder="08xxxxxxxxxx">
+                    </div>
+                    <div class="field">
+                        <label>Hari Libur Mingguan</label>
+                        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;" id="ibDays">
+                            <div class="day-btn" data-day="1" onclick="toggleDay(this)">Senin</div>
+                            <div class="day-btn" data-day="2" onclick="toggleDay(this)">Selasa</div>
+                            <div class="day-btn" data-day="3" onclick="toggleDay(this)">Rabu</div>
+                            <div class="day-btn" data-day="4" onclick="toggleDay(this)">Kamis</div>
+                            <div class="day-btn" data-day="5" onclick="toggleDay(this)">Jumat</div>
+                            <div class="day-btn" data-day="6" onclick="toggleDay(this)">Sabtu</div>
+                            <div class="day-btn" data-day="0" onclick="toggleDay(this)">Minggu</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-g" id="btnAddBarber" onclick="addBarber()">
+                        <i class="ti ti-plus"></i>
+                        Tambah ke Daftar
+                    </button>
+                </div>
+
+                <div style="display:flex;gap:10px;">
+                    <button class="btn btn-gh" onclick="goSetupStep(2)">
+                        <i class="ti ti-arrow-left"></i>
+                        Kembali
+                    </button>
+                    <button class="btn btn-g" style="flex:1;padding:14px;justify-content:center;" id="btnS3" onclick="saveStep3()">
+
+                                  Lanjut ke Paket 
+                        <i class="ti ti-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 4: PAKET LAYANAN -->
+            <div id="setup4" class="hidden">
+                <div class="setup-title">Paket Layanan</div>
+                <div class="setup-sub">Tambah paket yang kamu tawarkan beserta harga dan durasinya. Durasi ini dipakai untuk smart scheduling.</div>
+
+                <div id="pkgList" style="margin-bottom:16px;"></div>
+
+                <div class="card" style="margin-bottom:16px;" id="addPkgForm">
+                    <div style="font-size:13px;font-weight:500;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+                        <i class="ti ti-plus" style="color:var(--gold);font-size:16px;"></i>
+                        Tambah Paket
+                                
+                    </div>
+                    <div class="field" id="fpName">
+                        <label>
+                            Nama Paket 
+                            <span style="color:var(--rd);">*</span>
+                        </label>
+                        <input type="text" id="ipName" placeholder="cth: Potong Reguler">
+                        <div class="field-err">Wajib diisi</div>
+                    </div>
+                    <div class="field">
+                        <label>
+                            Deskripsi 
+                            <span style="color:var(--t4);font-size:10px;">(opsional)</span>
+                        </label>
+                        <input type="text" id="ipDesc" placeholder="cth: Potong rambut standar dengan gaya pilihan">
+                    </div>
+                    <div class="fr3">
+                        <div class="field" id="fpPrice">
+                            <label>
+                                Harga (Rp) 
+                                <span style="color:var(--rd);">*</span>
+                            </label>
+                            <input type="number" id="ipPrice" placeholder="35000" min="0">
+                            <div class="field-err">Wajib diisi</div>
+                        </div>
+                        <div class="field" id="fpDur">
+                            <label>
+                                Durasi Kerja (mnt) 
+                                <span style="color:var(--rd);">*</span>
+                            </label>
+                            <input type="number" id="ipDur" placeholder="30" min="5">
+                            <div class="field-hint">Lama pengerjaan</div>
+                            <div class="field-err">Wajib diisi</div>
+                        </div>
+                        <div class="field">
+                            <label>Buffer Bersih (mnt)</label>
+                            <input type="number" id="ipBuf" value="15" min="0">
+                            <div class="field-hint">Waktu bersih-bersih</div>
+                        </div>
+                    </div>
+                    <!-- Preview total blokir -->
+                    <div id="pkgPreview" style="background:rgba(201,168,76,.05);border:.5px solid var(--gold-b);border-radius:var(--r);padding:12px 14px;display:none;">
+                        <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:4px;">Total waktu diblokir per booking</div>
+                        <div style="font-size:14px;color:var(--gold);font-weight:500;" id="pkgPreviewVal">—</div>
+                    </div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;margin-top:8px;border-top:.5px solid var(--b);">
+                        <div style="font-size:13px;">Tampilkan sebagai "Terpopuler"</div>
+                        <label class="sw">
+                            <input type="checkbox" id="ipFeat">
+                            <span class="sw-t"></span>
+                        </label>
+                    </div>
+                    <button class="btn btn-g" id="btnAddPkg" onclick="addPkg()">
+                        <i class="ti ti-plus"></i>
+                        Tambah ke Daftar
+                    </button>
+                </div>
+
+                <div style="display:flex;gap:10px;">
+                    <button class="btn btn-gh" onclick="goSetupStep(3)">
+                        <i class="ti ti-arrow-left"></i>
+                        Kembali
+                    </button>
+                    <button class="btn btn-g" style="flex:1;padding:14px;justify-content:center;" id="btnS4" onclick="saveStep4()">
+                        <i class="ti ti-rocket"></i>
+                        Selesai & Buka Dashboard
+                                
+                    </button>
+                </div>
             </div>
 
         </div>
-        <!-- end content -->
+        <!-- end setup-body -->
     </div>
-    <!-- end app -->
+    <!-- end page-setup -->
 
-    <!-- MODAL: Detail & Kelola Subscription -->
-    <div class="ov" id="mStore">
-        <div class="mbox">
-            <div class="mhd">
-                <div class="mtitle" id="mStoreTitle">Detail Toko</div>
-                <button class="mclose" onclick="closeM('mStore')">
-                    <i class="ti ti-x"></i>
-                </button>
-            </div>
-            <div class="mbody" id="mStoreBody"></div>
-            <div class="mfoot" id="mStoreFoot"></div>
-        </div>
-    </div>
+    <style>
+    /* Day button untuk hari libur */
+    .day-btn {
+        padding: 6px 12px;
+        border: .5px solid var(--b2);
+        border-radius: 6px;
+        font-size: 11px;
+        color: var(--t3);
+        cursor: pointer;
+        transition: all .15s;
+        user-select: none;
+    }
 
-    <!-- MODAL: Set Subscription Manual -->
-    <div class="ov" id="mSetSub">
-        <div class="mbox" style="max-width:400px;">
-            <div class="mhd">
-                <div class="mtitle">Atur Subscription</div>
-                <button class="mclose" onclick="closeM('mSetSub')">
-                    <i class="ti ti-x"></i>
-                </button>
-            </div>
-            <div class="mbody">
-                <div class="info-box">
-                    <strong>Toko:</strong>
-                    <span id="subStoreName">—</span>
-                    <br>
+    .day-btn:hover {
+        border-color: var(--gold-b);
+        color: var(--gold);
+    }
 
-                            Atur status subscription toko ini secara manual setelah konfirmasi pembayaran.
-                          
-                </div>
-                <div class="field">
-                    <label>Plan</label>
-                    <select id="subPlan">
-                        <option value="free">Free</option>
-                        <option value="pro">Pro (Rp 49.000/bulan)</option>
-                    </select>
-                </div>
-                <div class="field">
-                    <label>Status Subscription</label>
-                    <select id="subStatus">
-                        <option value="trial">Trial</option>
-                        <option value="active">Aktif (Sudah Bayar)</option>
-                        <option value="expired">Expired</option>
-                    </select>
-                </div>
-                <div class="field">
-                    <label>Aktif Sampai Tanggal</label>
-                    <input type="date" id="subExpiry">
-                    <div class="field-hint">Kosongkan jika free/tidak ada batas</div>
-                </div>
-                <div class="field">
-                    <label>Catatan (opsional)</label>
-                    <textarea id="subNote" rows="2" style="width:100%;background:var(--bg2);border:.5px solid var(--b2);color:var(--t);padding:10px 12px;border-radius:var(--r);font-size:13px;outline:none;resize:vertical;" placeholder="cth: Sudah transfer Rp 49.000 via BCA tgl 25 Jul"></textarea>
-                </div>
-            </div>
-            <div class="mfoot">
-                <button class="btn btn-gh" onclick="closeM('mSetSub')">Batal</button>
-                <button class="btn btn-g" onclick="saveSubscription()">
-                    <i class="ti ti-check"></i>
-                    Simpan
-                </button>
-            </div>
-        </div>
-    </div>
+    .day-btn.off {
+        background: var(--rdd);
+        border-color: rgba(248, 113, 113, .3);
+        color: var(--rd);
+    }/* Barber card di list */
+    .barber-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--bg3);
+        border: .5px solid var(--b);
+        border-radius: var(--r);
+        padding: 14px;
+        margin-bottom: 10px;
+    }
 
-    <!-- MODAL: Konfirmasi Nonaktifkan -->
-    <div class="ov" id="mConfirm">
-        <div class="mbox" style="max-width:380px;">
-            <div class="mhd">
-                <div class="mtitle" id="mConfirmTitle">Konfirmasi</div>
-                <button class="mclose" onclick="closeM('mConfirm')">
-                    <i class="ti ti-x"></i>
-                </button>
-            </div>
-            <div class="mbody">
-                <div style="font-size:13px;color:var(--t2);line-height:1.65;" id="mConfirmText">—</div>
-            </div>
-            <div class="mfoot">
-                <button class="btn btn-gh" onclick="closeM('mConfirm')">Batal</button>
-                <button class="btn btn-g" id="mConfirmBtn">Ya, Lanjutkan</button>
-            </div>
-        </div>
-    </div>
+    .barber-item-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .barber-item-name {
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .barber-item-sub {
+        font-size: 11px;
+        color: var(--t3);
+        margin-top: 2px;
+    }
+
+    .barber-item-days {
+        font-size: 10px;
+        color: var(--rd);
+        margin-top: 3px;
+    }/* Pkg card di list */
+    .pkg-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--bg3);
+        border: .5px solid var(--b);
+        border-radius: var(--r);
+        padding: 14px;
+        margin-bottom: 10px;
+    }
+
+    .pkg-item-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .pkg-item-name {
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .pkg-item-sub {
+        font-size: 11px;
+        color: var(--t3);
+        margin-top: 2px;
+    }
+
+    .pkg-item-price {
+        font-family: 'Newsreader', serif;
+        font-size: 16px;
+        color: var(--gold);
+        flex-shrink: 0;
+    }
+    </style>
 
     <script>
     // ============================================================
-    // KONFIGURASI
+    // KONFIGURASI SUPABASE
+    // Ganti dengan URL dan ANON KEY Supabase project kamu
     // ============================================================
     const SUPABASE_URL = 'https://rdhytutkjzgizluyvrus.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_FGCxIQUPfWUKtdGI52oFKw_XCmRWFWh';
-    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // ============================================================
-    // GANTI DENGAN EMAIL ADMIN KAMU
-    // Hanya email ini yang bisa akses halaman admin
-    // ============================================================
-    const ADMIN_EMAIL = 'gameonline44335@gmail.com';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // ============================================================
     // STATE
     // ============================================================
     let STATE = {
         user: null,
-        stores: [],
-        filteredStores: [],
-        subTarget: null,
+        store: null,
+        setupStoreId: null,
+        setupBarbers: [],
+        // barberman yang ditambah di step 3 (sebelum save)
+        setupPkgs: [],
+        // paket yang ditambah di step 4 (sebelum save)
+        slugTimer: null,
     };
-    // store id yang sedang diubah subscription
+
+    const DAYS = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const COLORS = ['#C9A84C', '#60a5fa', '#4ade80', '#c084fc', '#f87171', '#fb923c', '#34d399'];
 
     // ============================================================
     // UTILS
     // ============================================================
     function fmtRp(n) {
-        return 'Rp ' + Math.round(n || 0).toLocaleString('id-ID');
+        return 'Rp ' + Math.round(n).toLocaleString('id-ID');
     }
-    function fmtDate(s) {
-        if (!s)
-            return '—';
-        return new Date(s).toLocaleDateString('id-ID', {
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric'
-        });
-    }
-    function escH(s) {
-        const d = document.createElement('div');
-        d.textContent = s ?? '';
-        return d.innerHTML;
-    }
+
     function showToast(msg, type='ok') {
         const icons = {
             ok: 'ti-check',
@@ -967,474 +1321,1007 @@
             setTimeout(() => el.remove(), 300);
         }, 3500);
     }
-    function openM(id) {
-        document.getElementById(id).classList.add('open');
+
+    function showPage(id) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        window.scrollTo(0, 0);
     }
-    function closeM(id) {
-        document.getElementById(id).classList.remove('open');
-    }
-    document.querySelectorAll('.ov').forEach(o => {
-        o.addEventListener('click', e => {
-            if (e.target === o)
-                o.classList.remove('open');
+
+    function showView(id) {
+        ['viewLogin', 'viewReg', 'viewForgot', 'viewEmailSent'].forEach(v => {
+            document.getElementById(v).classList.add('hidden');
         });
-    });
+        document.getElementById(id).classList.remove('hidden');
+    }
+
+    function togglePass(inputId, btn) {
+        const inp = document.getElementById(inputId);
+        const icon = btn.querySelector('i');
+        if (inp.type === 'password') {
+            inp.type = 'text';
+            icon.className = 'ti ti-eye-off';
+        } else {
+            inp.type = 'password';
+            icon.className = 'ti ti-eye';
+        }
+    }
+
+    function setLoading(btnId, loading, label='') {
+        const btn = document.getElementById(btnId);
+        if (!btn)
+            return;
+        if (loading) {
+            btn._origHTML = btn.innerHTML;
+            btn.innerHTML = `<div class="spin"></div>Memproses...`;
+            btn.disabled = true;
+        } else {
+            btn.innerHTML = btn._origHTML || label;
+            btn.disabled = false;
+        }
+    }
+
+    function validateField(fieldId, valid, errMsg='') {
+        const f = document.getElementById(fieldId);
+        if (!f)
+            return;
+        f.classList.toggle('error', !valid);
+        if (!valid && errMsg) {
+            const errEl = f.querySelector('.field-err');
+            if (errEl)
+                errEl.textContent = errMsg;
+        }
+    }
+
+    function clearErrors() {
+        document.querySelectorAll('.field.error').forEach(f => f.classList.remove('error'));
+    }
 
     // ============================================================
-    // AUTH GUARD — hanya admin yang bisa masuk
+    // INIT — cek session saat load
     // ============================================================
-    async function initGuard() {
-        const timeout = new Promise((_, r) => setTimeout(() => r(new Error('TIMEOUT')), 8000));
+    let _initHandled = false; // pastikan proses redirect cuma jalan sekali
+
+    async function init() {
+        // Timeout pengaman: kalau proses cek session lebih dari 8 detik
+        // (misal koneksi internet lambat/putus), jangan macet selamanya —
+        // tampilkan halaman login dan beri tahu user.
+        const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('TIMEOUT')), 8000)
+        );
+
         try {
-            const {data: {session}} = await Promise.race([sb.auth.getSession(), timeout]);
-            if (!session?.user) {
-                window.location.href = 'auth.html';
-                return;
+            const {data: {session}} = await Promise.race([
+            sb.auth.getSession(),
+            timeoutPromise,
+            ]);
+            if(session?.user) {
+                STATE.user = session.user;
+                if (!_initHandled) {
+                    _initHandled = true;
+                    await afterLogin();
+                }
+            } else {
+                if (!_initHandled) {
+                    _initHandled = true;
+                    showPage('page-auth');
+                }
             }
-            // Cek apakah email ini adalah admin
-            if (session.user.email !== ADMIN_EMAIL) {
-                document.getElementById('guard').classList.add('hidden');
-                document.getElementById('denied').classList.remove('hidden');
-                return;
-            }
-            STATE.user = session.user;
-            document.getElementById('adminEmail').textContent = STATE.user.email;
-            document.getElementById('guard').classList.add('hidden');
-            document.getElementById('app').classList.remove('hidden');
-            await loadAll();
         } catch (e) {
-            console.error('Guard error:', e);
-            window.location.href = 'auth.html';
+            console.error('Init error:', e);
+            if (_initHandled)
+                return; // listener lain sudah menangani, jangan timpa
+            _initHandled = true;
+            if (e.message === 'TIMEOUT') {
+                showToast('Koneksi lambat. Cek internet kamu dan coba lagi.', 'warn');
+            } else {
+                showToast('Gagal memuat. Cek koneksi internet kamu.', 'err');
+            }
+            showPage('page-auth');
+        }
+    }
+
+    // Setelah login: cek apakah sudah punya toko
+    async function afterLogin() {
+        const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('TIMEOUT')), 8000)
+        );
+
+        try {
+            const {data: store, error} = await Promise.race([
+            sb.from('stores').select('*').eq('owner_id', STATE.user.id).maybeSingle(),
+            timeoutPromise,
+            ]);
+
+            if (error) {
+                console.error('Gagal cek toko:', error);
+                showToast('Gagal memuat data toko. Coba refresh halaman.', 'err');
+                showPage('page-auth');
+                return;
+            }
+
+            if (!store) {
+                // Belum punya toko sama sekali → mulai Setup dari awal
+                STATE.store = null;
+                STATE.setupStoreId = null;
+                initSetupForm();
+                showPage('page-setup');
+            } else {
+                STATE.store = store;
+                STATE.setupStoreId = store.id;
+                // Cek apakah setup toko sudah lengkap (punya barberman & paket)
+                const isComplete = await checkSetupComplete(store.id);
+                if (isComplete) {
+                    window.location.href = 'dashboard.html';
+                } else {
+                    // Toko ada tapi setup belum selesai → lanjutkan dari step yang sesuai
+                    initSetupForm();
+                    prefillSetupFromStore(store);
+                    await resumeSetupProgress(store.id);
+                    showPage('page-setup');
+                }
+            }
+        } catch (e) {
+            console.error('afterLogin error:', e);
+            showToast('Koneksi gagal. Cek internet kamu dan coba lagi.', 'err');
+            showPage('page-auth');
+        }
+    }
+
+    // Cek apakah toko sudah punya minimal 1 barberman dan 1 paket (artinya setup selesai)
+    async function checkSetupComplete(storeId) {
+        try {
+            const [{count: barberCount}, {count: pkgCount}] = await Promise.all([
+            sb.from('barbers').select('id', {
+                count: 'exact',
+                head: true
+            }).eq('store_id', storeId),
+            sb.from('packages').select('id', {
+                count: 'exact',
+                head: true
+            }).eq('store_id', storeId),
+            ]);
+            return (barberCount > 0) && (pkgCount > 0);
+        } catch (e) {
+            console.error('checkSetupComplete error:', e);
+            return false;
+        }
+    }
+
+    // Isi ulang form step 1 dengan data toko yang sudah ada (kalau user kembali setelah setup terputus)
+    function prefillSetupFromStore(store) {
+        const fields = {
+            s1Name: store.name,
+            s1City: store.city,
+            s1Tag: store.tagline,
+            s1Addr: store.address,
+            s1Desc: store.description,
+            s1WA: store.phone_wa,
+            s1IG: store.instagram,
+            s1Slug: store.slug,
+            s1DP: store.dp_percent,
+            s1Cancel: store.cancel_hours,
+        };
+        Object.entries(fields).forEach(([id, val]) => {
+            const el = document.getElementById(id);
+            if (el && val !== null && val !== undefined)
+                el.value = val;
+        });
+        const walkinEl = document.getElementById('s1Walkin');
+        const notifEl = document.getElementById('s1WaNotif');
+        if (walkinEl)
+            walkinEl.checked = !!store.accept_walkin;
+        if (notifEl)
+            notifEl.checked = !!store.wa_notif;
+    }
+
+    // Lanjutkan ke step setup yang sesuai berdasarkan progress yang sudah tersimpan
+    async function resumeSetupProgress(storeId) {
+        try {
+            const {count: barberCount} = await sb.from('barbers')
+            .select('id', {
+                count: 'exact',
+                head: true
+            }).eq('store_id', storeId);
+            if (barberCount > 0) {
+                goSetupStep(4);
+                return;
+            }
+            const {data: hours} = await sb.from('store_hours')
+            .select('id').eq('store_id', storeId).limit(1);
+            if (hours && hours.length > 0) {
+                await loadJamFromDB();
+                goSetupStep(3);
+                return;
+            }
+            await loadJamFromDB();
+            goSetupStep(2);
+        } catch (e) {
+            console.error('resumeSetupProgress error:', e);
+            goSetupStep(1);
+        }
+    }
+
+    // ============================================================
+    // AUTH FUNCTIONS
+    // ============================================================
+    async function doLogin() {
+        clearErrors();
+        const email = document.getElementById('iEmail').value.trim();
+        const pass = document.getElementById('iPass').value;
+        let valid = true;
+
+        if (!email || !email.includes('@')) {
+            validateField('fEmail', false);
+            valid = false;
+        }
+        if (!pass) {
+            validateField('fPass', false);
+            valid = false;
+        }
+        if (!valid)
+            return;
+
+        setLoading('btnLogin', true);
+        try {
+            const {data, error} = await sb.auth.signInWithPassword({
+                email,
+                password: pass
+            });
+            if (error) {
+                if (error.message.includes('Invalid')) {
+                    validateField('fPass', false, 'Email atau password salah');
+                } else {
+                    showToast(error.message, 'err');
+                }
+                setLoading('btnLogin', false);
+                return;
+            }
+            STATE.user = data.user;
+            showToast('Selamat datang kembali!', 'ok');
+            await afterLogin();
+        } catch (e) {
+            showToast('Terjadi kesalahan. Coba lagi.', 'err');
+            setLoading('btnLogin', false);
+        }
+    }
+
+    async function doRegister() {
+        clearErrors();
+        const store = document.getElementById('iRStore').value.trim();
+        const city = document.getElementById('iRCity').value.trim();
+        const email = document.getElementById('iREmail').value.trim();
+        const pass = document.getElementById('iRPass').value;
+        const pass2 = document.getElementById('iRPass2').value;
+        let valid = true;
+
+        if (!store) {
+            validateField('fRStore', false);
+            valid = false;
+        }
+        if (!city) {
+            validateField('fRCity', false);
+            valid = false;
+        }
+        if (!email || !email.includes('@')) {
+            validateField('fREmail', false);
+            valid = false;
+        }
+        if (pass.length < 8) {
+            validateField('fRPass', false, 'Password minimal 8 karakter');
+            valid = false;
+        }
+        if (pass !== pass2) {
+            validateField('fRPass2', false, 'Password tidak cocok');
+            valid = false;
+        }
+        if (!valid)
+            return;
+
+        setLoading('btnReg', true);
+        try {
+            const {data, error} = await sb.auth.signUp({
+                email,
+                password: pass,
+                options: {
+                    data: {
+                        store_name: store,
+                        city
+                    }
+                }
+            });
+
+            if (error) {
+                if (error.message.includes('already registered')) {
+                    validateField('fREmail', false, 'Email sudah terdaftar');
+                } else {
+                    showToast(error.message, 'err');
+                }
+                setLoading('btnReg', false);
+                return;
+            }
+
+            // Simpan data untuk setup awal
+            if (data.user) {
+                STATE.user = data.user;
+                // Pre-fill setup form dengan nama toko dari register
+                document.getElementById('s1Name').value = store;
+                document.getElementById('s1City').value = city;
+                // Auto-generate slug
+                document.getElementById('s1Slug').value = slugify(store + '-' + city);
+            }
+
+            const msg = data.session
+            ? 'Akun berhasil dibuat!'
+            : 'Cek email untuk verifikasi akun.';
+
+            document.getElementById('emailSentMsg').textContent =
+            data.session
+            ? 'Akun berhasil dibuat! Melanjutkan setup toko...'
+            : `Link verifikasi dikirim ke ${email}. Setelah verifikasi, login kembali untuk melanjutkan setup.`;
+
+            showView('viewEmailSent');
+            showToast(msg, 'ok');
+            setLoading('btnReg', false);
+
+            if (data.session) {
+                setTimeout(() => {
+                    initSetupForm();
+                    showPage('page-setup');
+                }, 1500);
+            }
+        } catch (e) {
+            showToast('Terjadi kesalahan. Coba lagi.', 'err');
+            setLoading('btnReg', false);
+        }
+    }
+
+    async function doForgot() {
+        clearErrors();
+        const email = document.getElementById('iFEmail').value.trim();
+        if (!email || !email.includes('@')) {
+            validateField('fFEmail', false);
+            return;
+        }
+
+        setLoading('btnForgot', true);
+        try {
+            const {error} = await sb.auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.origin + '/reset-password.html'
+            });
+            if (error) {
+                showToast(error.message, 'err');
+                setLoading('btnForgot', false);
+                return;
+            }
+
+            document.getElementById('emailSentMsg').textContent =
+            `Link reset password dikirim ke ${email}. Cek inbox (dan folder spam) kamu.`;
+            showView('viewEmailSent');
+            setLoading('btnForgot', false);
+        } catch (e) {
+            showToast('Terjadi kesalahan.', 'err');
+            setLoading('btnForgot', false);
         }
     }
 
     async function doLogout() {
         await sb.auth.signOut();
-        window.location.href = 'auth.html';
+        STATE.user = null;
+        STATE.store = null;
+        showPage('page-auth');
+        showView('viewLogin');
+        showToast('Berhasil keluar', 'ok');
+    }
+
+    function goDemo() {
+        window.location.href = 'booking.html?store=demo';
     }
 
     // ============================================================
-    // LOAD ALL DATA
+    // SETUP TOKO
     // ============================================================
-    async function loadAll() {
-        document.getElementById('lastUpdated').textContent = 'Memuat data...';
+    function initSetupForm() {
+        goSetupStep(1);
+        renderJamRows();
+        renderBarberList();
+        renderPkgList();
+
+        // Auto-generate slug dari nama toko
+        document.getElementById('s1Name').addEventListener('input', function() {
+            const city = document.getElementById('s1City').value;
+            document.getElementById('s1Slug').value = slugify(this.value + (city ? '-' + city : ''));
+            checkSlug();
+        });
+        document.getElementById('s1City').addEventListener('input', function() {
+            const name = document.getElementById('s1Name').value;
+            document.getElementById('s1Slug').value = slugify(name + '-' + this.value);
+            checkSlug();
+        });
+        document.getElementById('s1Slug').addEventListener('input', function() {
+            this.value = slugify(this.value);
+            checkSlug();
+        });
+
+        // Preview total blokir paket
+        ['ipDur', 'ipBuf'].forEach(id => {
+            document.getElementById(id).addEventListener('input', updatePkgPreview);
+        });
+    }
+
+    function slugify(text) {
+        return text
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
+    }
+
+    async function checkSlug() {
+        const slug = document.getElementById('s1Slug').value;
+        const el = document.getElementById('slugCheck');
+        if (!slug || slug.length < 3) {
+            el.textContent = '';
+            return;
+        }
+
+        clearTimeout(STATE.slugTimer);
+        STATE.slugTimer = setTimeout(async () => {
+            el.innerHTML = '<span style="color:var(--t3);">Mengecek ketersediaan...</span>';
+            try {
+                const {data} = await sb.from('stores').select('id').eq('slug', slug).maybeSingle();
+                if (data) {
+                    el.innerHTML = '<span style="color:var(--rd);"><i class="ti ti-x" style="font-size:12px;vertical-align:-1px;"></i> URL sudah dipakai</span>';
+                } else {
+                    el.innerHTML = '<span style="color:var(--gr);"><i class="ti ti-check" style="font-size:12px;vertical-align:-1px;"></i> URL tersedia</span>';
+                }
+            } catch (e) {
+                el.textContent = '';
+            }
+        }, 500);
+    }
+
+    function goSetupStep(n) {
+        for (let i = 1; i <= 4; i++) {
+            document.getElementById(`setup${i}`).classList.toggle('hidden', i !== n);
+            const s = document.getElementById(`stp${i}`);
+            s.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+        }
+    }
+
+    // JAM OPERASIONAL
+    function renderJamRows() {
+        const defaultHours = [
+        {
+            day: 0,
+            name: 'Minggu',
+            open: '09:00',
+            close: '17:00',
+            on: false
+        },
+        {
+            day: 1,
+            name: 'Senin',
+            open: '08:00',
+            close: '20:00',
+            on: true
+        },
+        {
+            day: 2,
+            name: 'Selasa',
+            open: '08:00',
+            close: '20:00',
+            on: true
+        },
+        {
+            day: 3,
+            name: 'Rabu',
+            open: '08:00',
+            close: '20:00',
+            on: true
+        },
+        {
+            day: 4,
+            name: 'Kamis',
+            open: '08:00',
+            close: '20:00',
+            on: true
+        },
+        {
+            day: 5,
+            name: 'Jumat',
+            open: '08:00',
+            close: '20:00',
+            on: true
+        },
+        {
+            day: 6,
+            name: 'Sabtu',
+            open: '08:00',
+            close: '20:00',
+            on: true
+        },
+        ];
+
+        const container = document.getElementById('jamRows');
+        container.innerHTML = defaultHours.map(h => `
+    <div class="jam-row">
+      <div class="jam-day">${
+        h.name}</div>
+      <label class="sw" style="margin-right:12px;">
+        <input type="checkbox" ${
+        h.on ? 'checked' : ''} id="jamon${h.day}"
+          onchange="toggleJamRow(${h.day}, this.checked)">
+        <span class="sw-t"></span>
+      </label>
+      <div id="jamtimes${
+
+        h.day}" style="${h.on ? '' : 'opacity:.25;pointer-events:none;'}">
+        <input class="jam-in" type="time" id="jamopen${h.day}" value="${h.open}">
+        <span class="jam-dash">–</span>
+        <input class="jam-in" type="time" id="jamclose${
+        h.day}" value="${h.close}">
+      </div>
+    </div>
+  `
+
+
+        ).join('');
+    }
+
+    function toggleJamRow(day, on) {
+        const el = document.getElementById(`jamtimes${day}`);
+        el.style.opacity = on ? '1' : '.25';
+        el.style.pointerEvents = on ? 'auto' : 'none';
+    }
+
+    function getJamData() {
+        return [0, 1, 2, 3, 4, 5, 6].map(d => ({
+            day_of_week: d,
+            is_open: document.getElementById(`jamon${d}`)?.checked ?? false,
+            open_time: document.getElementById(`jamopen${d}`)?.value || '08:00',
+            close_time: document.getElementById(`jamclose${d}`)?.value || '20:00',
+        }));
+    }
+
+    // BARBERMAN
+    function toggleDay(el) {
+        el.classList.toggle('off');
+    }
+
+    function addBarber() {
+        clearErrors();
+        const name = document.getElementById('ibName').value.trim();
+        const spec = document.getElementById('ibSpec').value.trim();
+        const wa = document.getElementById('ibWA').value.trim();
+        if (!name) {
+            validateField('fbName', false);
+            return;
+        }
+
+        const daysOff = [...document.querySelectorAll('#ibDays .day-btn.off')]
+        .map(el => parseInt(el.dataset.day));
+
+        const color = COLORS[STATE.setupBarbers.length % COLORS.length];
+
+        STATE.setupBarbers.push({
+            name,
+            spec,
+            wa,
+            daysOff,
+            color,
+            sort_order: STATE.setupBarbers.length
+        });
+
+        // Reset form
+        document.getElementById('ibName').value = '';
+        document.getElementById('ibSpec').value = '';
+        document.getElementById('ibWA').value = '';
+        document.querySelectorAll('#ibDays .day-btn').forEach(b => b.classList.remove('off'));
+
+        renderBarberList();
+        showToast(name + ' ditambahkan!', 'ok');
+    }
+
+    function removeBarber(i) {
+        STATE.setupBarbers.splice(i, 1);
+        renderBarberList();
+    }
+
+    function renderBarberList() {
+        const el = document.getElementById('barberList');
+        if (!STATE.setupBarbers.length) {
+            el.innerHTML = '<div style="font-size:12px;color:var(--t3);margin-bottom:10px;">Belum ada barberman ditambahkan.</div>';
+            return;
+        }
+        el.innerHTML = STATE.setupBarbers.map((b, i) => `
+    <div class="barber-item">
+      <div class="av av-m" style="background:rgba(201,168,76,.15);color:${
+        b.color};font-size:16px;">${b.name[0]}</div>
+      <div class="barber-item-info">
+        <div class="barber-item-name">${
+        b.name}</div>
+        <div class="barber-item-sub">${b.spec || 'Spesialisasi belum diisi'} ${b.wa ? '· ' + b.wa : ''}</div>
+        ${b.daysOff.length ? `<div class="barber-item-days">Libur: ${b.daysOff.map(d => DAYS[d]).join(', ')}</div>` : ''}
+      </div>
+      <button class="btn btn-d" style="padding:6px 10px;" onclick="removeBarber(${
+        i})"><i class="ti ti-trash" style="font-size:14px;"></i></button>
+    </div>
+  `
+
+        ).join('');
+    }
+
+    // PAKET
+    function updatePkgPreview() {
+        const dur = parseInt(document.getElementById('ipDur').value) || 0;
+        const buf = parseInt(document.getElementById('ipBuf').value) || 0;
+        const prev = document.getElementById('pkgPreview');
+        const val = document.getElementById('pkgPreviewVal');
+        if (dur > 0) {
+            prev.style.display = 'block';
+            val.textContent = `${dur + buf} menit total (${dur} mnt kerja + ${buf} mnt buffer bersih)`;
+        } else {
+            prev.style.display = 'none';
+        }
+    }
+
+    function addPkg() {
+        clearErrors();
+        const name = document.getElementById('ipName').value.trim();
+        const desc = document.getElementById('ipDesc').value.trim();
+        const price = parseInt(document.getElementById('ipPrice').value) || 0;
+        const dur = parseInt(document.getElementById('ipDur').value) || 0;
+        const buf = parseInt(document.getElementById('ipBuf').value) || 15;
+        const feat = document.getElementById('ipFeat').checked;
+        let valid = true;
+
+        if (!name) {
+            validateField('fpName', false);
+            valid = false;
+        }
+        if (!price) {
+            validateField('fpPrice', false, 'Masukkan harga yang valid');
+            valid = false;
+        }
+        if (!dur) {
+            validateField('fpDur', false, 'Masukkan durasi yang valid');
+            valid = false;
+        }
+        if (!valid)
+            return;
+
+        STATE.setupPkgs.push({
+            name,
+            description: desc,
+            price,
+            duration_min: dur,
+            buffer_min: buf,
+            is_featured: feat,
+            sort_order: STATE.setupPkgs.length
+        });
+
+        // Reset form
+        document.getElementById('ipName').value = '';
+        document.getElementById('ipDesc').value = '';
+        document.getElementById('ipPrice').value = '';
+        document.getElementById('ipDur').value = '';
+        document.getElementById('ipBuf').value = '15';
+        document.getElementById('ipFeat').checked = false;
+        document.getElementById('pkgPreview').style.display = 'none';
+
+        renderPkgList();
+        showToast(name + ' ditambahkan!', 'ok');
+    }
+
+    function removePkg(i) {
+        STATE.setupPkgs.splice(i, 1);
+        renderPkgList();
+    }
+
+    function renderPkgList() {
+        const el = document.getElementById('pkgList');
+        if (!STATE.setupPkgs.length) {
+            el.innerHTML = '<div style="font-size:12px;color:var(--t3);margin-bottom:10px;">Belum ada paket ditambahkan.</div>';
+            return;
+        }
+        el.innerHTML = STATE.setupPkgs.map((p, i) => `
+    <div class="pkg-item">
+      <div class="pkg-item-info">
+        <div class="pkg-item-name">${
+
+        p.name} ${p.is_featured ? '<span class="badge bg" style="margin-left:6px;">Terpopuler</span>' : ''}</div>
+        <div class="pkg-item-sub">${p.duration_min} mnt kerja + ${p.buffer_min} mnt buffer · ${p.desc || 'Tanpa deskripsi'}</div>
+      </div>
+      <div class="pkg-item-price">${
+        fmtRp(p.price)}</div>
+      <button class="btn btn-d" style="padding:6px 10px;" onclick="removePkg(${i})"><i class="ti ti-trash" style="font-size:14px;"></i></button>
+    </div>
+  `
+
+        ).join('');
+    }
+
+    // ============================================================
+    // SAVE STEPS
+    // ============================================================
+    async function saveStep1() {
+        clearErrors();
+        const name = document.getElementById('s1Name').value.trim();
+        const slug = document.getElementById('s1Slug').value.trim();
+        const wa = document.getElementById('s1WA').value.trim();
+        let valid = true;
+
+        if (!name) {
+            validateField('fs1Name', false);
+            valid = false;
+        }
+        if (!slug || slug.length < 3) {
+            showToast('URL toko minimal 3 karakter', 'err');
+            valid = false;
+        }
+        if (!wa) {
+            showToast('Nomor WhatsApp wajib diisi', 'err');
+            valid = false;
+        }
+        if (!valid)
+            return;
+
+        setLoading('btnS1', true);
         try {
-            // Load semua toko + info owner
-            const {data: stores, error} = await sb
-            .from('stores')
-            .select(`
-        id,name,city,slug,is_active,
-        subscription_status,subscription_plan,subscription_expires_at,trial_ends_at,
-        created_at,owner_id,
-        phone_wa,instagram
-      `
+            // Cek slug unik
+            const {data: existing} = await sb.from('stores').select('id').eq('slug', slug).maybeSingle();
+            if (existing && existing.id !== STATE.setupStoreId) {
+                showToast('URL toko sudah dipakai, coba yang lain', 'err');
+                setLoading('btnS1', false);
+                return;
+            }
 
+            const storeData = {
+                owner_id: STATE.user.id,
+                name: name,
+                tagline: document.getElementById('s1Tag').value.trim() || null,
+                description: document.getElementById('s1Desc').value.trim() || null,
+                address: document.getElementById('s1Addr').value.trim() || null,
+                city: document.getElementById('s1City').value.trim() || null,
+                phone_wa: wa,
+                instagram: document.getElementById('s1IG').value.trim() || null,
+                slug: slug,
+                dp_percent: parseInt(document.getElementById('s1DP').value) || 30,
+                cancel_hours: parseInt(document.getElementById('s1Cancel').value) || 2,
+                accept_walkin: document.getElementById('s1Walkin').checked,
+                wa_notif: document.getElementById('s1WaNotif').checked,
+            };
 
+            let storeResult;
+            if (STATE.setupStoreId) {
+                // Update existing
+                const {data, error} = await sb.from('stores')
+                .update(storeData)
+                .eq('id', STATE.setupStoreId)
+                .select()
+                .single();
+                if (error)
+                    throw error;
+                storeResult = data;
+            } else {
+                // Insert baru
+                const {data, error} = await sb.from('stores')
+                .insert(storeData)
+                .select()
+                .single();
+                if (error)
+                    throw error;
+                storeResult = data;
+                STATE.setupStoreId = storeResult.id;
 
+                // Seed jam default
+                await sb.rpc('seed_store_hours', {
+                    p_store_id: storeResult.id
+                });
+            }
 
-            )
-            .order('created_at', {
-                ascending: false
-            });
+            STATE.store = storeResult;
+            setLoading('btnS1', false);
+            goSetupStep(2);
+            // Refresh jam rows dengan data yang sudah ada
+            await loadJamFromDB();
+        } catch (e) {
+            console.error('saveStep1 error:', e);
+            showToast(e.message || 'Gagal menyimpan. Coba lagi.', 'err');
+            setLoading('btnS1', false);
+        }
+    }
 
-            if (error)
-                throw error;
-            STATE.stores = stores || [];
+    async function loadJamFromDB() {
+        if (!STATE.setupStoreId)
+            return;
+        try {
+            const {data} = await sb.from('store_hours')
+            .select('*')
+            .eq('store_id', STATE.setupStoreId)
+            .order('day_of_week');
 
-            // Load jumlah booking per toko
-            const bookingCounts = {};
-            const {data: bkCounts} = await sb
-            .from('bookings')
-            .select('store_id')
-            .in('store_id', STATE.stores.map(s => s.id));
-            (bkCounts || []).forEach(b => {
-                bookingCounts[b.store_id] = (bookingCounts[b.store_id] || 0) + 1;
-            });
-            STATE.stores = STATE.stores.map(s => ({
-                ...s,
-                bookingCount: bookingCounts[s.id] || 0
+            if(data?.length) {
+                data.forEach(h => {
+                    const cb = document.getElementById(`jamon${h.day_of_week}`);
+                    const op = document.getElementById(`jamopen${h.day_of_week}`);
+                    const cl = document.getElementById(`jamclose${h.day_of_week}`);
+                    if (cb)
+                        cb.checked = h.is_open;
+                    if (op)
+                        op.value = h.open_time?.slice(0, 5) || '08:00';
+                    if (cl)
+                        cl.value = h.close_time?.slice(0, 5) || '20:00';
+                    toggleJamRow(h.day_of_week, h.is_open);
+                });
+            }
+        } catch (e) {
+            console.error('loadJam error:', e);
+        }
+    }
+
+    async function saveStep2() {
+        if (!STATE.setupStoreId) {
+            showToast('Simpan info toko dulu', 'err');
+            return;
+        }
+
+        setLoading('btnS2', true);
+        try {
+            const jamData = getJamData().map(j => ({
+                ...j,
+                store_id: STATE.setupStoreId,
             }));
 
-            renderPlatformStats();
-            filterStores();
-            renderActivity();
-            renderRevenue();
+            // Upsert jam operasional
+            const {error} = await sb.from('store_hours')
+            .upsert(jamData, {
+                onConflict: 'store_id,day_of_week'
+            });
 
-            document.getElementById('lastUpdated').textContent =
-            'Terakhir diperbarui: ' + new Date().toLocaleString('id-ID');
-        } catch (e) {
-            console.error('loadAll error:', e);
-            showToast('Gagal memuat data', 'err');
-        }
-    }
-
-    // ============================================================
-    // STATS PLATFORM
-    // ============================================================
-    function renderPlatformStats() {
-        const total = STATE.stores.length;
-        const trial = STATE.stores.filter(s => s.subscription_status === 'trial' || !s.subscription_status).length;
-        const active = STATE.stores.filter(s => s.subscription_status === 'active').length;
-        const expired = STATE.stores.filter(s => s.subscription_status === 'expired').length;
-        const mrr = active * 49000;
-
-        document.getElementById('platformStats').innerHTML = `
-    <div class="stat"><div class="stat-lbl">Total Toko</div><div class="stat-val">${total}</div><div class="stat-sub">terdaftar</div></div>
-    <div class="stat"><div class="stat-lbl">Trial</div><div class="stat-val" style="color:var(--bl);">${trial}</div><div class="stat-sub">sedang coba</div></div>
-    <div class="stat"><div class="stat-lbl">Aktif (Berbayar)</div><div class="stat-val" style="color:var(--gr);">${active}</div><div class="stat-sub">subscriber</div></div>
-    <div class="stat"><div class="stat-lbl">Expired</div><div class="stat-val" style="color:var(--rd);">${expired}</div><div class="stat-sub">perlu follow-up</div></div>
-    <div class="stat"><div class="stat-lbl">Est. MRR</div><div class="stat-val" style="color:var(--gold);font-size:18px;">${fmtRp(mrr)}</div><div class="stat-sub">per bulan</div></div>
-  `
-        ;
-    }
-
-    // ============================================================
-    // FILTER & RENDER TABEL TOKO
-    // ============================================================
-    function filterStores() {
-        const q = (document.getElementById('searchStore').value || '').toLowerCase();
-        const st = document.getElementById('filterStatus').value;
-
-        STATE.filteredStores = STATE.stores.filter(s => {
-            const matchQ = !q || (s.name || '').toLowerCase().includes(q) || (s.slug || '').toLowerCase().includes(q);
-            const subSt = s.subscription_status || 'trial';
-            const matchSt = st === 'all' || subSt === st;
-            return matchQ && matchSt;
-        });
-
-        document.getElementById('storeCount').textContent = `${STATE.filteredStores.length} toko`;
-        renderStoreTable();
-    }
-
-    function getSubBadge(s) {
-        const st = s.subscription_status || 'trial';
-        const plan = s.subscription_plan || 'free';
-        if (st === 'active')
-            return `<span class="badge b-active">Aktif</span> <span class="badge b-pro">${plan.toUpperCase()}</span>`;
-        if (st === 'expired')
-            return `<span class="badge b-expired">Expired</span>`;
-        if (st === 'trial')
-            return `<span class="badge b-trial">Trial</span>`;
-        return `<span class="badge b-free">Free</span>`;
-    }
-
-    function getExpiry(s) {
-        if (s.subscription_status === 'active' && s.subscription_expires_at) {
-            const d = new Date(s.subscription_expires_at);
-            const daysLeft = Math.ceil((d - new Date()) / (1000 * 60 * 60 * 24));
-            const color = daysLeft <= 7 ? 'var(--rd)' : daysLeft <= 14 ? 'var(--or)' : 'var(--gr)';
-            return `<span style="color:${color};">${fmtDate(s.subscription_expires_at)}</span><br><span style="font-size:11px;color:var(--t3);">${daysLeft} hari lagi</span>`;
-        }
-        if (s.subscription_status === 'trial' && s.trial_ends_at) {
-            const d = new Date(s.trial_ends_at);
-            const daysLeft = Math.ceil((d - new Date()) / (1000 * 60 * 60 * 24));
-            return `<span style="color:var(--bl);">Trial s/d ${fmtDate(s.trial_ends_at)}</span><br><span style="font-size:11px;color:var(--t3);">${Math.max(0, daysLeft)} hari tersisa</span>`;
-        }
-        return '—';
-    }
-
-    function renderStoreTable() {
-        const tbody = document.getElementById('storeTable');
-        if (!STATE.filteredStores.length) {
-            tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--t4);">Tidak ada toko ditemukan</td></tr>`;
-            return;
-        }
-        tbody.innerHTML = STATE.filteredStores.map(s => `
-    <tr>
-      <td>
-        <div style="font-weight:500;">${
-
-        escH(s.name || '—')}</div>
-        <div style="font-size:11px;color:var(--t3);">/${escH(s.slug || '')}</div>
-      </td>
-      <td style="font-size:12px;color:var(--t3);">${
-        escH(s.phone_wa || '—')}</td>
-      <td style="font-size:12px;">${escH(s.city || '—')}</td>
-      <td>${getSubBadge(s)}</td>
-      <td>${getSubBadge(s).includes('Aktif') ? '<span class="badge b-active">Aktif</span>' : s.subscription_status === 'expired' ? '<span class="badge b-expired">Expired</span>' : '<span class="badge b-trial">Trial</span>'}</td>
-      <td style="font-size:12px;">${getExpiry(s)}</td>
-      <td style="color:var(--gold);font-weight:500;">${s.bookingCount || 0}</td>
-      <td>
-        <label class="sw">
-          <input type="checkbox" ${
-
-        s.is_active ? 'checked' : ''} onchange="toggleStoreActive('${s.id}',this.checked)">
-          <span class="sw-t"></span>
-        </label>
-      </td>
-      <td>
-        <div style="display:flex;gap:6px;">
-          <button class="btn btn-sm btn-o" onclick="showStoreDetail('${
-
-
-
-
-        s.id}')"><i class="ti ti-eye" style="font-size:12px;"></i></button>
-          <button class="btn btn-sm btn-g" onclick="openSetSub('${s.id}')"><i class="ti ti-credit-card" style="font-size:12px;"></i>Sub</button>
-        </div>
-      </td>
-    </tr>
-  `
-
-
-
-        ).join('');
-    }
-
-    // ============================================================
-    // TOGGLE AKTIF/NONAKTIF TOKO
-    // ============================================================
-    async function toggleStoreActive(id, val) {
-        try {
-            const {error} = await sb.from('stores').update({
-                is_active: val
-            }).eq('id', id);
-            if (error)
-                throw error;
-            const idx = STATE.stores.findIndex(s => s.id === id);
-            if (idx > -1)
-                STATE.stores[idx].is_active = val;
-            showToast(val ? 'Toko diaktifkan' : 'Toko dinonaktifkan', val ? 'ok' : 'warn');
-        } catch (e) {
-            console.error('toggleStoreActive error:', e);
-            showToast('Gagal update status toko', 'err');
-        }
-    }
-
-    // ============================================================
-    // DETAIL TOKO
-    // ============================================================
-    function showStoreDetail(id) {
-        const s = STATE.stores.find(x => x.id === id);
-        if (!s)
-            return;
-        document.getElementById('mStoreTitle').textContent = s.name;
-        document.getElementById('mStoreBody').innerHTML = `
-    <div class="info-box">
-      <strong>Link Booking:</strong><br>
-      <span style="color:var(--gold);">/booking.html?store=${
-
-        escH(s.slug)}</span>
-    </div>
-    <div class="dr"><span class="dr-k">Nama Toko</span><span class="dr-v">${
-        escH(s.name || '—')}</span></div>
-    <div class="dr"><span class="dr-k">Kota</span><span class="dr-v">${escH(s.city || '—')}</span></div>
-    <div class="dr"><span class="dr-k">WhatsApp</span><span class="dr-v">${escH(s.phone_wa || '—')}</span></div>
-    <div class="dr"><span class="dr-k">Instagram</span><span class="dr-v">${escH(s.instagram || '—')}</span></div>
-    <div class="dr"><span class="dr-k">Daftar Sejak</span><span class="dr-v">${fmtDate(s.created_at)}</span></div>
-    <div class="dr"><span class="dr-k">Plan</span><span class="dr-v">${(s.subscription_plan || 'free').toUpperCase()}</span></div>
-    <div class="dr"><span class="dr-k">Status Subscription</span><span class="dr-v">${s.subscription_status || 'trial'}</span></div>
-    <div class="dr"><span class="dr-k">Aktif Sampai</span><span class="dr-v">${s.subscription_expires_at ? fmtDate(s.subscription_expires_at) : '—'}</span></div>
-    <div class="dr"><span class="dr-k">Trial Berakhir</span><span class="dr-v">${s.trial_ends_at ? fmtDate(s.trial_ends_at) : '—'}</span></div>
-    <div class="dr"><span class="dr-k">Total Booking</span><span class="dr-v" style="color:var(--gold);">${s.bookingCount || 0}</span></div>
-    <div class="dr"><span class="dr-k">Toko Aktif</span><span class="dr-v">${s.is_active ? '✅ Ya' : '❌ Tidak'}</span></div>
-  `
-        ;
-        document.getElementById('mStoreFoot').innerHTML = `
-    <button class="btn btn-gh" onclick="closeM('mStore')">Tutup</button>
-    <button class="btn btn-g" onclick="closeM('mStore');openSetSub('${
-        s.id}')"><i class="ti ti-credit-card"></i>Atur Subscription</button>
-  `
-        ;
-        openM('mStore');
-    }
-
-    // ============================================================
-    // SET SUBSCRIPTION MANUAL
-    // ============================================================
-    function openSetSub(id) {
-        const s = STATE.stores.find(x => x.id === id);
-        if (!s)
-            return;
-        STATE.subTarget = id;
-        document.getElementById('subStoreName').textContent = s.name;
-        document.getElementById('subPlan').value = s.subscription_plan || 'free';
-        document.getElementById('subStatus').value = s.subscription_status || 'trial';
-
-        // Default expiry: 1 bulan dari sekarang
-        const defaultExpiry = new Date();
-        defaultExpiry.setMonth(defaultExpiry.getMonth() + 1);
-        document.getElementById('subExpiry').value =
-        s.subscription_expires_at
-        ? new Date(s.subscription_expires_at).toISOString().slice(0, 10)
-        : defaultExpiry.toISOString().slice(0, 10);
-        document.getElementById('subNote').value = '';
-        openM('mSetSub');
-    }
-
-    async function saveSubscription() {
-        const id = STATE.subTarget;
-        if (!id)
-            return;
-        const plan = document.getElementById('subPlan').value;
-        const status = document.getElementById('subStatus').value;
-        const expiry = document.getElementById('subExpiry').value;
-
-        try {
-            const payload = {
-                subscription_plan: plan,
-                subscription_status: status,
-                subscription_expires_at: expiry ? new Date(expiry).toISOString() : null,
-            };
-            const {error} = await sb.from('stores').update(payload).eq('id', id);
             if (error)
                 throw error;
 
-            // Update local state
-            const idx = STATE.stores.findIndex(s => s.id === id);
-            if (idx > -1)
-                STATE.stores[idx] = {
-                    ...STATE.stores[idx],
-                    ...payload
-                };
-
-            closeM('mSetSub');
-            renderPlatformStats();
-            filterStores();
-            showToast('Subscription berhasil diperbarui!', 'ok');
-
-            // Tambah ke log aktivitas lokal
-            addActivityLog(STATE.stores.find(s => s.id === id)?.name || '—', status, plan);
+            setLoading('btnS2', false);
+            showToast('Jam operasional disimpan!', 'ok');
+            goSetupStep(3);
         } catch (e) {
-            console.error('saveSubscription error:', e);
-            showToast('Gagal menyimpan subscription', 'err');
+            console.error('saveStep2 error:', e);
+            showToast(e.message || 'Gagal menyimpan jam.', 'err');
+            setLoading('btnS2', false);
         }
     }
 
-    // ============================================================
-    // AKTIVITAS TERBARU
-    // ============================================================
-    const activityLogs = [];
-    function addActivityLog(storeName, status, plan) {
-        activityLogs.unshift({
-            storeName,
-            status,
-            plan,
-            time: new Date()
-        });
-        renderActivity();
-    }
-
-    function renderActivity() {
-        const el = document.getElementById('activityLog');
-        if (!activityLogs.length) {
-            el.innerHTML = '<div style="text-align:center;padding:32px;color:var(--t4);font-size:13px;">Belum ada aktivitas di sesi ini. Aktivitas akan muncul saat kamu ubah subscription.</div>';
+    async function saveStep3() {
+        if (!STATE.setupStoreId)
+            return;
+        if (!STATE.setupBarbers.length) {
+            showToast('Tambah minimal 1 barberman dulu', 'warn');
             return;
         }
-        const icons = {
-            active: '✅',
-            trial: '🔵',
-            expired: '❌',
-            free: '⬜'
-        };
-        el.innerHTML = activityLogs.map(log => `
-    <div class="log-item">
-      <div class="log-ic" style="background:var(--bg3);">${
-        icons[log.status] || '📝'}</div>
-      <div class="log-info">
-        <div class="log-msg"><strong>${
-        escH(log.storeName)}</strong> — subscription diubah ke <strong>${log.status.toUpperCase()}</strong> (${log.plan.toUpperCase()})</div>
-        <div class="log-time">${log.time.toLocaleString('id-ID')}</div>
-      </div>
-    </div>`
 
-        ).join('');
+        setLoading('btnS3', true);
+        try {
+            for (const b of STATE.setupBarbers) {
+                // Insert barberman
+                const {data: barber, error: bErr} = await sb.from('barbers').insert({
+                    store_id: STATE.setupStoreId,
+                    name: b.name,
+                    specialty: b.spec || null,
+                    phone_wa: b.wa || null,
+                    avatar_color: b.color,
+                    sort_order: b.sort_order,
+                }).select().single();
+
+                if (bErr)
+                    throw bErr;
+
+                // Insert hari libur
+                if (b.daysOff.length) {
+                    const {error: dErr} = await sb.from('barber_days_off').insert(
+                    b.daysOff.map(day => ({
+                        barber_id: barber.id,
+                        day_of_week: day
+                    }))
+                    );
+                    if (dErr)
+                        throw dErr;
+                }
+            }
+
+            STATE.setupBarbers = []; // clear setelah save
+            setLoading('btnS3', false);
+            showToast('Barberman berhasil disimpan!', 'ok');
+            goSetupStep(4);
+        } catch (e) {
+            console.error('saveStep3 error:', e);
+            showToast(e.message || 'Gagal menyimpan barberman.', 'err');
+            setLoading('btnS3', false);
+        }
+    }
+
+    async function saveStep4() {
+        if (!STATE.setupStoreId)
+            return;
+        if (!STATE.setupPkgs.length) {
+            showToast('Tambah minimal 1 paket dulu', 'warn');
+            return;
+        }
+
+        setLoading('btnS4', true);
+        try {
+            const {error} = await sb.from('packages').insert(
+            STATE.setupPkgs.map(p => ({
+                ...p,
+                store_id: STATE.setupStoreId,
+            }))
+            );
+
+            if (error)
+                throw error;
+
+            showToast('Setup selesai! Membuka dashboard...', 'ok');
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1200);
+        } catch (e) {
+            console.error('saveStep4 error:', e);
+            showToast(e.message || 'Gagal menyimpan paket.', 'err');
+            setLoading('btnS4', false);
+        }
     }
 
     // ============================================================
-    // PENDAPATAN
+    // AUTH STATE LISTENER
     // ============================================================
-    function renderRevenue() {
-        const el = document.getElementById('revenueContent');
-        const active = STATE.stores.filter(s => s.subscription_status === 'active');
-        const mrr = active.length * 49000;
-        const arr = mrr * 12;
+    sb.auth.onAuthStateChange(async (event, session) => {
+        console.log('Auth event:', event);
 
-        // Hitung yang akan expire dalam 30 hari
-        const expiringSoon = active.filter(s => {
-            if (!s.subscription_expires_at)
-                return false;
-            const d = new Date(s.subscription_expires_at);
-            return (d - new Date()) / (1000 * 60 * 60 * 24) <= 30;
-        });
-
-        el.innerHTML = `
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;">
-      <div class="stat" style="border-color:var(--gold-b);">
-        <div class="stat-lbl">MRR (Monthly Recurring)</div>
-        <div class="stat-val" style="color:var(--gold);">${
-
-
-        fmtRp(mrr)}</div>
-        <div class="stat-sub">${active.length} toko × Rp 49.000</div>
-      </div>
-      <div class="stat">
-        <div class="stat-lbl">ARR (Annual Run Rate)</div>
-        <div class="stat-val" style="font-size:18px;">${
-
-
-        fmtRp(arr)}</div>
-        <div class="stat-sub">proyeksi tahunan</div>
-      </div>
-      <div class="stat">
-        <div class="stat-lbl">Expire dalam 30 Hari</div>
-        <div class="stat-val" style="color:${
-
-
-
-        expiringSoon.length > 0 ? 'var(--or)' : 'var(--gr)'};">${expiringSoon.length}</div>
-        <div class="stat-sub">perlu diperbarui</div>
-      </div>
-    </div>
-
-    ${
-
-
-
-        expiringSoon.length ? `
-    <div style="background:rgba(251,146,60,.05);border:.5px solid rgba(251,146,60,.2);border-radius:var(--r);padding:14px;margin-bottom:16px;">
-      <div style="font-size:12px;font-weight:600;color:var(--or);margin-bottom:10px;">⚠️ Akan Expire dalam 30 Hari</div>
-      ${
-
-        expiringSoon.map(s => `
-        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:.5px solid rgba(245,245,240,.04);font-size:13px;">
-          <span>${
-        escH(s.name)}</span>
-          <span style="color:var(--or);">${fmtDate(s.subscription_expires_at)}</span>
-        </div>`).join('')}
-    </div>` : ''}
-
-    <div style="font-size:13px;color:var(--t2);line-height:1.7;">
-      <strong>Cara tambah pendapatan:</strong><br>
-      1. Follow-up toko yang trial sudah hampir habis<br>
-      2. Tawarkan perpanjangan ke yang akan expire<br>
-      3. Daftarkan lebih banyak barber shop baru
-    </div>
-  `
-
-
-
-
-
-
-
-        ;
-    }
+        if (event === 'INITIAL_SESSION') {
+            // Event ini dipicu Supabase sekali di awal load, dengan info session
+            // yang sudah final (lebih dapat diandalkan daripada getSession() manual).
+            if (_initHandled)
+                return; // init() sudah lebih dulu menangani, skip
+            _initHandled = true;
+            if(session?.user) {
+                STATE.user = session.user;
+                await afterLogin();
+            } else {
+                showPage('page-auth');
+            }
+        } else if (event === 'SIGNED_IN' && session) {
+            STATE.user = session.user;
+        } else if (event === 'SIGNED_OUT') {
+            STATE.user = null;
+            STATE.store = null;
+        } else if (event === 'PASSWORD_RECOVERY') {
+            // Handle reset password
+            window.location.href = 'reset-password.html';
+        }
+    });
 
     // ============================================================
-    // TABS
+    // KEYBOARD SHORTCUTS
     // ============================================================
-    function switchTab(id, el) {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-        el.classList.add('active');
-        document.getElementById('tab-' + id).classList.add('active');
-    }
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const loginBtn = document.getElementById('btnLogin');
+            const regBtn = document.getElementById('btnReg');
+            const viewLogin = document.getElementById('viewLogin');
+            const viewReg = document.getElementById('viewReg');
+            if (!viewLogin.classList.contains('hidden') && loginBtn)
+                loginBtn.click();
+            if (!viewReg.classList.contains('hidden') && regBtn)
+                regBtn.click();
+        }
+    });
 
     // ============================================================
     // START
     // ============================================================
-    initGuard();
+    init();
     </script>
 </body>
 </html>
