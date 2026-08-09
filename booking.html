@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Booking Online</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500;0,600;1,500;1,600&family=Manrope:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -20,34 +20,34 @@
     }
 
     body {
-        font-family: 'Inter', sans-serif;
-        background: #0E0E0E;
-        color: #F5F5F0;
+        font-family:'Manrope',sans-serif;
+        background:#F7F7F4;
+        color:#14181B;
         min-height: 100vh;
     }
 
     button, input, select, textarea {
-        font-family: 'Inter', sans-serif;
+        font-family:'Manrope',sans-serif;
     }
 
     :root {
-        --gold: #C9A84C;
-        --gold-l: #e0bc5a;
-        --gold-d: rgba(201, 168, 76, 0.12);
-        --gold-b: rgba(201, 168, 76, 0.28);
-        --bg: #0E0E0E;
-        --bg2: #141414;
-        --bg3: #1A1A1A;
-        --bg4: #222;
-        --t: #F5F5F0;
-        --t2: rgba(245, 245, 240, 0.6);
-        --t3: rgba(245, 245, 240, 0.35);
-        --t4: rgba(245, 245, 240, 0.14);
-        --b: rgba(245, 245, 240, 0.07);
-        --b2: rgba(245, 245, 240, 0.12);
-        --gr: #4ade80;
+        --gold:#0E6B4F;
+        --gold-l:#12805F;
+        --gold-d:rgba(14,107,79,0.07);
+        --gold-b:rgba(14,107,79,0.28);
+        --bg:#F7F7F4;
+        --bg2:#FFFFFF;
+        --bg3:#F2F1EC;
+        --bg4:#EAE8E0;
+        --t:#14181B;
+        --t2:rgba(20,24,27,0.62);
+        --t3:rgba(20,24,27,0.4);
+        --t4:rgba(20,24,27,0.12);
+        --b:rgba(20,24,27,0.1);
+        --b2:rgba(20,24,27,0.16);
+        --gr:#2F8F5B;
         --grd: rgba(74, 222, 128, 0.1);
-        --rd: #f87171;
+        --rd:#C23B2E;
         --rdd: rgba(248, 113, 113, 0.1);
         --bl: #60a5fa;
         --pr: #c084fc;
@@ -126,7 +126,7 @@
 
     .btn-g {
         background: var(--gold);
-        color: #111;
+        color: #fff;
         padding: 11px 22px;
         font-weight: 600;
     }
@@ -227,7 +227,7 @@
     }
 
     .hero-h1 {
-        font-family: 'Playfair Display', serif;
+        font-family:'Newsreader',serif;
         font-size: 38px;
         font-weight: 700;
         line-height: 1.1;
@@ -321,7 +321,7 @@
     }
 
     .step-h2 {
-        font-family: 'Playfair Display', serif;
+        font-family:'Newsreader',serif;
         font-size: 22px;
         margin-bottom: 6px;
     }
@@ -433,7 +433,7 @@
     }
 
     .pc-price {
-        font-family: 'Playfair Display', serif;
+        font-family:'Newsreader',serif;
         font-size: 20px;
         color: var(--gold);
     }
@@ -635,7 +635,7 @@
     }
 
     .bsum-t {
-        font-family: 'Playfair Display', serif;
+        font-family:'Newsreader',serif;
         font-size: 14px;
         margin-bottom: 11px;
         padding-bottom: 10px;
@@ -665,7 +665,7 @@
     }
 
     .bsr.tot .bsv {
-        font-family: 'Playfair Display', serif;
+        font-family:'Newsreader',serif;
         font-size: 18px;
         color: var(--gold);
     }/* TIMELINE */
@@ -734,7 +734,7 @@
         padding: 12px 28px;
         border-radius: var(--r);
         display: inline-block;
-        font-family: 'Playfair Display', serif;
+        font-family:'Newsreader',serif;
         font-size: 26px;
         color: var(--gold);
         letter-spacing: .18em;
@@ -859,9 +859,9 @@
 
     <!-- LOADING -->
     <div id="page-loading" style="display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:14px;">
-        <div style="font-family:'Playfair Display',serif;font-size:24px;color:var(--gold);">
-            BARBER
-            <span style="color:var(--t);">BOOK</span>
+        <div style="font-family:'Newsreader',serif;font-size:24px;color:var(--gold);">
+            CARI
+            <span style="color:var(--t);">CUKUR</span>
         </div>
         <div style="width:22px;height:22px;border:2px solid rgba(201,168,76,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .6s linear infinite;"></div>
         <div style="font-size:12px;color:var(--t3);">Memuat toko...</div>
@@ -872,7 +872,7 @@
         <div style="font-size:48px;color:var(--t4);">
             <i class="ti ti-building-store"></i>
         </div>
-        <div style="font-family:'Playfair Display',serif;font-size:22px;">Toko Tidak Ditemukan</div>
+        <div style="font-family:'Newsreader',serif;font-size:22px;">Toko Tidak Ditemukan</div>
         <div style="font-size:13px;color:var(--t3);max-width:340px;" id="notFoundMsg">Link booking ini tidak valid atau toko sudah tidak aktif.</div>
     </div>
 
@@ -883,7 +883,7 @@
             <div class="nav-ic">
                 <i class="ti ti-scissors"></i>
             </div>
-            <span id="navStoreName" style="font-family:'Playfair Display',serif;font-size:18px;color:var(--t);">Memuat...</span>
+            <span id="navStoreName" style="font-family:'Newsreader',serif;font-size:18px;color:var(--t);">Memuat...</span>
         </nav>
 
         <div class="bhero">
@@ -1046,7 +1046,7 @@
                                 DP Booking
                                           
                             </div>
-                            <div style="font-family:'Playfair Display',serif;font-size:22px;color:var(--gold);" id="dpAmt">Rp 0</div>
+                            <div style="font-family:'Newsreader',serif;font-size:22px;color:var(--gold);" id="dpAmt">Rp 0</div>
                         </div>
                         <div class="dpm" id="dpMeth">
                             <div class="dpm-c sel" data-m="qris" onclick="selDp(this)">
@@ -1295,7 +1295,7 @@
 
         const ticketHTML = `
     <div style="text-align:center;border-bottom:.5px dashed var(--b2);padding-bottom:10px;margin-bottom:10px;">
-      <div style="font-family:'Playfair Display',serif;font-size:14px;color:var(--gold);">${
+      <div style="font-family:'Newsreader',serif;font-size:14px;color:var(--gold);">${
         escH((bk.store || '').toUpperCase())}</div>
       <div style="font-size:10px;color:var(--t3);letter-spacing:.1em;margin-top:2px;">BOOKING TICKET</div>
     </div>
@@ -1315,7 +1315,7 @@
 
         document.getElementById('cfirmContent').innerHTML = `
     <div class="cfirm-ic"><i class="ti ti-check"></i></div>
-    <h2 style="font-family:'Playfair Display',serif;font-size:24px;margin-bottom:8px;">Kamu Sudah Booking!</h2>
+    <h2 style="font-family:'Newsreader',serif;font-size:24px;margin-bottom:8px;">Kamu Sudah Booking!</h2>
     <p style="font-size:13px;color:var(--t2);line-height:1.7;max-width:360px;margin:0 auto 18px;">
       Tunjukkan kode ini ke kasir saat datang ke toko. Hadir tepat waktu ya! 🙏
     </p>
@@ -1813,7 +1813,7 @@
 
         const btn = document.getElementById('btnConfirm');
         btn.disabled = true;
-        btn.innerHTML = '<div style="width:14px;height:14px;border:2px solid rgba(17,17,17,.3);border-top-color:#111;border-radius:50%;animation:spin .6s linear infinite;"></div>Memproses...';
+        btn.innerHTML = '<div style="width:14px;height:14px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;"></div>Memproses...';
 
         try {
             const price = (STATE.pkg.price) - (STATE.discount || 0);
@@ -1886,7 +1886,7 @@
 
         const ticketHTML = `
     <div style="text-align:center;border-bottom:.5px dashed var(--b2);padding-bottom:10px;margin-bottom:10px;">
-      <div style="font-family:'Playfair Display',serif;font-size:14px;color:var(--gold);">${
+      <div style="font-family:'Newsreader',serif;font-size:14px;color:var(--gold);">${
         escH(STATE.store.name.toUpperCase())}</div>
       <div style="font-size:10px;color:var(--t3);letter-spacing:.1em;margin-top:2px;">BOOKING TICKET</div>
     </div>
@@ -1907,7 +1907,7 @@
 
         document.getElementById('cfirmContent').innerHTML = `
     <div class="cfirm-ic"><i class="ti ti-check"></i></div>
-    <h2 style="font-family:'Playfair Display',serif;font-size:26px;margin-bottom:8px;">Booking Berhasil!</h2>
+    <h2 style="font-family:'Newsreader',serif;font-size:26px;margin-bottom:8px;">Booking Berhasil!</h2>
     <p style="font-size:13px;color:var(--t2);line-height:1.7;max-width:360px;margin:0 auto 18px;">
       Simpan kode booking ini. Tunjukkan ke kasir saat datang ke toko. 🙏
     </p>
