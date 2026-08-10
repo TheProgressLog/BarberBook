@@ -385,20 +385,16 @@ function startClock(){
 // AUTH GUARD
 // ============================================================
 async function initGuard(){
-  alert('DEBUG 1: kasir.html mulai jalan');
   const timeout=new Promise((_,r)=>setTimeout(()=>r(new Error('TIMEOUT')),8000));
   try {
     const { data:{session} } = await Promise.race([sb.auth.getSession(),timeout]);
-    alert('DEBUG 2: session = ' + JSON.stringify(session ? {user_id: session.user?.id, email: session.user?.email} : null));
-    if(!session?.user){ alert('DEBUG STOP: tidak ada session, redirect ke auth.html'); window.location.href='auth.html'; return; }
+    if(!session?.user){ window.location.href='auth.html'; return; }
     STATE.user=session.user;
 
     const { data:store,error } = await sb.from('stores').select('*').eq('owner_id',STATE.user.id).maybeSingle();
-    alert('DEBUG 3: store = ' + JSON.stringify(store) + ' | error = ' + JSON.stringify(error));
-    if(error||!store){ alert('DEBUG STOP: query toko gagal/kosong, redirect ke auth.html'); window.location.href='auth.html'; return; }
+    if(error||!store){ window.location.href='auth.html'; return; }
     STATE.store=store;
 
-    alert('DEBUG 4: berhasil! toko ditemukan: ' + store.name);
     await loadStoreData();
     document.getElementById('guard').classList.add('hidden');
     document.getElementById('app').classList.remove('hidden');
@@ -407,7 +403,6 @@ async function initGuard(){
     startClock();
     initQueues();
   } catch(e){
-    alert('DEBUG ERROR: ' + e.message);
     console.error('Guard error:',e);
     window.location.href='auth.html';
   }
