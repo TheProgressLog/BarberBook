@@ -1402,10 +1402,12 @@
         // Tidak ada booking tersimpan — load normal
         const timeout = new Promise((_, r) => setTimeout(() => r(new Error('TIMEOUT')), 8000));
         try {
+            alert('DEBUG A: mencari toko dengan slug = "' + slug + '"');
             const {data: store, error} = await Promise.race([
             sb.from('stores').select('*').eq('slug', slug).maybeSingle(),
             timeout,
             ]);
+            alert('DEBUG B: store = ' + JSON.stringify(store) + ' | error = ' + JSON.stringify(error));
             if (error || !store) {
                 showNotFound();
                 return;
