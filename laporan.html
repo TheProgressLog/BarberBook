@@ -870,20 +870,15 @@
     async function initGuard() {
         const timeout = new Promise((_, r) => setTimeout(() => r(new Error('TIMEOUT')), 8000));
         try {
-            alert('DEBUG L1: laporan.html mulai jalan');
             const {data: {session}} = await Promise.race([sb.auth.getSession(), timeout]);
-            alert('DEBUG L2: session = ' + JSON.stringify(session ? {user_id: session.user?.id} : null));
             if (!session?.user) {
-                alert('DEBUG L STOP: tidak ada session');
                 window.location.href = 'auth.html';
                 return;
             }
             STATE.user = session.user;
 
             const {data: store, error} = await sb.from('stores').select('*').eq('owner_id', STATE.user.id).maybeSingle();
-            alert('DEBUG L3: store = ' + (store ? store.name : 'null') + ' | error = ' + JSON.stringify(error));
             if (error || !store) {
-                alert('DEBUG L STOP: query toko gagal/kosong');
                 window.location.href = 'auth.html';
                 return;
             }
@@ -904,7 +899,6 @@
             setPeriod('month', document.querySelector('.pchip.active'));
             await loadData();
         } catch (e) {
-            alert('DEBUG L ERROR: ' + e.message);
             console.error('Guard error:', e);
             window.location.href = 'auth.html';
         }
