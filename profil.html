@@ -377,16 +377,13 @@ function setBtn(id, loading) {
 async function init() {
   const timeout = new Promise((_,r) => setTimeout(()=>r(new Error('TIMEOUT')), 8000));
   try {
-    alert('DEBUG P1: profil.html mulai jalan');
     const { data:{session} } = await Promise.race([sb.auth.getSession(), timeout]);
-    alert('DEBUG P2: session = ' + JSON.stringify(session ? {user_id: session.user?.id} : null));
-    if (!session?.user) { alert('DEBUG P STOP: tidak ada session'); window.location.href='auth.html'; return; }
+    if (!session?.user) { window.location.href='auth.html'; return; }
     S.user = session.user;
 
     const { data:store, error } = await sb.from('stores').select('*')
       .eq('owner_id', S.user.id).maybeSingle();
-    alert('DEBUG P3: store = ' + (store ? store.name : 'null') + ' | error = ' + JSON.stringify(error));
-    if (error || !store) { alert('DEBUG P STOP: query toko gagal/kosong'); window.location.href='auth.html'; return; }
+    if (error || !store) { window.location.href='auth.html'; return; }
     S.store = store;
 
     const { data:hours } = await sb.from('store_hours').select('*')
@@ -397,7 +394,6 @@ async function init() {
     document.getElementById('app').classList.remove('hidden');
     fillForm();
   } catch(e) {
-    alert('DEBUG P ERROR: ' + e.message);
     console.error('init error:', e);
     window.location.href = 'auth.html';
   }
