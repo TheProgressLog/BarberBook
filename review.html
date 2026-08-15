@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beri Ulasan — CariCukur</title>
+<meta name="description" content="Beri ulasan untuk kunjungan barbershop kamu.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500;0,600;1,500;1,600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:40px 20px;}
+
+:root{
+  --bg:#EFEDE5; --bg2:#FFFFFF; --bg3:#F2F1EC;
+  --ink:#14181B; --ink2:rgba(20,24,27,.72); --ink3:rgba(20,24,27,.58); --ink4:rgba(20,24,27,.12);
+  --line:rgba(20,24,27,.14); --line2:rgba(20,24,27,.2);
+  --acc:#0B8F5C; --acc-d:rgba(11,143,92,.08); --acc-b:rgba(11,143,92,.3); --acc-l:#12A874;
+  --gold:#B8752E;
+  --r:8px; --rl:14px;
+}
+h1,h2{font-family:'Newsreader',serif;font-weight:600;}
+
+.logo{font-family:'Newsreader',serif;font-weight:600;font-size:18px;margin-bottom:28px;}
+.logo span{color:var(--acc);}
+
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--rl);padding:32px 26px;max-width:440px;width:100%;box-shadow:0 1px 3px rgba(20,24,27,.05);}
+
+.state-box{text-align:center;padding:30px 10px;}
+.state-box p{color:var(--ink3);font-size:14px;margin-top:8px;}
+.state-icon{font-size:36px;margin-bottom:12px;}
+
+.booking-summary{background:var(--bg3);border-radius:var(--r);padding:16px 18px;margin-bottom:22px;}
+.bs-store{font-size:16px;font-weight:600;font-family:'Newsreader',serif;margin-bottom:3px;}
+.bs-meta{font-size:12px;color:var(--ink3);}
+
+.field{margin-bottom:22px;}
+.field-label{font-size:13px;font-weight:700;margin-bottom:10px;display:block;}
+.field-sub{font-size:12px;color:var(--ink3);font-weight:500;margin-top:2px;display:block;}
+
+.star-row{display:flex;gap:6px;}
+.star-btn{background:none;border:none;font-size:32px;cursor:pointer;color:var(--line2);transition:color .15s,transform .1s;line-height:1;padding:0;}
+.star-btn.on{color:var(--gold);}
+.star-btn:hover{transform:scale(1.1);}
+
+textarea{width:100%;border:1px solid var(--line2);border-radius:var(--r);padding:12px 14px;font-family:'Manrope',sans-serif;font-size:13px;resize:vertical;min-height:80px;background:var(--bg);color:var(--ink);}
+textarea:focus{outline:none;border-color:var(--acc-b);}
+textarea::placeholder{color:var(--ink4);}
+
+.btn-submit{width:100%;background:var(--acc);color:#fff;border:none;padding:14px;border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;transition:background .2s;}
+.btn-submit:hover{background:var(--acc-l);}
+.btn-submit:disabled{opacity:.5;cursor:not-allowed;}
+
+.err-msg{color:#C23B2E;font-size:12px;margin-top:8px;display:none;}
+</style>
+</head>
+<body>
+
+<a href="index.html" class="logo">Cari<span>Cukur</span></a>
+
+<div class="card" id="card">
+  <div class="state-box"><p>Memuat data booking...</p></div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://rdhytutkjzgizluyvrus.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_FGCxIQUPfWUKtdGI52oFKw_XCmRWFWh';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let ratingStore = 0;
+let ratingBarber = 0;
+let BOOKING = null;
+
+function escHtml(s) {
+  if (!s) return '';
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function starRow(id, current) {
+  let html = '<div class="star-row" id="' + id + '">';
+  for (let i = 1; i <= 5; i++) {
+    html += `<button type="button" class="star-btn ${i <= current ? 'on' : ''}" data-val="${i}" onclick="setStar('${id}',${i})">★</button>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+function setStar(groupId, val) {
+  if (groupId === 'starStore') ratingStore = val;
+  if (groupId === 'starBarber') ratingBarber = val;
+  document.querySelectorAll(`#${groupId} .star-btn`).forEach(btn => {
+    btn.classList.toggle('on', parseInt(btn.dataset.val) <= val);
+  });
+}
+window.setStar = setStar;
+
+function renderVerify() {
+  const b = BOOKING;
+  document.getElementById('card').innerHTML = `
+    <div class="booking-summary">
+      <div class="bs-store">${escHtml(b.stores?.name || 'Toko')}</div>
+      <div class="bs-meta">${escHtml(b.customer_name)} · ${escHtml(b.booking_code)}</div>
+    </div>
+    <div class="field">
+      <label class="field-label">Konfirmasi dulu, ya</label>
+      <span class="field-sub" style="display:block;margin-bottom:12px;">Masukkan 4 digit terakhir nomor WhatsApp yang kamu pakai waktu booking, supaya ulasan ini benar dari kamu.</span>
+      <input type="tel" id="phoneVerify" maxlength="4" placeholder="0000" style="width:100%;border:1px solid var(--line2);border-radius:var(--r);padding:12px 14px;font-family:'Manrope',sans-serif;font-size:16px;letter-spacing:.2em;text-align:center;background:var(--bg);color:var(--ink);">
+    </div>
+    <button class="btn-submit" onclick="checkPhone()">Lanjut</button>
+    <div class="err-msg" id="errMsg"></div>
+  `;
+  document.getElementById('phoneVerify').focus();
+}
+
+function checkPhone() {
+  const input = document.getElementById('phoneVerify').value.trim();
+  const errEl = document.getElementById('errMsg');
+  const actualLast4 = (BOOKING.customer_phone || '').replace(/[^0-9]/g, '').slice(-4);
+
+  if (input.length !== 4) {
+    errEl.textContent = 'Masukkan 4 digit angka.';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (input !== actualLast4) {
+    errEl.textContent = 'Nomor tidak cocok dengan data booking ini.';
+    errEl.style.display = 'block';
+    return;
+  }
+  renderForm();
+}
+window.checkPhone = checkPhone;
+
+function renderForm() {
+  const b = BOOKING;
+  document.getElementById('card').innerHTML = `
+    <div class="booking-summary">
+      <div class="bs-store">${escHtml(b.stores?.name || 'Toko')}</div>
+      <div class="bs-meta">${escHtml(b.customer_name)} · ${escHtml(b.booking_code)} · ${escHtml(b.booking_date || '')}</div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Rating untuk toko</label>
+      ${starRow('starStore', 0)}
+    </div>
+
+    ${b.barbers ? `
+    <div class="field">
+      <label class="field-label">Rating untuk ${escHtml(b.barbers.name)} (barberman)</label>
+      ${starRow('starBarber', 0)}
+    </div>` : ''}
+
+    <div class="field">
+      <label class="field-label">Komentar <span class="field-sub" style="display:inline;font-weight:500;">(opsional)</span></label>
+      <textarea id="comment" placeholder="Ceritain pengalaman kamu di sini..."></textarea>
+    </div>
+
+    <button class="btn-submit" id="submitBtn" onclick="submitReview()">Kirim Ulasan</button>
+    <div class="err-msg" id="errMsg"></div>
+  `;
+}
+
+async function submitReview() {
+  const errEl = document.getElementById('errMsg');
+  errEl.style.display = 'none';
+
+  if (ratingStore === 0) {
+    errEl.textContent = 'Kasih rating untuk toko dulu ya.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Mengirim...';
+
+  const { error } = await sb.from('reviews').insert({
+    booking_id: BOOKING.id,
+    store_id: BOOKING.store_id,
+    barber_id: BOOKING.barber_id || null,
+    customer_name: BOOKING.customer_name,
+    rating_store: ratingStore,
+    rating_barber: BOOKING.barber_id ? (ratingBarber || null) : null,
+    comment: document.getElementById('comment').value.trim() || null
+  });
+
+  if (error) {
+    btn.disabled = false;
+    btn.textContent = 'Kirim Ulasan';
+    if (error.code === '23505') {
+      showState('✓', 'Kamu sudah pernah kasih ulasan untuk booking ini. Terima kasih!');
+    } else {
+      errEl.textContent = 'Gagal mengirim ulasan. Coba lagi sebentar.';
+      errEl.style.display = 'block';
+    }
+    return;
+  }
+
+  showState('🎉', 'Terima kasih atas ulasannya! Ini sangat membantu barbershop dan customer lain.');
+}
+
+function showState(icon, text) {
+  document.getElementById('card').innerHTML = `
+    <div class="state-box">
+      <div class="state-icon">${icon}</div>
+      <p>${text}</p>
+    </div>
+  `;
+}
+
+async function init() {
+  const params = new URLSearchParams(location.search);
+  const code = params.get('booking');
+
+  if (!code) {
+    showState('❓', 'Link tidak valid. Pastikan kamu membuka link dari pesan WhatsApp konfirmasi booking.');
+    return;
+  }
+
+  const { data: booking, error } = await sb.from('bookings')
+    .select('id, booking_code, customer_name, customer_phone, booking_date, status, store_id, barber_id, stores(name), barbers(name)')
+    .eq('booking_code', code)
+    .maybeSingle();
+
+  if (error || !booking) {
+    showState('❓', 'Booking tidak ditemukan. Cek kembali link yang kamu terima.');
+    return;
+  }
+
+  if (booking.status !== 'done') {
+    showState('⏳', 'Ulasan baru bisa diisi setelah booking-mu selesai dikerjakan.');
+    return;
+  }
+
+  const { data: existing } = await sb.from('reviews').select('id').eq('booking_id', booking.id).maybeSingle();
+  if (existing) {
+    showState('✓', 'Kamu sudah pernah kasih ulasan untuk booking ini. Terima kasih!');
+    return;
+  }
+
+  BOOKING = booking;
+  renderVerify();
+}
+
+init();
+</script>
+</body>
+</html>
