@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cari Barbershop — CariCukur</title>
+<meta name="description" content="Temukan barbershop terbaik di kotamu, lengkap dengan rating toko dan barberman.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500;0,600;1,500;1,600&family=Manrope:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;}
+
+:root{
+  --bg:#EFEDE5; --bg2:#FFFFFF; --bg3:#F2F1EC;
+  --ink:#14181B; --ink2:rgba(20,24,27,.72); --ink3:rgba(20,24,27,.58); --ink4:rgba(20,24,27,.12);
+  --line:rgba(20,24,27,.14); --line2:rgba(20,24,27,.2);
+  --acc:#0B8F5C; --acc-d:rgba(11,143,92,.08); --acc-b:rgba(11,143,92,.3); --acc-l:#12A874;
+  --gold:#B8752E;
+  --r:8px; --rl:14px;
+}
+h1,h2,h3{font-family:'Newsreader',serif;font-weight:600;}
+.mono{font-family:'Space Mono',monospace;}
+
+/* ===== NAV ===== */
+nav{display:flex;align-items:center;justify-content:space-between;padding:16px 40px;background:var(--bg2);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:50;}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;font-family:'Newsreader',serif;font-weight:600;font-size:17px;color:var(--ink);}
+.nav-logo span{color:var(--acc);}
+.nav-back{font-size:13px;color:var(--ink3);text-decoration:none;font-weight:500;}
+.nav-back:hover{color:var(--ink);}
+
+/* ===== HERO / SEARCH ===== */
+.search-hero{padding:56px 24px 40px;text-align:center;}
+.search-hero h1{font-size:clamp(28px,4vw,40px);margin-bottom:10px;}
+.search-hero p{font-size:14px;color:var(--ink3);margin-bottom:28px;}
+.city-picker{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:700px;margin:0 auto;}
+.city-chip{background:var(--bg2);border:1px solid var(--line2);padding:9px 18px;border-radius:30px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;color:var(--ink2);}
+.city-chip:hover{border-color:var(--acc-b);color:var(--acc);}
+.city-chip.active{background:var(--acc);border-color:var(--acc);color:#fff;}
+
+/* ===== LIST ===== */
+.wrap{max-width:900px;margin:0 auto;padding:0 24px 80px;}
+.result-count{font-size:13px;color:var(--ink3);margin-bottom:16px;font-weight:600;}
+.store-grid{display:flex;flex-direction:column;gap:14px;}
+.store-card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--rl);padding:22px 24px;display:flex;gap:18px;align-items:flex-start;cursor:pointer;transition:all .15s;box-shadow:0 1px 3px rgba(20,24,27,.05);text-decoration:none;color:inherit;}
+.store-card:hover{border-color:var(--acc-b);transform:translateY(-1px);box-shadow:0 4px 14px rgba(20,24,27,.08);}
+.store-av{width:52px;height:52px;border-radius:12px;background:var(--acc-d);color:var(--acc);display:flex;align-items:center;justify-content:center;font-family:'Newsreader',serif;font-size:22px;font-weight:600;flex-shrink:0;}
+.store-info{flex:1;min-width:0;}
+.store-name{font-size:17px;font-weight:600;font-family:'Newsreader',serif;margin-bottom:3px;}
+.store-tagline{font-size:13px;color:var(--ink3);margin-bottom:10px;line-height:1.5;}
+.store-meta{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.store-rating{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;color:var(--ink);}
+.store-rating .stars{color:var(--gold);}
+.store-rating .count{color:var(--ink3);font-weight:500;}
+.store-addr{font-size:12px;color:var(--ink3);display:flex;align-items:center;gap:4px;}
+.store-cta{align-self:center;background:var(--acc);color:#fff;padding:9px 18px;border-radius:var(--r);font-size:12px;font-weight:700;white-space:nowrap;}
+.no-rating{font-size:12px;color:var(--ink4);font-weight:500;}
+
+/* ===== EMPTY / LOADING ===== */
+.state-msg{text-align:center;padding:60px 20px;color:var(--ink3);font-size:14px;}
+
+/* ===== DETAIL VIEW ===== */
+.detail-hero{background:var(--bg2);border-bottom:1px solid var(--line);padding:40px 24px;}
+.detail-inner{max-width:900px;margin:0 auto;display:flex;gap:20px;align-items:flex-start;}
+.detail-av{width:72px;height:72px;border-radius:16px;background:var(--acc-d);color:var(--acc);display:flex;align-items:center;justify-content:center;font-family:'Newsreader',serif;font-size:30px;font-weight:600;flex-shrink:0;}
+.detail-name{font-size:26px;margin-bottom:6px;}
+.detail-tagline{font-size:14px;color:var(--ink2);margin-bottom:12px;line-height:1.6;max-width:560px;}
+.detail-rating{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;margin-bottom:10px;}
+.detail-rating .stars{color:var(--gold);font-size:16px;}
+.detail-addr{font-size:13px;color:var(--ink3);}
+.detail-btn{background:var(--acc);color:#fff;padding:12px 26px;border-radius:var(--r);font-size:14px;font-weight:700;text-decoration:none;display:inline-block;margin-top:14px;}
+
+.section-title{font-size:20px;margin:36px 0 16px;}
+.barber-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+.barber-card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--rl);padding:18px;display:flex;gap:12px;align-items:center;}
+.barber-av{width:44px;height:44px;border-radius:10px;background:var(--bg3);color:var(--ink2);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;flex-shrink:0;}
+.barber-name{font-size:14px;font-weight:700;margin-bottom:3px;}
+.barber-rating{font-size:12px;color:var(--ink3);display:flex;align-items:center;gap:4px;}
+.barber-rating .stars{color:var(--gold);}
+
+.review-card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--rl);padding:18px 20px;margin-bottom:10px;}
+.review-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.review-name{font-size:13px;font-weight:700;}
+.review-stars{color:var(--gold);font-size:12px;}
+.review-text{font-size:13px;color:var(--ink2);line-height:1.6;}
+
+@media(max-width:600px){
+  nav{padding:14px 20px;}
+  .search-hero{padding:36px 16px 28px;}
+  .wrap{padding:0 16px 60px;}
+  .store-card{flex-wrap:wrap;}
+  .store-cta{width:100%;text-align:center;}
+  .detail-inner{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Cari<span>Cukur</span></a>
+  <a href="index.html" class="nav-back">← Beranda</a>
+</nav>
+
+<!-- ===== LIST VIEW ===== -->
+<div id="listView">
+  <div class="search-hero">
+    <h1>Cari Barbershop Terdekat</h1>
+    <p>Pilih kota untuk lihat barbershop terdaftar, lengkap dengan rating</p>
+    <div class="city-picker" id="cityPicker"></div>
+  </div>
+  <div class="wrap">
+    <div class="result-count" id="resultCount"></div>
+    <div class="store-grid" id="storeGrid">
+      <div class="state-msg">Memuat data toko...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DETAIL VIEW ===== -->
+<div id="detailView" style="display:none;">
+  <div class="detail-hero">
+    <div class="detail-inner" id="detailHeroContent"></div>
+  </div>
+  <div class="wrap">
+    <h2 class="section-title">Barberman</h2>
+    <div class="barber-grid" id="barberGrid"></div>
+    <h2 class="section-title">Ulasan Customer</h2>
+    <div id="reviewList"></div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://rdhytutkjzgizluyvrus.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_FGCxIQUPfWUKtdGI52oFKw_XCmRWFWh';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let ALL_STORES = [];
+let SELECTED_CITY = null;
+
+function escHtml(s) {
+  if (!s) return '';
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function initials(name) {
+  return (name || '?').trim().split(/\s+/).slice(0,2).map(w => w[0]).join('').toUpperCase();
+}
+
+function starDisplay(rating) {
+  const r = Math.round(rating || 0);
+  return '★'.repeat(r) + '☆'.repeat(5 - r);
+}
+
+function renderCityPicker() {
+  const cities = [...new Set(ALL_STORES.map(s => s.city).filter(Boolean))].sort();
+  const el = document.getElementById('cityPicker');
+  el.innerHTML = `<div class="city-chip ${!SELECTED_CITY ? 'active' : ''}" onclick="selectCity(null)">Semua Kota</div>` +
+    cities.map(c => `<div class="city-chip ${SELECTED_CITY === c ? 'active' : ''}" onclick="selectCity('${escHtml(c)}')">${escHtml(c)}</div>`).join('');
+}
+
+function selectCity(city) {
+  SELECTED_CITY = city;
+  renderCityPicker();
+  renderStoreGrid();
+}
+window.selectCity = selectCity;
+
+function renderStoreGrid() {
+  const filtered = SELECTED_CITY ? ALL_STORES.filter(s => s.city === SELECTED_CITY) : ALL_STORES;
+  document.getElementById('resultCount').textContent = `${filtered.length} barbershop ditemukan`;
+  const grid = document.getElementById('storeGrid');
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div class="state-msg">Belum ada barbershop terdaftar di kota ini.</div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(s => `
+    <a href="?store=${encodeURIComponent(s.slug)}" class="store-card" onclick="event.preventDefault(); showDetail('${s.slug}');">
+      <div class="store-av">${initials(s.name)}</div>
+      <div class="store-info">
+        <div class="store-name">${escHtml(s.name)}</div>
+        <div class="store-tagline">${escHtml(s.tagline || '')}</div>
+        <div class="store-meta">
+          ${s.review_count > 0
+            ? `<div class="store-rating"><span class="stars">${starDisplay(s.avg_rating)}</span> ${s.avg_rating} <span class="count">(${s.review_count} ulasan)</span></div>`
+            : `<div class="no-rating">Belum ada ulasan</div>`}
+          <div class="store-addr">📍 ${escHtml(s.city || '')}</div>
+        </div>
+      </div>
+      <div class="store-cta">Lihat Toko</div>
+    </a>
+  `).join('');
+}
+
+async function loadStores() {
+  const { data, error } = await sb.from('stores')
+    .select('id,name,tagline,city,address,slug,avg_rating,review_count')
+    .eq('is_active', true)
+    .order('avg_rating', { ascending: false });
+
+  if (error || !data) {
+    document.getElementById('storeGrid').innerHTML = '<div class="state-msg">Gagal memuat data. Coba refresh halaman.</div>';
+    return;
+  }
+  ALL_STORES = data;
+  renderCityPicker();
+  renderStoreGrid();
+
+  // Kalau ada ?store=slug di URL, langsung buka detail
+  const params = new URLSearchParams(location.search);
+  const slug = params.get('store');
+  if (slug) showDetail(slug);
+}
+
+async function showDetail(slug) {
+  const store = ALL_STORES.find(s => s.slug === slug);
+  if (!store) return;
+
+  document.getElementById('listView').style.display = 'none';
+  document.getElementById('detailView').style.display = 'block';
+  window.scrollTo(0,0);
+  history.replaceState(null, '', '?store=' + encodeURIComponent(slug));
+
+  document.getElementById('detailHeroContent').innerHTML = `
+    <div class="detail-av">${initials(store.name)}</div>
+    <div>
+      <h1 class="detail-name">${escHtml(store.name)}</h1>
+      <p class="detail-tagline">${escHtml(store.tagline || '')}</p>
+      ${store.review_count > 0
+        ? `<div class="detail-rating"><span class="stars">${starDisplay(store.avg_rating)}</span> ${store.avg_rating} <span style="color:var(--ink3);font-weight:500;">(${store.review_count} ulasan)</span></div>`
+        : `<div class="no-rating">Belum ada ulasan</div>`}
+      <div class="detail-addr">📍 ${escHtml(store.address || '')}, ${escHtml(store.city || '')}</div>
+      <a href="booking.html?store=${encodeURIComponent(store.slug)}" class="detail-btn">Booking Sekarang →</a>
+    </div>
+  `;
+
+  const [{ data: barbers }, { data: reviews }] = await Promise.all([
+    sb.from('barbers').select('id,name,avg_rating,review_count').eq('store_id', store.id).order('avg_rating', { ascending: false }),
+    sb.from('reviews').select('customer_name,rating_store,comment,created_at').eq('store_id', store.id).order('created_at', { ascending: false }).limit(10)
+  ]);
+
+  document.getElementById('barberGrid').innerHTML = (barbers || []).map(b => `
+    <div class="barber-card">
+      <div class="barber-av">${initials(b.name)}</div>
+      <div>
+        <div class="barber-name">${escHtml(b.name)}</div>
+        <div class="barber-rating">${b.review_count > 0 ? `<span class="stars">★</span> ${b.avg_rating} (${b.review_count})` : 'Belum ada rating'}</div>
+      </div>
+    </div>
+  `).join('') || '<div class="state-msg">Belum ada barberman terdaftar.</div>';
+
+  document.getElementById('reviewList').innerHTML = (reviews || []).map(r => `
+    <div class="review-card">
+      <div class="review-top">
+        <span class="review-name">${escHtml(r.customer_name)}</span>
+        <span class="review-stars">${starDisplay(r.rating_store)}</span>
+      </div>
+      ${r.comment ? `<div class="review-text">${escHtml(r.comment)}</div>` : ''}
+    </div>
+  `).join('') || '<div class="state-msg">Belum ada ulasan untuk toko ini.</div>';
+}
+window.showDetail = showDetail;
+
+loadStores();
+</script>
+</body>
+</html>
