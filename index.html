@@ -1,1410 +1,399 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CariCukur — Platform Booking Barber Shop Modern</title>
-    <meta name="description" content="Kelola booking, antrian, dan barberman toko kamu dalam satu platform. Gratis untuk mulai.">
-    <meta property="og:title" content="CariCukur — Platform Booking Barber Shop Modern">
-    <meta property="og:description" content="Kelola booking, antrian, dan barberman toko kamu dalam satu platform. Gratis untuk mulai.">
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="CariCukur">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500;0,600;1,500;1,600&family=Manrope:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-    *, * ::before, * ::after {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
-
-    html {
-        scroll-behavior: smooth;
-    }
-
-    body {
-        font-family: 'Manrope', sans-serif;
-        background: var(--bg);
-        color: var(--ink);
-        overflow-x: hidden;
-    }
-
-    :root {
-        --bg: #F7F7F4;
-        --bg2: #EFEEE9;
-        --surface: #FFFFFF;
-        --ink: #14181B;
-        --ink2: rgba(20, 24, 27, .62);
-        --ink3: rgba(20, 24, 27, .4);
-        --ink4: rgba(20, 24, 27, .12);
-        --line: rgba(20, 24, 27, .1);
-        --line2: rgba(20, 24, 27, .16);
-        --acc: #0E6B4F;
-        --acc-d: rgba(14, 107, 79, .07);
-        --acc-b: rgba(14, 107, 79, .28);
-        --acc-l: #12805F;
-        --steel: #4C5B66;
-        --steel-d: rgba(76, 91, 102, .08);
-        --steel-b: rgba(76, 91, 102, .28);
-        --warn: #9A6A22;
-        --r: 8px;
-        --rl: 14px;
-    }
-
-    .serif {
-        font-family: 'Newsreader', serif;
-    }
-
-    .mono {
-        font-family: 'Space Mono', monospace;
-    }
-
-    h1, h2 {
-        font-family: 'Newsreader', serif;
-        font-weight: 600;
-    }/* comb-teeth signature rule */
-    .comb-rule {
-        display: flex;
-        gap: 5px;
-        align-items: flex-end;
-        height: 14px;
-        margin-bottom: 18px;
-    }
-
-    .comb-rule span {
-        width: 1.5px;
-        background: var(--acc);
-        opacity: .55;
-    }
-
-    .comb-rule span:nth-child(3n) {
-        height: 100%;
-        opacity: .9;
-    }
-
-    .comb-rule span:nth-child(3n + 1) {
-        height: 60%;
-    }
-
-    .comb-rule span:nth-child(3n + 2) {
-        height: 35%;
-    }
-
-    .center .comb-rule {
-        margin-left: auto;
-        margin-right: auto;
-    }/* ===== NAV ===== */
-    nav {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 20px 60px;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 100;
-        background: rgba(247, 247, 244, .92);
-        backdrop-filter: blur(10px);
-        border-bottom: 1px solid transparent;
-        transition: border-color .25s;
-    }
-
-    nav.scrolled {
-        border-bottom-color: var(--line);
-    }
-
-    .nav-logo {
-        display: flex;
-        align-items: center;
-        gap: 9px;
-        text-decoration: none;
-    }
-
-    .nav-logo-ic {
-        width: 30px;
-        height: 30px;
-        background: var(--acc);
-        border-radius: 7px;
-        position: relative;
-    }
-
-    .nav-logo-ic::before {
-        content: '';
-        position: absolute;
-        left: 8px;
-        top: 6px;
-        bottom: 6px;
-        width: 1.5px;
-        background: rgba(255, 255, 255, .5);
-        box-shadow: 5px 0 rgba(255, 255, 255, .5), 10px 0 rgba(255, 255, 255, .8);
-    }
-
-    .nav-logo-text {
-        font-family: 'Newsreader', serif;
-        font-weight: 600;
-        font-size: 18px;
-        color: var(--ink);
-    }
-
-    .nav-logo-text span {
-        color: var(--acc);
-    }
-
-    .nav-links {
-        display: flex;
-        align-items: center;
-        gap: 34px;
-    }
-
-    .nav-links a {
-        font-size: 13px;
-        color: var(--ink2);
-        text-decoration: none;
-        font-weight: 500;
-        transition: color .2s;
-    }
-
-    .nav-links a:hover {
-        color: var(--ink);
-    }
-
-    .nav-cta {
-        background: var(--ink);
-        color: var(--surface);
-        border: none;
-        padding: 10px 20px;
-        border-radius: var(--r);
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        text-decoration: none;
-        transition: background .2s;
-    }
-
-    .nav-cta:hover {
-        background: #000;
-    }/* ===== HERO ===== */
-    .hero {
-        padding: 150px 24px 40px;
-        text-align: center;
-        position: relative;
-    }
-
-    .hero-eyebrow {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: var(--acc-d);
-        border: 1px solid var(--acc-b);
-        padding: 6px 14px;
-        border-radius: 40px;
-        font-size: 11px;
-        font-weight: 600;
-        color: var(--acc);
-        margin-bottom: 26px;
-        letter-spacing: .03em;
-    }
-
-    .hero-dot {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: var(--acc);
-        animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-        0%, 100% {
-            opacity: 1;
-        }
-
-        50% {
-            opacity: .3;
-        }
-    }
-
-    .hero h1 {
-        font-size: clamp(38px, 5vw, 66px);
-        line-height: 1.1;
-        margin-bottom: 22px;
-        letter-spacing: -.01em;
-        max-width: 820px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    .hero h1 i {
-        font-style: italic;
-        color: var(--acc);
-    }
-
-    .hero-sub {
-        font-size: 17px;
-        color: var(--ink2);
-        max-width: 520px;
-        margin: 0 auto 36px;
-        line-height: 1.7;
-    }
-
-    .hero-actions {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-
-    .btn-hero {
-        background: var(--acc);
-        color: #fff;
-        padding: 14px 30px;
-        border-radius: var(--r);
-        font-size: 14px;
-        font-weight: 700;
-        cursor: pointer;
-        text-decoration: none;
-        border: none;
-        transition: all .2s;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .btn-hero:hover {
-        background: var(--acc-l);
-        transform: translateY(-1px);
-    }
-
-    .btn-ghost {
-        background: var(--surface);
-        color: var(--ink2);
-        padding: 13px 26px;
-        border-radius: var(--r);
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        text-decoration: none;
-        border: 1px solid var(--line2);
-        transition: all .2s;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .btn-ghost:hover {
-        border-color: var(--acc-b);
-        color: var(--acc);
-    }
-
-    .hero-note {
-        margin-top: 16px;
-        font-size: 12px;
-        color: var(--ink3);
-    }/* ===== DASHBOARD MOCKUP ===== */
-    .dash-mock {
-        margin: 64px auto 0;
-        max-width: 880px;
-        background: var(--surface);
-        border: 1px solid var(--line2);
-        border-radius: 16px;
-        overflow: hidden;
-        box-shadow: 0 30px 80px rgba(20, 24, 27, .1);
-        position: relative;
-    }
-
-    .dash-mock::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        background: var(--acc);
-    }
-
-    .dash-top {
-        padding: 14px 20px;
-        border-bottom: 1px solid var(--line);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .dash-top-l {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 12px;
-        color: var(--ink2);
-        font-weight: 600;
-    }
-
-    .dash-live {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 11px;
-        color: var(--acc);
-        font-weight: 600;
-    }
-
-    .dash-body {
-        padding: 22px;
-        display: grid;
-        grid-template-columns: 170px 1fr;
-        gap: 16px;
-        text-align: left;
-    }
-
-    .dash-side {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-    }
-
-    .dash-nav-item {
-        padding: 9px 11px;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 500;
-        color: var(--ink3);
-    }
-
-    .dash-nav-item.act {
-        background: var(--acc-d);
-        color: var(--acc);
-    }
-
-    .dash-stat-row {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 8px;
-        margin-bottom: 12px;
-    }
-
-    .dash-stat {
-        background: var(--bg);
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        padding: 11px 12px;
-    }
-
-    .dash-stat-lbl {
-        font-size: 9px;
-        color: var(--ink3);
-        text-transform: uppercase;
-        letter-spacing: .06em;
-        margin-bottom: 5px;
-        font-weight: 600;
-    }
-
-    .dash-stat-val {
-        font-family: 'Space Mono', monospace;
-        font-size: 17px;
-        font-weight: 700;
-    }
-
-    .dash-table {
-        background: var(--bg);
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        overflow: hidden;
-    }
-
-    .dash-th {
-        display: grid;
-        grid-template-columns: 2fr 1fr 1fr 1fr;
-        gap: 8px;
-        padding: 8px 12px;
-        border-bottom: 1px solid var(--line);
-    }
-
-    .dash-th span {
-        font-size: 9px;
-        color: var(--ink3);
-        text-transform: uppercase;
-        letter-spacing: .06em;
-        font-weight: 600;
-    }
-
-    .dash-row {
-        display: grid;
-        grid-template-columns: 2fr 1fr 1fr 1fr;
-        gap: 8px;
-        padding: 10px 12px;
-        border-bottom: 1px solid var(--line);
-        align-items: center;
-    }
-
-    .dash-row:last-child {
-        border-bottom: none;
-    }
-
-    .dash-row span {
-        font-size: 11px;
-        color: var(--ink2);
-    }
-
-    .dash-badge {
-        font-size: 9px;
-        padding: 2px 7px;
-        border-radius: 4px;
-        font-weight: 700;
-        display: inline-block;
-    }
-
-    .db-pend {
-        background: rgba(154, 106, 34, .1);
-        color: var(--warn);
-    }
-
-    .db-conf {
-        background: var(--steel-d);
-        color: var(--steel);
-    }
-
-    .db-done {
-        background: var(--acc-d);
-        color: var(--acc);
-    }/* ===== SECTION ===== */
-    section {
-        padding: 100px 60px;
-    }
-
-    .section-eyebrow {
-        font-size: 11px;
-        letter-spacing: .1em;
-        text-transform: uppercase;
-        color: var(--acc);
-        font-weight: 700;
-        margin-bottom: 10px;
-    }
-
-    .section-h2 {
-        font-size: clamp(30px, 3.6vw, 44px);
-        line-height: 1.15;
-        margin-bottom: 16px;
-    }
-
-    .section-sub {
-        font-size: 15px;
-        color: var(--ink2);
-        line-height: 1.75;
-        max-width: 520px;
-    }
-
-    .center {
-        text-align: center;
-    }
-
-    .center .section-sub {
-        margin: 0 auto;
-    }/* ===== PROBLEM ===== */
-    .problem {
-        background: var(--bg2);
-    }
-
-    .problem-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 16px;
-        margin-top: 52px;
-    }
-
-    .prob-item {
-        background: var(--surface);
-        border: 1px solid var(--line);
-        border-left: 3px solid var(--steel);
-        border-radius: var(--r);
-        padding: 26px 24px;
-    }
-
-    .prob-title {
-        font-size: 15px;
-        font-weight: 700;
-        margin-bottom: 8px;
-    }
-
-    .prob-desc {
-        font-size: 13px;
-        color: var(--ink3);
-        line-height: 1.65;
-    }/* ===== FEATURES ===== */
-    .features-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 16px;
-        margin-top: 52px;
-    }
-
-    .feat-card {
-        background: var(--surface);
-        border: 1px solid var(--line);
-        border-radius: var(--rl);
-        padding: 26px 22px;
-        transition: border-color .2s, transform .2s;
-    }
-
-    .feat-card:hover {
-        border-color: var(--acc-b);
-        transform: translateY(-2px);
-    }
-
-    .feat-ic {
-        width: 40px;
-        height: 40px;
-        background: var(--acc-d);
-        border-radius: 9px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 16px;
-    }
-
-    .feat-ic svg {
-        width: 18px;
-        height: 18px;
-        fill: none;
-        stroke: var(--acc);
-        stroke-width: 2;
-    }
-
-    .feat-title {
-        font-size: 15px;
-        font-weight: 700;
-        margin-bottom: 8px;
-    }
-
-    .feat-desc {
-        font-size: 13px;
-        color: var(--ink3);
-        line-height: 1.65;
-    }/* ===== HOW IT WORKS ===== */
-    .how-steps {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 0;
-        margin-top: 56px;
-        position: relative;
-    }
-
-    .how-steps::before {
-        content: '';
-        position: absolute;
-        top: 19px;
-        left: 10%;
-        right: 10%;
-        height: 1px;
-        background: var(--line2);
-    }
-
-    .how-step {
-        text-align: center;
-        padding: 0 18px;
-    }
-
-    .how-num {
-        width: 38px;
-        height: 38px;
-        border-radius: 50%;
-        background: var(--ink);
-        color: var(--surface);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 18px;
-        font-family: 'Space Mono', monospace;
-        font-size: 13px;
-        font-weight: 700;
-        position: relative;
-        z-index: 1;
-    }
-
-    .how-title {
-        font-size: 14px;
-        font-weight: 700;
-        margin-bottom: 8px;
-    }
-
-    .how-desc {
-        font-size: 12px;
-        color: var(--ink3);
-        line-height: 1.65;
-    }/* ===== STATS ===== */
-    .stats-row {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 16px;
-        margin-top: 52px;
-    }
-
-    .stat-item {
-        background: var(--surface);
-        border: 1px solid var(--line);
-        border-radius: var(--rl);
-        padding: 44px 30px;
-        text-align: center;
-    }
-
-    .stat-num {
-        font-family: 'Space Mono', monospace;
-        font-weight: 700;
-        font-size: clamp(32px, 4vw, 46px);
-        color: var(--acc);
-        line-height: 1;
-        margin-bottom: 10px;
-    }
-
-    .stat-lbl {
-        font-size: 13px;
-        color: var(--ink3);
-    }/* ===== PRICING ===== */
-    .pricing-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
-        max-width: 700px;
-        margin: 52px auto 0;
-    }
-
-    .price-card {
-        background: var(--surface);
-        border: 1px solid var(--line);
-        border-radius: var(--rl);
-        padding: 30px 26px;
-    }
-
-    .price-card.featured {
-        border-color: var(--acc-b);
-        box-shadow: 0 0 0 3px var(--acc-d);
-    }
-
-    .price-badge {
-        font-size: 10px;
-        letter-spacing: .08em;
-        text-transform: uppercase;
-        font-weight: 700;
-        color: var(--acc);
-        background: var(--acc-d);
-        padding: 4px 10px;
-        border-radius: 20px;
-        display: inline-block;
-        margin-bottom: 14px;
-    }
-
-    .price-name {
-        font-size: 17px;
-        font-weight: 700;
-        margin-bottom: 6px;
-    }
-
-    .price-amount {
-        font-family: 'Newsreader', serif;
-        font-weight: 600;
-        font-size: 38px;
-        line-height: 1;
-        margin-bottom: 4px;
-    }
-
-    .price-amount span {
-        font-size: 14px;
-        font-family: 'Manrope', sans-serif;
-        font-weight: 500;
-        color: var(--ink3);
-    }
-
-    .price-period {
-        font-size: 12px;
-        color: var(--ink3);
-        margin-bottom: 22px;
-    }
-
-    .price-features {
-        list-style: none;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        margin-bottom: 26px;
-    }
-
-    .price-features li {
-        font-size: 13px;
-        color: var(--ink2);
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .price-features li::before {
-        content: '✓';
-        color: var(--acc);
-        font-weight: 700;
-        font-size: 12px;
-        flex-shrink: 0;
-    }
-
-    .price-features li.off {
-        color: var(--ink4);
-    }
-
-    .price-features li.off::before {
-        content: '–';
-        color: var(--ink4);
-    }
-
-    .price-btn {
-        width: 100%;
-        padding: 12px;
-        border-radius: var(--r);
-        font-size: 13px;
-        font-weight: 700;
-        cursor: pointer;
-        border: none;
-        transition: all .2s;
-        text-decoration: none;
-        display: block;
-        text-align: center;
-    }
-
-    .price-btn-acc {
-        background: var(--acc);
-        color: #fff;
-    }
-
-    .price-btn-acc:hover {
-        background: var(--acc-l);
-    }
-
-    .price-btn-outline {
-        background: transparent;
-        color: var(--ink2);
-        border: 1px solid var(--line2);
-    }
-
-    .price-btn-outline:hover {
-        border-color: var(--acc-b);
-        color: var(--acc);
-    }/* ===== TESTIMONIAL ===== */
-    .testi-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 16px;
-        margin-top: 52px;
-    }
-
-    .testi-card {
-        background: var(--surface);
-        border: 1px solid var(--line);
-        border-radius: var(--rl);
-        padding: 26px 22px;
-    }
-
-    .testi-stars {
-        color: var(--acc);
-        font-size: 13px;
-        margin-bottom: 14px;
-        letter-spacing: 2px;
-    }
-
-    .testi-text {
-        font-size: 14px;
-        color: var(--ink2);
-        line-height: 1.7;
-        margin-bottom: 20px;
-    }
-
-    .testi-author {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .testi-av {
-        width: 34px;
-        height: 34px;
-        border-radius: 7px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 13px;
-        flex-shrink: 0;
-        font-family: 'Space Mono', monospace;
-        background: var(--bg2);
-        color: var(--ink);
-    }
-
-    .testi-name {
-        font-size: 13px;
-        font-weight: 700;
-    }
-
-    .testi-role {
-        font-size: 11px;
-        color: var(--ink3);
-        margin-top: 2px;
-    }/* ===== CTA ===== */
-    .cta-section {
-        text-align: center;
-        padding: 110px 60px;
-        background: var(--acc);
-        color: #fff;
-    }
-
-    .cta-section .section-eyebrow {
-        color: rgba(255, 255, 255, .75);
-    }
-
-    .cta-section .comb-rule span {
-        background: #fff;
-    }
-
-    .cta-section h2 {
-        font-size: clamp(32px, 4.4vw, 54px);
-        margin-bottom: 18px;
-        line-height: 1.12;
-        color: #fff;
-    }
-
-    .cta-section p {
-        font-size: 16px;
-        color: rgba(255, 255, 255, .8);
-        margin-bottom: 38px;
-        max-width: 460px;
-        margin-left: auto;
-        margin-right: auto;
-        line-height: 1.7;
-    }
-
-    .cta-section .btn-hero {
-        background: #fff;
-        color: var(--acc);
-    }
-
-    .cta-section .btn-hero:hover {
-        background: #F0FBF6;
-    }
-
-    .cta-section .btn-ghost {
-        background: transparent;
-        color: rgba(255, 255, 255, .85);
-        border-color: rgba(255, 255, 255, .3);
-    }
-
-    .cta-section .btn-ghost:hover {
-        border-color: #fff;
-        color: #fff;
-    }/* ===== FOOTER ===== */
-    footer {
-        border-top: 1px solid var(--line);
-        padding: 36px 60px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 16px;
-    }
-
-    .footer-logo {
-        font-family: 'Newsreader', serif;
-        font-weight: 600;
-        font-size: 15px;
-        color: var(--ink);
-    }
-
-    .footer-logo span {
-        color: var(--acc);
-    }
-
-    .footer-links {
-        display: flex;
-        gap: 24px;
-    }
-
-    .footer-links a {
-        font-size: 12px;
-        color: var(--ink3);
-        text-decoration: none;
-        transition: color .2s;
-    }
-
-    .footer-links a:hover {
-        color: var(--ink);
-    }
-
-    .footer-copy {
-        font-size: 12px;
-        color: var(--ink4);
-    }
-
-    @media (max-width: 900px) {
-        nav {
-            padding: 14px 20px;
-        }
-
-        .nav-links {
-            display: none;
-        }
-
-        .hero {
-            padding: 110px 20px 40px;
-        }
-
-        section {
-            padding: 64px 20px;
-        }
-
-        .problem-grid, .features-grid, .how-steps, .stats-row, .testi-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .how-steps::before {
-            display: none;
-        }
-
-        .pricing-grid {
-            grid-template-columns: 1fr;
-            max-width: 400px;
-        }
-
-        .dash-body {
-            grid-template-columns: 1fr;
-        }
-
-        .dash-side {
-            display: none;
-        }
-
-        .dash-stat-row {
-            grid-template-columns: 1fr 1fr;
-        }
-
-        footer {
-            flex-direction: column;
-            align-items: flex-start;
-            padding: 26px 20px;
-        }
-
-        .cta-section {
-            padding: 70px 20px;
-        }
-    }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CariCukur — Platform Booking Barber Shop Modern</title>
+<meta name="description" content="Kelola booking, antrian, dan barberman toko kamu dalam satu platform. Gratis untuk mulai.">
+<meta property="og:title" content="CariCukur — Platform Booking Barber Shop Modern">
+<meta property="og:description" content="Kelola booking, antrian, dan barberman toko kamu dalam satu platform. Gratis untuk mulai.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="CariCukur">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500;0,600;1,500;1,600&family=Manrope:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--ink);overflow-x:hidden;}
+
+:root{
+  --bg:#EFEDE5; --bg2:#EFEEE9; --surface:#FFFFFF;
+  --ink:#14181B; --ink2:rgba(20,24,27,.72); --ink3:rgba(20,24,27,.58); --ink4:rgba(20,24,27,.12);
+  --line:rgba(20,24,27,.14); --line2:rgba(20,24,27,.2);
+  --acc:#0E6B4F; --acc-d:rgba(14,107,79,.07); --acc-b:rgba(14,107,79,.28); --acc-l:#12805F;
+  --steel:#4C5B66; --steel-d:rgba(76,91,102,.08); --steel-b:rgba(76,91,102,.28);
+  --warn:#9A6A22; --r:8px; --rl:14px;
+}
+.serif{font-family:'Newsreader',serif;}
+.mono{font-family:'Space Mono',monospace;}
+h1,h2{font-family:'Newsreader',serif;font-weight:600;}
+
+/* comb-teeth signature rule */
+.comb-rule{display:flex;gap:5px;align-items:flex-end;height:14px;margin-bottom:18px;}
+.comb-rule span{width:1.5px;background:var(--acc);opacity:.55;}
+.comb-rule span:nth-child(3n){height:100%;opacity:.9;}
+.comb-rule span:nth-child(3n+1){height:60%;}
+.comb-rule span:nth-child(3n+2){height:35%;}
+.center .comb-rule{margin-left:auto;margin-right:auto;}
+
+/* ===== NAV ===== */
+nav{display:flex;align-items:center;justify-content:space-between;padding:20px 60px;position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,247,244,.92);backdrop-filter:blur(10px);border-bottom:1px solid transparent;transition:border-color .25s;}
+nav.scrolled{border-bottom-color:var(--line);}
+.nav-logo{display:flex;align-items:center;gap:9px;text-decoration:none;}
+.nav-logo-ic{width:30px;height:30px;background:var(--acc);border-radius:7px;position:relative;}
+.nav-logo-ic::before{content:'';position:absolute;left:8px;top:6px;bottom:6px;width:1.5px;background:rgba(255,255,255,.5);box-shadow:5px 0 rgba(255,255,255,.5),10px 0 rgba(255,255,255,.8);}
+.nav-logo-text{font-family:'Newsreader',serif;font-weight:600;font-size:18px;color:var(--ink);}
+.nav-logo-text span{color:var(--acc);}
+.nav-links{display:flex;align-items:center;gap:34px;}
+.nav-links a{font-size:13px;color:var(--ink2);text-decoration:none;font-weight:500;transition:color .2s;}
+.nav-links a:hover{color:var(--ink);}
+.nav-cta{background:var(--ink);color:var(--surface);border:none;padding:10px 20px;border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;transition:background .2s;}
+.nav-cta:hover{background:#000;}
+
+/* ===== HERO ===== */
+.hero{padding:150px 24px 40px;text-align:center;position:relative;}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--acc-d);border:1px solid var(--acc-b);padding:6px 14px;border-radius:40px;font-size:11px;font-weight:600;color:var(--acc);margin-bottom:26px;letter-spacing:.03em;}
+.hero-dot{width:6px;height:6px;border-radius:50%;background:var(--acc);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+.hero h1{font-size:clamp(38px,5vw,66px);line-height:1.1;margin-bottom:22px;letter-spacing:-.01em;max-width:820px;margin-left:auto;margin-right:auto;}
+.hero h1 i{font-style:italic;color:var(--acc);}
+.hero-sub{font-size:17px;color:var(--ink2);max-width:520px;margin:0 auto 36px;line-height:1.7;}
+.hero-actions{display:flex;align-items:flex-start;gap:22px;justify-content:center;flex-wrap:wrap;}
+.hero-path{display:flex;flex-direction:column;align-items:center;gap:9px;}
+.hero-path-label{font-size:12px;color:var(--ink3);max-width:180px;text-align:center;line-height:1.4;}
+.btn-hero{background:var(--acc);color:#fff;padding:14px 30px;border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;border:none;transition:all .2s;display:inline-flex;align-items:center;gap:8px;}
+.btn-hero:hover{background:var(--acc-l);transform:translateY(-1px);}
+.btn-ghost{background:var(--surface);color:var(--ink2);padding:13px 26px;border-radius:var(--r);font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;border:1px solid var(--line2);transition:all .2s;display:inline-flex;align-items:center;gap:8px;}
+.btn-ghost:hover{border-color:var(--acc-b);color:var(--acc);}
+.hero-note{margin-top:16px;font-size:12px;color:var(--ink3);}
+
+/* ===== DASHBOARD MOCKUP ===== */
+.dash-mock{margin:64px auto 0;max-width:880px;background:var(--surface);border:1px solid var(--line2);border-radius:16px;overflow:hidden;box-shadow:0 30px 80px rgba(20,24,27,.1);position:relative;}
+.dash-mock::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--acc);}
+.dash-top{padding:14px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;}
+.dash-top-l{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink2);font-weight:600;}
+.dash-live{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--acc);font-weight:600;}
+.dash-body{padding:22px;display:grid;grid-template-columns:170px 1fr;gap:16px;text-align:left;}
+.dash-side{display:flex;flex-direction:column;gap:5px;}
+.dash-nav-item{padding:9px 11px;border-radius:6px;font-size:12px;font-weight:500;color:var(--ink3);}
+.dash-nav-item.act{background:var(--acc-d);color:var(--acc);}
+.dash-stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;}
+.dash-stat{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:11px 12px;}
+.dash-stat-lbl{font-size:9px;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;font-weight:600;}
+.dash-stat-val{font-family:'Space Mono',monospace;font-size:17px;font-weight:700;}
+.dash-table{background:var(--bg);border:1px solid var(--line);border-radius:8px;overflow:hidden;}
+.dash-th{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line);}
+.dash-th span{font-size:9px;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em;font-weight:600;}
+.dash-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line);align-items:center;}
+.dash-row:last-child{border-bottom:none;}
+.dash-row span{font-size:11px;color:var(--ink2);}
+.dash-badge{font-size:9px;padding:2px 7px;border-radius:4px;font-weight:700;display:inline-block;}
+.db-pend{background:rgba(154,106,34,.1);color:var(--warn);}
+.db-conf{background:var(--steel-d);color:var(--steel);}
+.db-done{background:var(--acc-d);color:var(--acc);}
+
+/* ===== SECTION ===== */
+section{padding:100px 60px;}
+.section-eyebrow{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--acc);font-weight:700;margin-bottom:10px;}
+.section-h2{font-size:clamp(30px,3.6vw,44px);line-height:1.15;margin-bottom:16px;}
+.section-sub{font-size:15px;color:var(--ink2);line-height:1.75;max-width:520px;}
+.center{text-align:center;}
+.center .section-sub{margin:0 auto;}
+
+/* ===== PROBLEM ===== */
+.problem{background:var(--bg2);}
+.problem-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:52px;}
+.prob-item{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--steel);border-radius:var(--r);padding:26px 24px;}
+.prob-title{font-size:15px;font-weight:700;margin-bottom:8px;}
+.prob-desc{font-size:13px;color:var(--ink3);line-height:1.65;}
+
+/* ===== FEATURES ===== */
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:52px;}
+.feat-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--rl);padding:26px 22px;transition:border-color .2s,transform .2s;}
+.feat-card:hover{border-color:var(--acc-b);transform:translateY(-2px);}
+.feat-ic{width:40px;height:40px;background:var(--acc-d);border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
+.feat-ic svg{width:18px;height:18px;fill:none;stroke:var(--acc);stroke-width:2;}
+.feat-title{font-size:15px;font-weight:700;margin-bottom:8px;}
+.feat-desc{font-size:13px;color:var(--ink3);line-height:1.65;}
+
+/* ===== HOW IT WORKS ===== */
+.how-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:56px;position:relative;}
+.how-steps::before{content:'';position:absolute;top:19px;left:10%;right:10%;height:1px;background:var(--line2);}
+.how-step{text-align:center;padding:0 18px;}
+.how-num{width:38px;height:38px;border-radius:50%;background:var(--ink);color:var(--surface);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-family:'Space Mono',monospace;font-size:13px;font-weight:700;position:relative;z-index:1;}
+.how-title{font-size:14px;font-weight:700;margin-bottom:8px;}
+.how-desc{font-size:12px;color:var(--ink3);line-height:1.65;}
+
+/* ===== STATS ===== */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:52px;}
+.stat-item{background:var(--surface);border:1px solid var(--line);border-radius:var(--rl);padding:44px 30px;text-align:center;}
+.stat-num{font-family:'Space Mono',monospace;font-weight:700;font-size:clamp(32px,4vw,46px);color:var(--acc);line-height:1;margin-bottom:10px;}
+.stat-lbl{font-size:13px;color:var(--ink3);}
+
+/* ===== PRICING ===== */
+.pricing-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;max-width:700px;margin:52px auto 0;}
+.price-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--rl);padding:30px 26px;}
+.price-card.featured{border-color:var(--acc-b);box-shadow:0 0 0 3px var(--acc-d);}
+.price-badge{font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--acc);background:var(--acc-d);padding:4px 10px;border-radius:20px;display:inline-block;margin-bottom:14px;}
+.price-name{font-size:17px;font-weight:700;margin-bottom:6px;}
+.price-amount{font-family:'Newsreader',serif;font-weight:600;font-size:38px;line-height:1;margin-bottom:4px;}
+.price-amount span{font-size:14px;font-family:'Manrope',sans-serif;font-weight:500;color:var(--ink3);}
+.price-period{font-size:12px;color:var(--ink3);margin-bottom:22px;}
+.price-features{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:26px;}
+.price-features li{font-size:13px;color:var(--ink2);display:flex;align-items:center;gap:8px;}
+.price-features li::before{content:'✓';color:var(--acc);font-weight:700;font-size:12px;flex-shrink:0;}
+.price-features li.off{color:var(--ink4);}
+.price-features li.off::before{content:'–';color:var(--ink4);}
+.price-btn{width:100%;padding:12px;border-radius:var(--r);font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .2s;text-decoration:none;display:block;text-align:center;}
+.price-btn-acc{background:var(--acc);color:#fff;}
+.price-btn-acc:hover{background:var(--acc-l);}
+.price-btn-outline{background:transparent;color:var(--ink2);border:1px solid var(--line2);}
+.price-btn-outline:hover{border-color:var(--acc-b);color:var(--acc);}
+
+/* ===== TESTIMONIAL ===== */
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:52px;}
+.testi-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--rl);padding:26px 22px;}
+.testi-stars{color:var(--acc);font-size:13px;margin-bottom:14px;letter-spacing:2px;}
+.testi-text{font-size:14px;color:var(--ink2);line-height:1.7;margin-bottom:20px;}
+.testi-author{display:flex;align-items:center;gap:10px;}
+.testi-av{width:34px;height:34px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;font-family:'Space Mono',monospace;background:var(--bg2);color:var(--ink);}
+.testi-name{font-size:13px;font-weight:700;}
+.testi-role{font-size:11px;color:var(--ink3);margin-top:2px;}
+
+/* ===== CTA ===== */
+.cta-section{text-align:center;padding:110px 60px;background:var(--acc);color:#fff;}
+.cta-section .section-eyebrow{color:rgba(255,255,255,.75);}
+.cta-section .comb-rule span{background:#fff;}
+.cta-section h2{font-size:clamp(32px,4.4vw,54px);margin-bottom:18px;line-height:1.12;color:#fff;}
+.cta-section p{font-size:16px;color:rgba(255,255,255,.8);margin-bottom:38px;max-width:460px;margin-left:auto;margin-right:auto;line-height:1.7;}
+.cta-section .btn-hero{background:#fff;color:var(--acc);}
+.cta-section .btn-hero:hover{background:#F0FBF6;}
+.cta-section .btn-ghost{background:transparent;color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.3);}
+.cta-section .btn-ghost:hover{border-color:#fff;color:#fff;}
+
+/* ===== FOOTER ===== */
+footer{border-top:1px solid var(--line);padding:36px 60px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+.footer-logo{font-family:'Newsreader',serif;font-weight:600;font-size:15px;color:var(--ink);}
+.footer-logo span{color:var(--acc);}
+.footer-links{display:flex;gap:24px;}
+.footer-links a{font-size:12px;color:var(--ink3);text-decoration:none;transition:color .2s;}
+.footer-links a:hover{color:var(--ink);}
+.footer-copy{font-size:12px;color:var(--ink4);}
+
+@media(max-width:900px){
+  nav{padding:14px 20px;}
+  .nav-links{display:none;}
+  .hero{padding:110px 20px 40px;}
+  section{padding:64px 20px;}
+  .problem-grid,.features-grid,.how-steps,.stats-row,.testi-grid{grid-template-columns:1fr;}
+  .how-steps::before{display:none;}
+  .pricing-grid{grid-template-columns:1fr;max-width:400px;}
+  .dash-body{grid-template-columns:1fr;}
+  .dash-side{display:none;}
+  .dash-stat-row{grid-template-columns:1fr 1fr;}
+  footer{flex-direction:column;align-items:flex-start;padding:26px 20px;}
+  .cta-section{padding:70px 20px;}
+}
+</style>
 </head>
 <body>
 
-    <nav id="mainNav">
-        <a href="#" class="nav-logo">
-            <div class="nav-logo-ic"></div>
-            <span class="nav-logo-text">
-                Cari
-                <span>Cukur</span>
-            </span>
-        </a>
-        <div class="nav-links">
-            <a href="#fitur">Fitur</a>
-            <a href="#cara-kerja">Cara Kerja</a>
-            <a href="#harga">Harga</a>
-        </div>
-        <a href="auth.html" class="nav-cta">Daftar Gratis →</a>
-    </nav>
+<nav id="mainNav">
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-ic"></div>
+    <span class="nav-logo-text">Cari<span>Cukur</span></span>
+  </a>
+  <div class="nav-links">
+    <a href="cari.html">Cari Barbershop</a>
+    <a href="#fitur">Fitur</a>
+    <a href="#cara-kerja">Cara Kerja</a>
+    <a href="#harga">Harga</a>
+  </div>
+  <a href="auth.html" class="nav-cta">Daftar Gratis →</a>
+</nav>
 
-    <!-- HERO -->
-    <section class="hero">
-        <div class="hero-eyebrow">
-            <span class="hero-dot"></span>
-            Platform Booking Barber Shop
-        </div>
-        <h1>
-            Booking rapi, toko jalan 
-            <i>tanpa ribet</i>
-        </h1>
-        <p class="hero-sub">CariCukur membantu barber shop kelola booking online, antrian walk-in, dan barberman — semua dari satu dashboard sederhana.</p>
-        <div class="hero-actions">
-            <a href="auth.html" class="btn-hero">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <path d="M12 5v14M5 12h14"/>
-                </svg>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow"><span class="hero-dot"></span>Platform Booking Barber Shop</div>
+  <h1>Booking rapi, toko jalan <i>tanpa ribet</i></h1>
+  <p class="hero-sub">CariCukur membantu barber shop kelola booking online, antrian walk-in, dan barberman — semua dari satu dashboard sederhana.</p>
+  <div class="hero-actions">
+    <div class="hero-path">
+      <a href="auth.html" class="btn-hero">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        Daftar Sebagai Owner
+      </a>
+      <span class="hero-path-label">Punya barbershop? Kelola booking di sini</span>
+    </div>
+    <div class="hero-path">
+      <a href="cari.html" class="btn-ghost">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        Cari Barbershop
+      </a>
+      <span class="hero-path-label">Mau potong rambut? Cari & booking di sini</span>
+    </div>
+  </div>
+  <p class="hero-note">Gratis selamanya · Tidak perlu kartu kredit · Setup 5 menit</p>
 
-                      Daftar Gratis Sekarang
-                    
-            </a>
-            <a href="booking.html?store=vinbarber-sigli" class="btn-ghost" target="_blank">Lihat Contoh Booking →</a>
+  <div class="dash-mock">
+    <div class="dash-top">
+      <div class="dash-top-l">caricukur.pages.dev/dashboard</div>
+      <div class="dash-live"><span class="hero-dot"></span>Live</div>
+    </div>
+    <div class="dash-body">
+      <div class="dash-side">
+        <div class="dash-nav-item act">Kelola Booking</div>
+        <div class="dash-nav-item">Barberman</div>
+        <div class="dash-nav-item">Paket & Harga</div>
+        <div class="dash-nav-item">Profil Toko</div>
+      </div>
+      <div>
+        <div class="dash-stat-row">
+          <div class="dash-stat"><div class="dash-stat-lbl">Hari Ini</div><div class="dash-stat-val">8</div></div>
+          <div class="dash-stat"><div class="dash-stat-lbl">Menunggu</div><div class="dash-stat-val" style="color:var(--warn);">3</div></div>
+          <div class="dash-stat"><div class="dash-stat-lbl">Selesai</div><div class="dash-stat-val" style="color:var(--acc);">24</div></div>
+          <div class="dash-stat"><div class="dash-stat-lbl">Pendapatan</div><div class="dash-stat-val" style="font-size:14px;">2,4jt</div></div>
         </div>
-        <p class="hero-note">Gratis selamanya · Tidak perlu kartu kredit · Setup 5 menit</p>
+        <div class="dash-table">
+          <div class="dash-th"><span>Customer</span><span>Paket</span><span>Waktu</span><span>Status</span></div>
+          <div class="dash-row"><span>Rizal M.</span><span>Basic</span><span>09:00</span><span><span class="dash-badge db-done">Selesai</span></span></div>
+          <div class="dash-row"><span>Dimas A.</span><span>Premium</span><span>10:30</span><span><span class="dash-badge db-conf">Terkonfirmasi</span></span></div>
+          <div class="dash-row"><span>Fajar S.</span><span>Exclusive</span><span>11:00</span><span><span class="dash-badge db-pend">Menunggu</span></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-        <div class="dash-mock">
-            <div class="dash-top">
-                <div class="dash-top-l">caricukur.pages.dev/dashboard</div>
-                <div class="dash-live">
-                    <span class="hero-dot"></span>
-                    Live
-                </div>
-            </div>
-            <div class="dash-body">
-                <div class="dash-side">
-                    <div class="dash-nav-item act">Kelola Booking</div>
-                    <div class="dash-nav-item">Barberman</div>
-                    <div class="dash-nav-item">Paket & Harga</div>
-                    <div class="dash-nav-item">Profil Toko</div>
-                </div>
-                <div>
-                    <div class="dash-stat-row">
-                        <div class="dash-stat">
-                            <div class="dash-stat-lbl">Hari Ini</div>
-                            <div class="dash-stat-val">8</div>
-                        </div>
-                        <div class="dash-stat">
-                            <div class="dash-stat-lbl">Menunggu</div>
-                            <div class="dash-stat-val" style="color:var(--warn);">3</div>
-                        </div>
-                        <div class="dash-stat">
-                            <div class="dash-stat-lbl">Selesai</div>
-                            <div class="dash-stat-val" style="color:var(--acc);">24</div>
-                        </div>
-                        <div class="dash-stat">
-                            <div class="dash-stat-lbl">Pendapatan</div>
-                            <div class="dash-stat-val" style="font-size:14px;">2,4jt</div>
-                        </div>
-                    </div>
-                    <div class="dash-table">
-                        <div class="dash-th">
-                            <span>Customer</span>
-                            <span>Paket</span>
-                            <span>Waktu</span>
-                            <span>Status</span>
-                        </div>
-                        <div class="dash-row">
-                            <span>Rizal M.</span>
-                            <span>Basic</span>
-                            <span>09:00</span>
-                            <span>
-                                <span class="dash-badge db-done">Selesai</span>
-                            </span>
-                        </div>
-                        <div class="dash-row">
-                            <span>Dimas A.</span>
-                            <span>Premium</span>
-                            <span>10:30</span>
-                            <span>
-                                <span class="dash-badge db-conf">Terkonfirmasi</span>
-                            </span>
-                        </div>
-                        <div class="dash-row">
-                            <span>Fajar S.</span>
-                            <span>Exclusive</span>
-                            <span>11:00</span>
-                            <span>
-                                <span class="dash-badge db-pend">Menunggu</span>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+<!-- MASALAH -->
+<section class="problem" id="masalah">
+  <div class="center">
+    <div class="comb-rule"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="section-eyebrow">Masalah yang Kami Selesaikan</div>
+    <h2 class="section-h2">Kenapa barber shop butuh CariCukur?</h2>
+    <p class="section-sub">Tanpa sistem yang baik, owner barber shop kehilangan banyak waktu dan pendapatan setiap hari.</p>
+  </div>
+  <div class="problem-grid">
+    <div class="prob-item"><div class="prob-title">Booking lewat WhatsApp berantakan</div><div class="prob-desc">Pesan terlewat, jadwal tabrakan, customer komplain. Butuh sistem yang otomatis dan rapi.</div></div>
+    <div class="prob-item"><div class="prob-title">Antrian walk-in tidak teratur</div><div class="prob-desc">Customer nunggu lama tanpa kepastian, kasir kewalahan, barberman tidak tahu siapa giliran berikutnya.</div></div>
+    <div class="prob-item"><div class="prob-title">Tidak ada data pendapatan yang jelas</div><div class="prob-desc">Susah tahu berapa omzet hari ini, barberman mana yang paling produktif, dan paket apa yang paling laku.</div></div>
+  </div>
+</section>
 
-    <!-- MASALAH -->
-    <section class="problem" id="masalah">
-        <div class="center">
-            <div class="comb-rule">
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-            <div class="section-eyebrow">Masalah yang Kami Selesaikan</div>
-            <h2 class="section-h2">Kenapa barber shop butuh CariCukur?</h2>
-            <p class="section-sub">Tanpa sistem yang baik, owner barber shop kehilangan banyak waktu dan pendapatan setiap hari.</p>
-        </div>
-        <div class="problem-grid">
-            <div class="prob-item">
-                <div class="prob-title">Booking lewat WhatsApp berantakan</div>
-                <div class="prob-desc">Pesan terlewat, jadwal tabrakan, customer komplain. Butuh sistem yang otomatis dan rapi.</div>
-            </div>
-            <div class="prob-item">
-                <div class="prob-title">Antrian walk-in tidak teratur</div>
-                <div class="prob-desc">Customer nunggu lama tanpa kepastian, kasir kewalahan, barberman tidak tahu siapa giliran berikutnya.</div>
-            </div>
-            <div class="prob-item">
-                <div class="prob-title">Tidak ada data pendapatan yang jelas</div>
-                <div class="prob-desc">Susah tahu berapa omzet hari ini, barberman mana yang paling produktif, dan paket apa yang paling laku.</div>
-            </div>
-        </div>
-    </section>
+<!-- FITUR -->
+<section id="fitur">
+  <div class="center">
+    <div class="section-eyebrow">Fitur Lengkap</div>
+    <h2 class="section-h2">Semua yang kamu butuhkan</h2>
+    <p class="section-sub">Dari booking online sampai kasir walk-in — satu platform untuk kelola semua.</p>
+  </div>
+  <div class="features-grid">
+    <div class="feat-card"><div class="feat-ic"><svg viewBox="0 0 24 24"><path d="M8 2v3M16 2v3M3 8h18M5 4h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z"/></svg></div><div class="feat-title">Booking Online 24 Jam</div><div class="feat-desc">Customer booking kapan saja lewat link toko kamu. Pilih barberman, paket, dan slot waktu yang tersedia secara real-time.</div></div>
+    <div class="feat-card"><div class="feat-ic"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div><div class="feat-title">Kelola Barberman</div><div class="feat-desc">Tambah barberman, atur hari libur, dan pantau performa masing-masing — semuanya dari dashboard owner.</div></div>
+    <div class="feat-card"><div class="feat-ic"><svg viewBox="0 0 24 24"><path d="M9 7H6a2 2 0 00-2 2v9a2 2 0 002 2h9a2 2 0 002-2v-3M18 2l4 4-10 10H8v-4L18 2z"/></svg></div><div class="feat-title">Panel Kasir Walk-in</div><div class="feat-desc">Kelola antrian customer yang datang langsung. Lihat estimasi waktu tunggu dan tandai selesai dengan satu klik.</div></div>
+    <div class="feat-card"><div class="feat-ic"><svg viewBox="0 0 24 24"><path d="M12 6v6l4 2M22 12a10 10 0 11-20 0 10 10 0 0120 0z"/></svg></div><div class="feat-title">Smart Scheduling</div><div class="feat-desc">Slot otomatis diblokir berdasarkan durasi + buffer waktu setiap paket. Tidak ada lagi jadwal yang tabrakan.</div></div>
+    <div class="feat-card"><div class="feat-ic"><svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div><div class="feat-title">Dashboard & Ringkasan</div><div class="feat-desc">Lihat booking hari ini, pendapatan bulan ini, dan performa barberman dalam satu halaman yang bersih.</div></div>
+    <div class="feat-card"><div class="feat-ic"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div><div class="feat-title">Multi-Tenant</div><div class="feat-desc">Satu platform untuk banyak toko. Setiap toko punya data dan link booking sendiri yang terpisah sepenuhnya.</div></div>
+  </div>
+</section>
 
-    <!-- FITUR -->
-    <section id="fitur">
-        <div class="center">
-            <div class="section-eyebrow">Fitur Lengkap</div>
-            <h2 class="section-h2">Semua yang kamu butuhkan</h2>
-            <p class="section-sub">Dari booking online sampai kasir walk-in — satu platform untuk kelola semua.</p>
-        </div>
-        <div class="features-grid">
-            <div class="feat-card">
-                <div class="feat-ic">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M8 2v3M16 2v3M3 8h18M5 4h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z"/>
-                    </svg>
-                </div>
-                <div class="feat-title">Booking Online 24 Jam</div>
-                <div class="feat-desc">Customer booking kapan saja lewat link toko kamu. Pilih barberman, paket, dan slot waktu yang tersedia secara real-time.</div>
-            </div>
-            <div class="feat-card">
-                <div class="feat-ic">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
-                    </svg>
-                </div>
-                <div class="feat-title">Kelola Barberman</div>
-                <div class="feat-desc">Tambah barberman, atur hari libur, dan pantau performa masing-masing — semuanya dari dashboard owner.</div>
-            </div>
-            <div class="feat-card">
-                <div class="feat-ic">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M9 7H6a2 2 0 00-2 2v9a2 2 0 002 2h9a2 2 0 002-2v-3M18 2l4 4-10 10H8v-4L18 2z"/>
-                    </svg>
-                </div>
-                <div class="feat-title">Panel Kasir Walk-in</div>
-                <div class="feat-desc">Kelola antrian customer yang datang langsung. Lihat estimasi waktu tunggu dan tandai selesai dengan satu klik.</div>
-            </div>
-            <div class="feat-card">
-                <div class="feat-ic">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M12 6v6l4 2M22 12a10 10 0 11-20 0 10 10 0 0120 0z"/>
-                    </svg>
-                </div>
-                <div class="feat-title">Smart Scheduling</div>
-                <div class="feat-desc">Slot otomatis diblokir berdasarkan durasi + buffer waktu setiap paket. Tidak ada lagi jadwal yang tabrakan.</div>
-            </div>
-            <div class="feat-card">
-                <div class="feat-ic">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M18 20V10M12 20V4M6 20v-6"/>
-                    </svg>
-                </div>
-                <div class="feat-title">Dashboard & Ringkasan</div>
-                <div class="feat-desc">Lihat booking hari ini, pendapatan bulan ini, dan performa barberman dalam satu halaman yang bersih.</div>
-            </div>
-            <div class="feat-card">
-                <div class="feat-ic">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
-                    </svg>
-                </div>
-                <div class="feat-title">Multi-Tenant</div>
-                <div class="feat-desc">Satu platform untuk banyak toko. Setiap toko punya data dan link booking sendiri yang terpisah sepenuhnya.</div>
-            </div>
-        </div>
-    </section>
+<!-- CARA KERJA -->
+<section class="problem" id="cara-kerja">
+  <div class="center">
+    <div class="section-eyebrow">Cara Kerja</div>
+    <h2 class="section-h2">Setup dalam 5 menit</h2>
+    <p class="section-sub">Tidak perlu keahlian teknis. Daftar, isi data toko, dan langsung siap terima booking.</p>
+  </div>
+  <div class="how-steps">
+    <div class="how-step"><div class="how-num">1</div><div class="how-title">Daftar & Isi Data Toko</div><div class="how-desc">Buat akun owner, isi nama toko, jam buka, dan tambahkan barberman.</div></div>
+    <div class="how-step"><div class="how-num">2</div><div class="how-title">Tambah Paket Layanan</div><div class="how-desc">Buat paket (Basic, Premium, dll) lengkap dengan harga dan durasi pengerjaan.</div></div>
+    <div class="how-step"><div class="how-num">3</div><div class="how-title">Bagikan Link Booking</div><div class="how-desc">Copy link toko kamu dan bagikan ke customer lewat WhatsApp atau Instagram.</div></div>
+    <div class="how-step"><div class="how-num">4</div><div class="how-title">Kelola dari Dashboard</div><div class="how-desc">Terima notifikasi booking baru dan kelola antrian dari dashboard owner.</div></div>
+  </div>
+</section>
 
-    <!-- CARA KERJA -->
-    <section class="problem" id="cara-kerja">
-        <div class="center">
-            <div class="section-eyebrow">Cara Kerja</div>
-            <h2 class="section-h2">Setup dalam 5 menit</h2>
-            <p class="section-sub">Tidak perlu keahlian teknis. Daftar, isi data toko, dan langsung siap terima booking.</p>
-        </div>
-        <div class="how-steps">
-            <div class="how-step">
-                <div class="how-num">1</div>
-                <div class="how-title">Daftar & Isi Data Toko</div>
-                <div class="how-desc">Buat akun owner, isi nama toko, jam buka, dan tambahkan barberman.</div>
-            </div>
-            <div class="how-step">
-                <div class="how-num">2</div>
-                <div class="how-title">Tambah Paket Layanan</div>
-                <div class="how-desc">Buat paket (Basic, Premium, dll) lengkap dengan harga dan durasi pengerjaan.</div>
-            </div>
-            <div class="how-step">
-                <div class="how-num">3</div>
-                <div class="how-title">Bagikan Link Booking</div>
-                <div class="how-desc">Copy link toko kamu dan bagikan ke customer lewat WhatsApp atau Instagram.</div>
-            </div>
-            <div class="how-step">
-                <div class="how-num">4</div>
-                <div class="how-title">Kelola dari Dashboard</div>
-                <div class="how-desc">Terima notifikasi booking baru dan kelola antrian dari dashboard owner.</div>
-            </div>
-        </div>
-    </section>
+<!-- STATS -->
+<section>
+  <div class="center">
+    <div class="section-eyebrow">Kenapa CariCukur</div>
+    <h2 class="section-h2">Dibangun untuk barber shop Indonesia</h2>
+  </div>
+  <div class="stats-row">
+    <div class="stat-item"><div class="stat-num">5 mnt</div><div class="stat-lbl">Waktu setup dari daftar sampai siap terima booking</div></div>
+    <div class="stat-item"><div class="stat-num">0 Rp</div><div class="stat-lbl">Biaya untuk memulai — gratis selamanya untuk fitur dasar</div></div>
+    <div class="stat-item"><div class="stat-num">24/7</div><div class="stat-lbl">Customer bisa booking kapan saja tanpa harus hubungi toko</div></div>
+  </div>
+</section>
 
-    <!-- STATS -->
-    <section>
-        <div class="center">
-            <div class="section-eyebrow">Kenapa CariCukur</div>
-            <h2 class="section-h2">Dibangun untuk barber shop Indonesia</h2>
-        </div>
-        <div class="stats-row">
-            <div class="stat-item">
-                <div class="stat-num">5 mnt</div>
-                <div class="stat-lbl">Waktu setup dari daftar sampai siap terima booking</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-num">0 Rp</div>
-                <div class="stat-lbl">Biaya untuk memulai — gratis selamanya untuk fitur dasar</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-num">24/7</div>
-                <div class="stat-lbl">Customer bisa booking kapan saja tanpa harus hubungi toko</div>
-            </div>
-        </div>
-    </section>
+<!-- HARGA -->
+<section id="harga">
+  <div class="center">
+    <div class="section-eyebrow">Harga</div>
+    <h2 class="section-h2">Mulai gratis, upgrade kapan saja</h2>
+    <p class="section-sub">Tidak ada biaya tersembunyi. Semua fitur inti tersedia di paket gratis.</p>
+  </div>
+  <div class="pricing-grid">
+    <div class="price-card">
+      <div class="price-badge">Gratis</div>
+      <div class="price-name">Starter</div>
+      <div class="price-amount">Rp 0<span></span></div>
+      <div class="price-period">Selamanya gratis</div>
+      <ul class="price-features"><li>1 toko, barberman unlimited</li><li>Booking online 24 jam</li><li>Panel kasir walk-in</li><li>Dashboard & ringkasan</li><li>Kelola paket & harga</li><li class="off">Notifikasi WhatsApp otomatis</li><li class="off">Laporan & export Excel</li></ul>
+      <a href="auth.html" class="price-btn price-btn-outline">Mulai Gratis</a>
+    </div>
+    <div class="price-card featured">
+      <div class="price-badge">Segera Hadir</div>
+      <div class="price-name">Pro</div>
+      <div class="price-amount">Rp 99k<span>/bulan</span></div>
+      <div class="price-period">Per toko</div>
+      <ul class="price-features"><li>Semua fitur Starter</li><li>Notifikasi WhatsApp otomatis</li><li>Laporan & export Excel</li><li>TV antrian untuk layar toko</li><li>Review & rating customer</li><li>Prioritas support</li></ul>
+      <a href="#" class="price-btn price-btn-acc" style="opacity:.6;cursor:default;">Segera Tersedia</a>
+    </div>
+  </div>
+</section>
 
-    <!-- HARGA -->
-    <section id="harga">
-        <div class="center">
-            <div class="section-eyebrow">Harga</div>
-            <h2 class="section-h2">Mulai gratis, upgrade kapan saja</h2>
-            <p class="section-sub">Tidak ada biaya tersembunyi. Semua fitur inti tersedia di paket gratis.</p>
-        </div>
-        <div class="pricing-grid">
-            <div class="price-card">
-                <div class="price-badge">Gratis</div>
-                <div class="price-name">Starter</div>
-                <div class="price-amount">
-                    Rp 0
-                    <span></span>
-                </div>
-                <div class="price-period">Selamanya gratis</div>
-                <ul class="price-features">
-                    <li>1 toko, barberman unlimited</li>
-                    <li>Booking online 24 jam</li>
-                    <li>Panel kasir walk-in</li>
-                    <li>Dashboard & ringkasan</li>
-                    <li>Kelola paket & harga</li>
-                    <li class="off">Notifikasi WhatsApp otomatis</li>
-                    <li class="off">Laporan & export Excel</li>
-                </ul>
-                <a href="auth.html" class="price-btn price-btn-outline">Mulai Gratis</a>
-            </div>
-            <div class="price-card featured">
-                <div class="price-badge">Segera Hadir</div>
-                <div class="price-name">Pro</div>
-                <div class="price-amount">
-                    Rp 99k
-                    <span>/bulan</span>
-                </div>
-                <div class="price-period">Per toko</div>
-                <ul class="price-features">
-                    <li>Semua fitur Starter</li>
-                    <li>Notifikasi WhatsApp otomatis</li>
-                    <li>Laporan & export Excel</li>
-                    <li>TV antrian untuk layar toko</li>
-                    <li>Review & rating customer</li>
-                    <li>Prioritas support</li>
-                </ul>
-                <a href="#" class="price-btn price-btn-acc" style="opacity:.6;cursor:default;">Segera Tersedia</a>
-            </div>
-        </div>
-    </section>
+<!-- TESTIMONIAL -->
+<section style="background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="center">
+    <div class="section-eyebrow">Testimoni</div>
+    <h2 class="section-h2">Yang owner katakan</h2>
+  </div>
+  <div class="testi-grid">
+    <div class="testi-card"><div class="testi-stars">★★★★★</div><p class="testi-text">"Dulu booking via WA sering tabrakan jadwal. Sekarang customer langsung pilih slot sendiri, saya tinggal lihat dashboard."</p><div class="testi-author"><div class="testi-av">V</div><div><div class="testi-name">Vin</div><div class="testi-role">Owner · Vin Barber Sigli</div></div></div></div>
+    <div class="testi-card"><div class="testi-stars">★★★★★</div><p class="testi-text">"Panel kasir walk-in sangat membantu. Barberman jadi tahu urutan antrian tanpa perlu tanya-tanya ke kasir terus."</p><div class="testi-author"><div class="testi-av">R</div><div><div class="testi-name">Rizal</div><div class="testi-role">Owner · Prime Cut Banda Aceh</div></div></div></div>
+    <div class="testi-card"><div class="testi-stars">★★★★★</div><p class="testi-text">"Setup cuma 10 menit, langsung bisa kirim link booking ke Instagram. Customer senang karena bisa booking malam hari."</p><div class="testi-author"><div class="testi-av">A</div><div><div class="testi-name">Arif</div><div class="testi-role">Owner · Kings Barbershop</div></div></div></div>
+  </div>
+</section>
 
-    <!-- TESTIMONIAL -->
-    <section style="background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
-        <div class="center">
-            <div class="section-eyebrow">Testimoni</div>
-            <h2 class="section-h2">Yang owner katakan</h2>
-        </div>
-        <div class="testi-grid">
-            <div class="testi-card">
-                <div class="testi-stars">★★★★★</div>
-                <p class="testi-text">"Dulu booking via WA sering tabrakan jadwal. Sekarang customer langsung pilih slot sendiri, saya tinggal lihat dashboard."</p>
-                <div class="testi-author">
-                    <div class="testi-av">V</div>
-                    <div>
-                        <div class="testi-name">Vin</div>
-                        <div class="testi-role">Owner · Vin Barber Sigli</div>
-                    </div>
-                </div>
-            </div>
-            <div class="testi-card">
-                <div class="testi-stars">★★★★★</div>
-                <p class="testi-text">"Panel kasir walk-in sangat membantu. Barberman jadi tahu urutan antrian tanpa perlu tanya-tanya ke kasir terus."</p>
-                <div class="testi-author">
-                    <div class="testi-av">R</div>
-                    <div>
-                        <div class="testi-name">Rizal</div>
-                        <div class="testi-role">Owner · Prime Cut Banda Aceh</div>
-                    </div>
-                </div>
-            </div>
-            <div class="testi-card">
-                <div class="testi-stars">★★★★★</div>
-                <p class="testi-text">"Setup cuma 10 menit, langsung bisa kirim link booking ke Instagram. Customer senang karena bisa booking malam hari."</p>
-                <div class="testi-author">
-                    <div class="testi-av">A</div>
-                    <div>
-                        <div class="testi-name">Arif</div>
-                        <div class="testi-role">Owner · Kings Barbershop</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+<!-- CTA AKHIR -->
+<section class="cta-section">
+  <div class="comb-rule" style="margin-left:auto;margin-right:auto;"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="section-eyebrow center">Mulai Sekarang</div>
+  <h2>Siap terima booking<br>lebih rapi?</h2>
+  <p>Daftar gratis dalam 5 menit. Tidak perlu kartu kredit, tidak perlu keahlian teknis.</p>
+  <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+    <a href="auth.html" class="btn-hero">Daftar Gratis Sekarang →</a>
+    <a href="booking.html?store=vinbarber-sigli" class="btn-ghost" target="_blank">Lihat Demo Booking</a>
+  </div>
+</section>
 
-    <!-- CTA AKHIR -->
-    <section class="cta-section">
-        <div class="comb-rule" style="margin-left:auto;margin-right:auto;">
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-        <div class="section-eyebrow center">Mulai Sekarang</div>
-        <h2>
-            Siap terima booking
-            <br>
-            lebih rapi?
-        </h2>
-        <p>Daftar gratis dalam 5 menit. Tidak perlu kartu kredit, tidak perlu keahlian teknis.</p>
-        <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
-            <a href="auth.html" class="btn-hero">Daftar Gratis Sekarang →</a>
-            <a href="booking.html?store=vinbarber-sigli" class="btn-ghost" target="_blank">Lihat Demo Booking</a>
-        </div>
-    </section>
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Cari<span>Cukur</span></div>
+  <div class="footer-links"><a href="#fitur">Fitur</a><a href="#cara-kerja">Cara Kerja</a><a href="#harga">Harga</a><a href="auth.html">Login Owner</a></div>
+  <div class="footer-copy">© 2026 CariCukur. Platform booking barber shop Indonesia.</div>
+</footer>
 
-    <!-- FOOTER -->
-    <footer>
-        <div class="footer-logo">
-            Cari
-            <span>Cukur</span>
-        </div>
-        <div class="footer-links">
-            <a href="#fitur">Fitur</a>
-            <a href="#cara-kerja">Cara Kerja</a>
-            <a href="#harga">Harga</a>
-            <a href="auth.html">Login Owner</a>
-        </div>
-        <div class="footer-copy">© 2026 CariCukur. Platform booking barber shop Indonesia.</div>
-    </footer>
-
-    <script>
-    window.addEventListener('scroll', () => {
-        document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 20);
-    });
-    document.querySelectorAll('a[href^="#"]').forEach(a => {
-        a.addEventListener('click', e => {
-            const target = document.querySelector(a.getAttribute('href'));
-            if (target) {
-                e.preventDefault();
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        });
-    });
-    </script>
+<script>
+window.addEventListener('scroll', () => {
+  document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 20);
+});
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) { e.preventDefault(); target.scrollIntoView({behavior:'smooth', block:'start'}); }
+  });
+});
+</script>
 </body>
 </html>
