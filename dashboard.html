@@ -28,19 +28,21 @@
     }
 
     :root {
-        --gold:#0E6B4F;
-        --gold-l:#12805F;
+        --gold:#0B8F5C;
+        --gold-l:#12A874;
         --gold-d:rgba(14,107,79,0.07);
         --gold-b:rgba(14,107,79,0.28);
-        --bg:#F7F7F4;
+        --gold-l:#12A874;
+        --ink-side:#12211C;
+        --bg:#EFEDE5;
         --bg2:#FFFFFF;
         --bg3:#F2F1EC;
         --bg4:#EAE8E0;
         --t:#14181B;
-        --t2:rgba(20,24,27,0.62);
-        --t3:rgba(20,24,27,0.4);
+        --t2:rgba(20,24,27,0.72);
+        --t3:rgba(20,24,27,0.58);
         --t4:rgba(20,24,27,0.12);
-        --b:rgba(20,24,27,0.1);
+        --b:rgba(20,24,27,0.14);
         --b2:rgba(20,24,27,0.16);
         --gr:#2F8F5B;
         --grd: rgba(74, 222, 128, 0.1);
@@ -229,8 +231,8 @@
     }
 
     .side {
-        background: var(--bg2);
-        border-right: .5px solid var(--b);
+        background: var(--ink-side);
+        border-right: none;
         padding: 18px 0;
     }
 
@@ -240,21 +242,21 @@
         gap: 10px;
         padding: 11px 20px;
         font-size: 13px;
-        color: var(--t3);
+        color: rgba(240,242,238,.55);
         cursor: pointer;
         border-left: 2px solid transparent;
         transition: all .15s;
     }
 
     .snav:hover {
-        color: var(--t2);
-        background: rgba(245, 245, 240, .02);
+        color: rgba(240,242,238,.85);
+        background: rgba(255,255,255,.04);
     }
 
     .snav.active {
-        color: var(--gold);
-        border-left-color: var(--gold);
-        background: rgba(201, 168, 76, .04);
+        color: #fff;
+        border-left-color: var(--gold-l);
+        background: rgba(255,255,255,.06);
     }
 
     .snav i {
@@ -266,7 +268,7 @@
         font-size: 9px;
         letter-spacing: .15em;
         text-transform: uppercase;
-        color: var(--t4);
+        color: rgba(240,242,238,.3);
         padding: 16px 20px 8px;
     }
 
@@ -281,10 +283,11 @@
     }
 
     .stat {
-        background: var(--bg3);
+        background: var(--bg2);
         border: .5px solid var(--b);
         border-radius: var(--rl);
         padding: 14px 16px;
+        box-shadow: 0 1px 3px rgba(20,24,27,.05), 0 8px 20px rgba(20,24,27,.04);
     }
 
     .stat-lbl {
@@ -307,10 +310,11 @@
         margin-top: 5px;
     }/* ===== CARD ===== */
     .card {
-        background: var(--bg3);
+        background: var(--bg2);
         border: .5px solid var(--b);
         border-radius: var(--rl);
         padding: 18px 20px;
+        box-shadow: 0 1px 3px rgba(20,24,27,.05), 0 8px 20px rgba(20,24,27,.04);
     }/* ===== TABS (filter status) ===== */
     .filter-row {
         display: flex;
@@ -2280,6 +2284,7 @@
             b.id}')"><i class="ti ti-eye" style="font-size:14px;"></i></button>
             <button class="act-btn" title="Ubah status" onclick="openStatusModal('${b.id}')"><i class="ti ti-edit" style="font-size:14px;"></i></button>
             <button class="act-btn" title="Kirim WA" onclick="kirimWA('${b.id}')" style="background:rgba(74,222,128,.08);border-color:rgba(74,222,128,.25);color:#4ade80;"><i class="ti ti-brand-whatsapp" style="font-size:14px;"></i></button>
+            ${b.status === 'done' ? `<button class="act-btn" title="Kirim Link Ulasan" onclick="kirimReviewWA('${b.id}')" style="background:rgba(184,117,46,.08);border-color:rgba(184,117,46,.25);color:#B8752E;"><i class="ti ti-star" style="font-size:14px;"></i></button>` : ''}
           </div>
         </td>
       </tr>`
@@ -2395,6 +2400,27 @@
         }
         window.open(`https://wa.me/${phone}?text=${encodeURIComponent(pesan)}`, '_blank');
     }
+
+    function kirimReviewWA(id) {
+        const b = STATE.bookings.find(x => x.id === id);
+        if (!b) return;
+        if (b.status !== 'done') {
+            showToast('Booking ini belum berstatus Selesai', 'warn');
+            return;
+        }
+        const toko = STATE.store?.name || 'Toko Kami';
+        const nama = b.customer_name || 'Pelanggan';
+        const kode = b.booking_code || '';
+        const phone = (b.customer_phone || '').replace(/[^0-9]/g, '').replace(/^0/, '62');
+        const link = window.location.origin + '/review.html?booking=' + encodeURIComponent(kode);
+
+        const pesan = `Halo ${nama} 👋\n\nTerima kasih sudah booking di *${toko}*! Kalau berkenan, boleh kasih ulasan singkat lewat link ini:\n\n${link}\n\nUlasan kamu sangat membantu kami dan customer lain 🙏`;
+
+        if (!phone) {
+            showToast('Nomor WhatsApp customer tidak tersedia', 'warn');
+            return;
+        }
+        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(pesan)}`, '_blank');
     async function confirmStatusChange() {
         const id = STATE.statusTarget;
         const newStatus = document.getElementById('newStatusSelect').value;
