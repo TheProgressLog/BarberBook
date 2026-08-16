@@ -2421,6 +2421,8 @@
             return;
         }
         window.open(`https://wa.me/${phone}?text=${encodeURIComponent(pesan)}`, '_blank');
+    }
+
     async function confirmStatusChange() {
         const id = STATE.statusTarget;
         const newStatus = document.getElementById('newStatusSelect').value;
