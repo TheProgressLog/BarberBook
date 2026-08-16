@@ -31,19 +31,19 @@
     }
 
     :root {
-        --gold:#0E6B4F;
-        --gold-l:#12805F;
+        --gold:#0B8F5C;
+        --gold-l:#12A874;
         --gold-d:rgba(14,107,79,0.07);
         --gold-b:rgba(14,107,79,0.28);
-        --bg:#F7F7F4;
+        --bg:#EFEDE5;
         --bg2:#FFFFFF;
         --bg3:#F2F1EC;
         --bg4:#EAE8E0;
         --t:#14181B;
-        --t2:rgba(20,24,27,0.62);
-        --t3:rgba(20,24,27,0.4);
+        --t2:rgba(20,24,27,0.72);
+        --t3:rgba(20,24,27,0.58);
         --t4:rgba(20,24,27,0.12);
-        --b:rgba(20,24,27,0.1);
+        --b:rgba(20,24,27,0.14);
         --b2:rgba(20,24,27,0.16);
         --gr:#2F8F5B;
         --grd: rgba(74, 222, 128, 0.1);
@@ -1596,7 +1596,7 @@
         try {
             const {data} = await sb.from('bookings').select('start_time,end_time')
             .eq('barber_id', STATE.barber.id).eq('booking_date', STATE.date)
-            .in('status', ['pending', 'confirmed', 'active']);
+            .in('status', ['pending', 'confirmed', 'active', 'waiting']);
             STATE.existingBookings = data || [];
             renderSlots();
         } catch (e) {
@@ -1823,7 +1823,7 @@
             // Re-cek slot masih kosong
             const {data: recheck} = await sb.from('bookings').select('start_time,end_time')
             .eq('barber_id', STATE.barber.id).eq('booking_date', STATE.date)
-            .in('status', ['pending', 'confirmed', 'active']);
+            .in('status', ['pending', 'confirmed', 'active', 'waiting']);
             const totalNeeded = STATE.pkg.duration_min + STATE.pkg.buffer_min;
             const startM = s2m(STATE.time);
             const stillFree = !(recheck || []).some(b => {
