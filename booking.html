@@ -1181,6 +1181,14 @@
         const p = t.split(':');
         return parseInt(p[0]) * 60 + parseInt(p[1]);
     }
+    // Format tanggal pakai waktu LOKAL (bukan toISOString yang geser ke UTC
+    // dan bisa salah 1 hari kalau diakses jam 00:00-06:59 WIB)
+    function localDateStr(d) {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+    }
     function m2s(m) {
         return pad(Math.floor(m / 60)) + ':' + pad(m % 60);
     }
@@ -1553,7 +1561,7 @@
         for (let i = 0; i < 14; i++) {
             const d = new Date(today);
             d.setDate(today.getDate() + i);
-            const dateStr = d.toISOString().slice(0, 10);
+            const dateStr = localDateStr(d);
             const dow = d.getDay();
             const storeOpen=STATE.storeHours.find(h => h.day_of_week === dow)?.is_open;
             const barberOff = (STATE.daysOff[STATE.barber.id] || []).includes(dow);
@@ -1573,7 +1581,7 @@
                 const storeOpen=STATE.storeHours.find(h => h.day_of_week === dow)?.is_open;
                 const barberOff = (STATE.daysOff[STATE.barber.id] || []).includes(dow);
                 if (storeOpen && !barberOff) {
-                    pickDate(d.toISOString().slice(0, 10));
+                    pickDate(localDateStr(d));
                     return;
                 }
             }
@@ -1594,7 +1602,7 @@
         const grid = document.getElementById('slotsGrid');
         grid.innerHTML = '<div class="skel" style="height:38px;grid-column:1/-1;"></div>';
         try {
-            const {data} = await sb.from('bookings').select('start_time,end_time')
+            const {data} = await sb.from('public_booking_slots').select('start_time,end_time')
             .eq('barber_id', STATE.barber.id).eq('booking_date', STATE.date)
             .in('status', ['pending', 'confirmed', 'active', 'waiting']);
             STATE.existingBookings = data || [];
@@ -1624,7 +1632,7 @@
         });
 
         const now = new Date();
-        const isToday = STATE.date === now.toISOString().slice(0, 10);
+        const isToday = STATE.date === localDateStr(now);
         const nowMin = now.getHours() * 60 + now.getMinutes();
 
         let html = '';
@@ -1821,7 +1829,7 @@
             const dpAmount = dpPct > 0 ? Math.round(price * dpPct / 100) : 0;
 
             // Re-cek slot masih kosong
-            const {data: recheck} = await sb.from('bookings').select('start_time,end_time')
+            const {data: recheck} = await sb.from('public_booking_slots').select('start_time,end_time')
             .eq('barber_id', STATE.barber.id).eq('booking_date', STATE.date)
             .in('status', ['pending', 'confirmed', 'active', 'waiting']);
             const totalNeeded = STATE.pkg.duration_min + STATE.pkg.buffer_min;
