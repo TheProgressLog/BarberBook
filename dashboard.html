@@ -1705,6 +1705,18 @@
     function fmtRp(n) {
         return 'Rp ' + Math.round(n || 0).toLocaleString('id-ID');
     }
+    function localDateStr(d) {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+    }
+    function showSubscriptionWarning() {
+        const bar = document.createElement('div');
+        bar.style.cssText = 'background:#C23B2E;color:#fff;padding:10px 20px;text-align:center;font-size:13px;font-weight:600;position:sticky;top:0;z-index:200;';
+        bar.innerHTML = '⚠️ Langganan toko ini sudah berakhir. Beberapa fitur mungkin dibatasi — hubungi admin untuk perpanjang.';
+        document.body.prepend(bar);
+    }
     function fmtDate(dateStr) {
         if (!dateStr)
             return '—';
@@ -1797,6 +1809,9 @@
             }
 
             STATE.store = store;
+            if (store.subscription_status === 'expired') {
+                showSubscriptionWarning();
+            }
             document.getElementById('loadingGuard').classList.add('hidden');
             document.getElementById('app').classList.remove('hidden');
             initApp();
@@ -1902,13 +1917,13 @@
             return;
 
         const today = new Date();
-        const todayStr = today.toISOString().slice(0, 10);
+        const todayStr = localDateStr(today);
         const thisMonth = today.toISOString().slice(0, 7);
 
         // Ambil semua booking bulan ini + 7 hari terakhir sekaligus
         const startOf7Days = new Date(today);
         startOf7Days.setDate(today.getDate() - 6);
-        const startStr = startOf7Days.toISOString().slice(0, 10);
+        const startStr = localDateStr(startOf7Days);
 
         try {
             const {data: bookings} = await sb.from('bookings')
@@ -1948,12 +1963,12 @@
     }
 
     function renderBarChart(bookings, today) {
-        const todayStr = today.toISOString().slice(0, 10);
+        const todayStr = localDateStr(today);
         const days = [];
         for (let i = 6; i >= 0; i--) {
             const d = new Date(today);
             d.setDate(today.getDate() - i);
-            const dateStr = d.toISOString().slice(0, 10);
+            const dateStr = localDateStr(d);
             const count = bookings.filter(b => b.booking_date === dateStr).length;
             days.push({
                 dateStr,
@@ -2163,7 +2178,7 @@
     // STATS
     // ============================================================
     function updateStats() {
-        const today = new Date().toISOString().slice(0, 10);
+        const today = localDateStr(new Date());
         const thisMonth = new Date().toISOString().slice(0, 7);
 
         const todayCount = STATE.bookings.filter(b => b.booking_date === today).length;
