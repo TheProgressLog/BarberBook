@@ -28,19 +28,19 @@
     }
 
     :root {
-        --gold:#0E6B4F;
-        --gold-l:#12805F;
+        --gold:#0B8F5C;
+        --gold-l:#12A874;
         --gold-d:rgba(14,107,79,0.07);
         --gold-b:rgba(14,107,79,0.28);
-        --bg:#F7F7F4;
+        --bg:#EFEDE5;
         --bg2:#FFFFFF;
         --bg3:#F2F1EC;
         --bg4:#EAE8E0;
         --t:#14181B;
-        --t2:rgba(20,24,27,0.62);
-        --t3:rgba(20,24,27,0.4);
+        --t2:rgba(20,24,27,0.72);
+        --t3:rgba(20,24,27,0.58);
         --t4:rgba(20,24,27,0.12);
-        --b:rgba(20,24,27,0.1);
+        --b:rgba(20,24,27,0.14);
         --b2:rgba(20,24,27,0.16);
         --gr:#2F8F5B;
         --grd: rgba(74, 222, 128, 0.1);
@@ -261,10 +261,11 @@
     }
 
     .stat {
-        background: var(--bg3);
+        background: var(--bg2);
         border: .5px solid var(--b);
         border-radius: var(--rl);
         padding: 14px 16px;
+        box-shadow: 0 1px 3px rgba(20,24,27,.05), 0 8px 20px rgba(20,24,27,.04);
     }
 
     .stat-lbl {
@@ -294,11 +295,12 @@
         border-radius: 6px;
     }/* CARDS */
     .card {
-        background: var(--bg3);
+        background: var(--bg2);
         border: .5px solid var(--b);
         border-radius: var(--rl);
         padding: 18px 20px;
         margin-bottom: 14px;
+        box-shadow: 0 1px 3px rgba(20,24,27,.05), 0 8px 20px rgba(20,24,27,.04);
     }
 
     .card-title {
@@ -816,6 +818,10 @@
     function fmtRp(n) {
         return 'Rp ' + Math.round(n || 0).toLocaleString('id-ID');
     }
+    function localDateStr(d) {
+        const y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, '0'), day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+    }
     function fmtDate(s) {
         if (!s)
             return '—';
@@ -912,7 +918,7 @@
         el?.classList.add('active');
 
         const today = new Date();
-        const fmt = d => d.toISOString().slice(0, 10);
+        const fmt = d => localDateStr(d);
 
         let from,
             to = fmt(today);
@@ -933,6 +939,7 @@
 
         document.getElementById('dateFrom').value = from;
         document.getElementById('dateTo').value = to;
+        loadData();
     }
 
     // ============================================================
@@ -1031,7 +1038,7 @@
     // ============================================================
     function renderDailyChart(bk, from, to) {
         const el = document.getElementById('dailyChart');
-        const todayStr = new Date().toISOString().slice(0, 10);
+        const todayStr = localDateStr(new Date());
 
         // Buat map tanggal
         const dateMap = {};
@@ -1069,7 +1076,7 @@
             for (let i = 0; i < diff; i++) {
                 const d = new Date(start);
                 d.setDate(start.getDate() + i);
-                dateMap[d.toISOString().slice(0, 10)] = 0;
+                dateMap[localDateStr(d)] = 0;
             }
             bk.forEach(b => {
                 if (b.booking_date && dateMap[b.booking_date] !== undefined)
