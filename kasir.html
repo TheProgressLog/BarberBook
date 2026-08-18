@@ -346,6 +346,7 @@ function fmtRp(n){ return 'Rp '+Math.round(n||0).toLocaleString('id-ID'); }
 function pad(n){ return n<10?'0'+n:''+n; }
 function fmtT(d){ return pad(d.getHours())+':'+pad(d.getMinutes()); }
 function addMin(d,m){ return new Date(d.getTime()+m*60000); }
+function localDateStr(d){ const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0'); return `${y}-${m}-${day}`; }
 function avatarColor(str){
   let h=0; for(let i=0;i<(str||'').length;i++) h=str.charCodeAt(i)+((h<<5)-h);
   return AVATAR_COLORS[Math.abs(h)%AVATAR_COLORS.length];
@@ -441,7 +442,7 @@ async function loadStoreData(){
 // INIT ANTRIAN — cek booking aktif hari ini dari Supabase
 // ============================================================
 async function initQueues(){
-  const today = new Date().toISOString().slice(0,10);
+  const today = localDateStr(new Date());
   try {
     const { data,error } = await sb.from('bookings')
       .select('id,booking_code,customer_name,customer_phone,customer_note,start_time,end_time,status,barber_id,package_id,total_price,type')
@@ -661,7 +662,7 @@ async function confirmWalkin(){
     const eta=getEta(barberId);
     const startAt=eta.wait===0?new Date():eta.start;
     const status=eta.wait===0?'active':'waiting';
-    const today=new Date().toISOString().slice(0,10);
+    const today=localDateStr(new Date());
     const endTime=addMin(startAt,pkg?.duration_min||30);
 
     // Simpan ke Supabase sebagai booking dengan tipe walkin
@@ -793,7 +794,7 @@ function confirmExtend(){
 // RIWAYAT
 // ============================================================
 async function loadRiwayat(){
-  const today=new Date().toISOString().slice(0,10);
+  const today=localDateStr(new Date());
   try {
     const { data } = await sb.from('bookings')
       .select('customer_name,total_price,type,done_at,barbers(name),packages(name)')
@@ -897,7 +898,7 @@ function setupRealtime(){
       (payload)=>{
         const bk=payload.new;
         // Kalau booking online baru masuk untuk hari ini & barberman ada di antrian kita, kasih tahu
-        const today=new Date().toISOString().slice(0,10);
+        const today=localDateStr(new Date());
         if(bk.booking_date===today&&bk.type==='online'){
           const barber=STATE.barbers.find(b=>b.id===bk.barber_id);
           const pkg=STATE.packages.find(p=>p.id===bk.package_id);
