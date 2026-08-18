@@ -113,17 +113,18 @@ function renderVerify() {
   document.getElementById('phoneVerify').focus();
 }
 
-function checkPhone() {
+async function checkPhone() {
   const input = document.getElementById('phoneVerify').value.trim();
   const errEl = document.getElementById('errMsg');
-  const actualLast4 = (BOOKING.customer_phone || '').replace(/[^0-9]/g, '').slice(-4);
 
   if (input.length !== 4) {
     errEl.textContent = 'Masukkan 4 digit angka.';
     errEl.style.display = 'block';
     return;
   }
-  if (input !== actualLast4) {
+
+  const { data: ok } = await sb.rpc('verify_booking_phone', { p_code: BOOKING.booking_code, p_last4: input });
+  if (!ok) {
     errEl.textContent = 'Nomor tidak cocok dengan data booking ini.';
     errEl.style.display = 'block';
     return;
@@ -218,10 +219,10 @@ async function init() {
     return;
   }
 
-  const { data: booking, error } = await sb.from('bookings')
-    .select('id, booking_code, customer_name, customer_phone, booking_date, status, store_id, barber_id, stores(name), barbers(name)')
-    .eq('booking_code', code)
-    .maybeSingle();
+  const { data: rows, error } = await sb.rpc('get_booking_for_review', { p_code: code });
+  const booking = rows && rows[0]
+    ? { ...rows[0], stores: { name: rows[0].store_name }, barbers: rows[0].barber_name ? { name: rows[0].barber_name } : null }
+    : null;
 
   if (error || !booking) {
     showState('❓', 'Booking tidak ditemukan. Cek kembali link yang kamu terima.');
