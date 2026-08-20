@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panduan Penggunaan — CariCukur</title>
+<meta name="description" content="Panduan lengkap penggunaan CariCukur untuk owner barbershop.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500;0,600;1,500;1,600&family=Manrope:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--ink);line-height:1.65;}
+
+:root{
+  --bg:#EFEDE5; --bg2:#FFFFFF; --bg3:#F2F1EC;
+  --ink:#14181B; --ink2:rgba(20,24,27,.72); --ink3:rgba(20,24,27,.58);
+  --line:rgba(20,24,27,.14);
+  --acc:#0B8F5C; --acc-d:rgba(11,143,92,.08); --acc-b:rgba(11,143,92,.3); --acc-l:#12A874;
+  --gold:#B8752E;
+  --r:8px; --rl:14px;
+}
+h1,h2,h3{font-family:'Newsreader',serif;font-weight:600;}
+
+/* ===== LAYOUT ===== */
+.wrap{display:grid;grid-template-columns:260px 1fr;max-width:1100px;margin:0 auto;}
+
+/* ===== SIDEBAR (table of contents) ===== */
+.toc{position:sticky;top:0;height:100vh;overflow-y:auto;background:var(--bg2);border-right:1px solid var(--line);padding:28px 20px;}
+.toc-logo{display:flex;align-items:center;gap:8px;font-family:'Newsreader',serif;font-weight:600;font-size:18px;margin-bottom:4px;text-decoration:none;color:var(--ink);}
+.toc-logo span{color:var(--acc);}
+.toc-tagline{font-size:10px;letter-spacing:.08em;color:var(--ink3);text-transform:uppercase;margin-bottom:28px;font-weight:700;}
+.toc a{display:block;font-size:13px;color:var(--ink2);text-decoration:none;padding:7px 10px;border-radius:6px;margin-bottom:2px;transition:all .15s;}
+.toc a:hover{background:var(--acc-d);color:var(--acc);}
+.toc a.sub{padding-left:22px;font-size:12.5px;color:var(--ink3);}
+
+/* ===== CONTENT ===== */
+.content{padding:48px 56px 100px;max-width:720px;}
+.cover{padding-bottom:40px;margin-bottom:40px;border-bottom:1px solid var(--line);}
+.cover-logo{font-family:'Newsreader',serif;font-weight:600;font-size:42px;margin-bottom:6px;}
+.cover-logo span{color:var(--acc);}
+.cover-tagline{font-size:12px;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;font-weight:700;margin-bottom:24px;}
+.cover-title{font-size:22px;color:var(--ink2);font-style:italic;font-family:'Newsreader',serif;}
+.cover-version{font-size:12px;color:var(--ink3);margin-top:10px;}
+
+section{margin-bottom:52px;scroll-margin-top:24px;}
+h2{font-size:26px;color:var(--acc);border-bottom:2px solid var(--acc);padding-bottom:10px;margin-bottom:20px;}
+h3{font-size:18px;color:var(--ink);margin:26px 0 12px;}
+p{font-size:15px;color:var(--ink2);margin-bottom:14px;}
+ul,ol{margin:0 0 16px 20px;}
+li{font-size:15px;color:var(--ink2);margin-bottom:8px;}
+ol li{margin-bottom:10px;}
+code{background:var(--bg3);padding:2px 7px;border-radius:4px;font-family:'Space Mono',monospace;font-size:13px;color:var(--acc);}
+
+.tip{background:var(--acc-d);border-left:4px solid var(--acc);border-radius:6px;padding:14px 18px;margin:16px 0 22px;font-size:14px;color:var(--ink2);}
+.tip b{color:var(--acc);text-transform:uppercase;font-size:11px;letter-spacing:.05em;}
+
+table{width:100%;border-collapse:collapse;margin:16px 0 24px;font-size:14px;}
+th{background:var(--acc);color:#fff;text-align:left;padding:10px 14px;font-weight:700;}
+td{padding:10px 14px;border-bottom:1px solid var(--line);color:var(--ink2);}
+tr:nth-child(even) td{background:var(--bg3);}
+
+.faq-q{font-weight:700;color:var(--ink);font-size:15px;margin-top:20px;margin-bottom:6px;}
+
+.closing{text-align:center;font-style:italic;color:var(--ink3);margin-top:60px;padding-top:30px;border-top:1px solid var(--line);}
+
+@media(max-width:800px){
+  .wrap{grid-template-columns:1fr;}
+  .toc{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);}
+  .content{padding:32px 20px 80px;}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav class="toc">
+    <a href="index.html" class="toc-logo">Cari<span>Cukur</span></a>
+    <div class="toc-tagline">Booking Rapi, Tanpa Ribet</div>
+    <a href="#selamat-datang">1. Selamat Datang</a>
+    <a href="#setup-awal">2. Memulai — Setup Awal</a>
+    <a href="#setup-awal-akun" class="sub">2.1 Membuat Akun</a>
+    <a href="#setup-awal-profil" class="sub">2.2 Profil Toko</a>
+    <a href="#setup-awal-barberman" class="sub">2.3 Barberman</a>
+    <a href="#setup-awal-paket" class="sub">2.4 Paket & Harga</a>
+    <a href="#dashboard">3. Mengenal Dashboard</a>
+    <a href="#kasir">4. Panel Kasir</a>
+    <a href="#link-booking">5. Bagikan Link Booking</a>
+    <a href="#ulasan">6. Meminta Ulasan</a>
+    <a href="#laporan">7. Laporan & Export</a>
+    <a href="#tv-antrian">8. TV Antrian</a>
+    <a href="#direktori">9. Direktori Publik</a>
+    <a href="#faq">10. Tanya Jawab</a>
+    <a href="#bantuan">11. Butuh Bantuan?</a>
+  </nav>
+
+  <main class="content">
+    <div class="cover">
+      <div class="cover-logo">Cari<span>Cukur</span></div>
+      <div class="cover-tagline">Booking Rapi, Tanpa Ribet</div>
+      <div class="cover-title">Panduan Penggunaan untuk Owner Barbershop</div>
+      <div class="cover-version">Versi 1.0 — Agustus 2026</div>
+    </div>
+
+    <section id="selamat-datang">
+      <h2>1. Selamat Datang di CariCukur</h2>
+      <p>CariCukur adalah platform untuk membantu barbershop Anda mengelola booking online, antrian walk-in, barberman, dan laporan pendapatan — semuanya dari satu dashboard yang sederhana.</p>
+      <p>Dengan CariCukur, Anda bisa:</p>
+      <ul>
+        <li>Menerima booking online 24 jam lewat link toko sendiri</li>
+        <li>Mengelola antrian customer yang datang langsung (walk-in)</li>
+        <li>Memantau performa tiap barberman</li>
+        <li>Melihat laporan pendapatan harian, bulanan, atau tahunan</li>
+        <li>Ditemukan customer baru lewat direktori pencarian barbershop</li>
+      </ul>
+      <p>Panduan ini menjelaskan setiap fitur langkah demi langkah, supaya Anda bisa langsung mulai memakainya tanpa kebingungan.</p>
+    </section>
+
+    <section id="setup-awal">
+      <h2>2. Memulai — Daftar &amp; Setup Awal</h2>
+
+      <h3 id="setup-awal-akun">2.1 Membuat Akun</h3>
+      <ol>
+        <li>Buka halaman <code>auth.html</code> (link daftar dari CariCukur).</li>
+        <li>Isi email dan password, klik "Daftar".</li>
+        <li>Anda akan otomatis masuk ke Dashboard setelah daftar berhasil.</li>
+      </ol>
+
+      <h3 id="setup-awal-profil">2.2 Mengisi Profil Toko</h3>
+      <p>Langkah ini penting dilakukan pertama kali, karena customer tidak bisa booking kalau profil toko belum lengkap.</p>
+      <ol>
+        <li>Buka menu "Profil Toko" di sidebar dashboard.</li>
+        <li>Isi nama toko, alamat, kota, dan nomor WhatsApp toko.</li>
+        <li>Atur jam buka untuk tiap hari (Senin–Minggu).</li>
+        <li>Atur persentase DP (uang muka) yang wajib dibayar customer saat booking online — umumnya 20–30%.</li>
+        <li>Simpan perubahan.</li>
+      </ol>
+      <div class="tip"><b>Tips</b> — Nama toko dan alamat yang Anda isi di sini akan tampil di halaman pencarian publik (direktori). Pastikan diisi dengan benar dan menarik.</div>
+
+      <h3 id="setup-awal-barberman">2.3 Menambah Barberman</h3>
+      <ol>
+        <li>Buka menu "Barberman" di sidebar.</li>
+        <li>Klik "Tambah Barberman", isi nama.</li>
+        <li>Ulangi untuk semua barberman yang bekerja di toko Anda.</li>
+      </ol>
+
+      <h3 id="setup-awal-paket">2.4 Menambah Paket &amp; Harga</h3>
+      <ol>
+        <li>Buka menu "Paket & Harga".</li>
+        <li>Klik "Tambah Paket" — isi nama paket (misal: Basic, Premium, Exclusive), harga, dan durasi pengerjaan.</li>
+        <li>Paket dengan waktu pengerjaan lebih lama sebaiknya diberi buffer (jeda) beberapa menit, supaya jadwal berikutnya tidak mepet.</li>
+      </ol>
+      <div class="tip"><b>Tips</b> — Tandai satu paket sebagai "Terpopuler" untuk menonjolkannya ke customer saat booking online.</div>
+    </section>
+
+    <section id="dashboard">
+      <h2>3. Mengenal Dashboard</h2>
+      <p>Dashboard adalah halaman utama yang muncul setiap kali Anda login. Di sini Anda bisa melihat ringkasan bisnis dan mengelola semua booking.</p>
+
+      <h3>3.1 Kartu Ringkasan</h3>
+      <ul>
+        <li><strong>Booking Hari Ini</strong> — jumlah booking untuk hari ini</li>
+        <li><strong>Menunggu Konfirmasi</strong> — booking online yang belum Anda konfirmasi</li>
+        <li><strong>Selesai Bulan Ini</strong> — total layanan yang sudah selesai bulan berjalan</li>
+        <li><strong>Pendapatan Bulan Ini</strong> — total omzet dari booking yang sudah selesai</li>
+      </ul>
+
+      <h3>3.2 Kelola Booking</h3>
+      <p>Tabel ini menampilkan semua booking, bisa difilter berdasarkan status atau dicari berdasarkan nama/kode booking. Setiap baris punya tombol aksi:</p>
+      <ul>
+        <li>Ikon mata — lihat detail lengkap booking</li>
+        <li>Ikon pensil — ubah status booking</li>
+        <li>Ikon WhatsApp — kirim pesan konfirmasi ke customer</li>
+        <li>Ikon bintang (muncul kalau status "Selesai") — kirim link ulasan ke customer</li>
+      </ul>
+
+      <h3>3.3 Arti Setiap Status Booking</h3>
+      <table>
+        <tr><th>Status</th><th>Artinya</th></tr>
+        <tr><td>Menunggu</td><td>Booking online baru masuk, belum dikonfirmasi owner</td></tr>
+        <tr><td>Terkonfirmasi</td><td>Owner sudah konfirmasi, customer pasti datang</td></tr>
+        <tr><td>Berlangsung</td><td>Customer sedang dilayani sekarang</td></tr>
+        <tr><td>Dalam Antrian</td><td>Walk-in yang masih menunggu giliran di kasir</td></tr>
+        <tr><td>Selesai</td><td>Layanan sudah selesai dikerjakan</td></tr>
+        <tr><td>Dibatalkan</td><td>Booking dibatalkan (oleh owner atau customer)</td></tr>
+        <tr><td>No-Show</td><td>Customer tidak datang sesuai jadwal booking</td></tr>
+      </table>
+    </section>
+
+    <section id="kasir">
+      <h2>4. Panel Kasir — Walk-in &amp; Antrian</h2>
+      <p>Panel Kasir dipakai untuk mengelola customer yang datang langsung ke toko (walk-in), atau mencatat booking manual dari yang telepon/chat WhatsApp.</p>
+
+      <h3>4.1 Menambahkan Customer ke Antrian</h3>
+      <ol>
+        <li>Buka "Buka Kasir" dari dashboard.</li>
+        <li>Klik "+ Walk-in / Booking" pada barberman yang dituju.</li>
+        <li>Pilih tipe: "Walk-in" (customer datang langsung) atau "Booking Online" (Anda mencatatkan booking dari telepon/chat).</li>
+        <li>Isi nama customer, nomor WhatsApp (opsional), pilih paket.</li>
+        <li>Sistem otomatis menghitung perkiraan waktu mulai dilayani — Anda tidak perlu isi jam manual.</li>
+        <li>Klik "Masukkan Antrian".</li>
+      </ol>
+      <div class="tip"><b>Tips</b> — Waktu mulai dihitung otomatis berdasarkan kondisi antrian yang sebenarnya. Kalau barberman sedang bebas, customer langsung dilayani sekarang. Ini sudah memperhitungkan booking online yang sudah ada, jadi tidak akan bentrok jadwal.</div>
+
+      <h3>4.2 Kalau Layanan Molor dari Perkiraan</h3>
+      <p>Gunakan tombol "perpanjang waktu" (misalnya +15 menit) pada customer yang sedang dilayani. Semua antrian setelahnya akan otomatis mundur menyesuaikan — tidak perlu ubah jam satu-satu.</p>
+
+      <h3>4.3 Riwayat Hari Ini</h3>
+      <p>Tab ini menampilkan semua customer yang sudah selesai dilayani hari ini, termasuk yang berasal dari booking online.</p>
+    </section>
+
+    <section id="link-booking">
+      <h2>5. Bagikan Link Booking ke Customer</h2>
+      <p>Setiap toko punya link booking sendiri, formatnya:</p>
+      <p><code>caricukur.com/booking.html?store=nama-toko-anda</code></p>
+      <ol>
+        <li>Klik tombol "Link Booking" di navbar dashboard untuk menyalin link ini.</li>
+        <li>Bagikan ke bio Instagram, status WhatsApp, atau Google Maps toko Anda.</li>
+        <li>Customer yang klik link ini bisa langsung pilih barberman, paket, tanggal, dan jam — tanpa perlu daftar akun.</li>
+      </ol>
+      <div class="tip"><b>Tips</b> — Semakin banyak tempat Anda menaruh link ini (Instagram, WA, Google Maps), semakin mudah customer baru menemukan dan booking ke toko Anda.</div>
+    </section>
+
+    <section id="ulasan">
+      <h2>6. Meminta Ulasan dari Customer</h2>
+      <p>Ulasan (rating bintang) membantu toko Anda lebih dipercaya dan lebih sering muncul di direktori pencarian CariCukur.</p>
+      <ol>
+        <li>Setelah customer selesai dilayani, ubah status booking-nya jadi "Selesai".</li>
+        <li>Klik ikon bintang oranye pada baris booking tersebut.</li>
+        <li>WhatsApp otomatis terbuka dengan pesan + link ulasan siap dikirim ke customer.</li>
+        <li>Customer klik link itu, verifikasi 4 digit terakhir nomor HP-nya, lalu isi rating dan komentar.</li>
+      </ol>
+      <div class="tip"><b>Tips</b> — Verifikasi nomor HP ini untuk memastikan yang kasih ulasan benar-benar customer yang datang, bukan orang lain.</div>
+    </section>
+
+    <section id="laporan">
+      <h2>7. Laporan &amp; Export</h2>
+      <ol>
+        <li>Buka menu "Laporan & Export" di sidebar.</li>
+        <li>Pilih periode: Hari Ini, Bulan Ini, Bulan Lalu, Tahun Ini, atau Semua — data langsung diperbarui saat Anda klik.</li>
+        <li>Atau pilih rentang tanggal sendiri lewat kolom "Dari Tanggal" / "Sampai Tanggal", lalu klik "Tampilkan".</li>
+        <li>Klik "Export Excel" untuk mengunduh data dalam format spreadsheet.</li>
+      </ol>
+      <p>Halaman ini juga menampilkan grafik booking harian, performa tiap barberman, dan paket paling laris — berguna untuk evaluasi bisnis bulanan.</p>
+    </section>
+
+    <section id="tv-antrian">
+      <h2>8. TV Antrian</h2>
+      <p>Fitur ini untuk ditampilkan di layar TV/monitor toko, menunjukkan antrian yang sedang berjalan supaya customer di ruang tunggu tahu gilirannya.</p>
+      <ol>
+        <li>Buka menu "TV Antrian" di sidebar, atau akses langsung lewat <code>tv.html?store=nama-toko-anda</code>.</li>
+        <li>Sambungkan laptop/HP ke TV toko (lewat kabel HDMI atau Chromecast), buka halaman ini di browser layar penuh.</li>
+        <li>Tampilan akan otomatis update setiap ada perubahan antrian di kasir.</li>
+      </ol>
+    </section>
+
+    <section id="direktori">
+      <h2>9. Direktori Publik — Ditemukan Customer Baru</h2>
+      <p>CariCukur punya halaman direktori (<code>cari.html</code>) tempat customer mencari barbershop berdasarkan kota, lalu membandingkan rating sebelum booking.</p>
+      <ul>
+        <li>Toko Anda otomatis muncul di direktori selama status "Aktif"</li>
+        <li>Semakin tinggi rating toko dan barberman, semakin menarik di mata calon customer</li>
+        <li>Tidak ada tindakan tambahan yang perlu dilakukan — cukup pastikan profil toko lengkap dan aktif meminta ulasan dari customer</li>
+      </ul>
+    </section>
+
+    <section id="faq">
+      <h2>10. Tanya Jawab (FAQ)</h2>
+
+      <div class="faq-q">Apa bedanya "Walk-in" dan "Booking Online" di Kasir?</div>
+      <p>Keduanya diproses sama persis (langsung masuk antrian hari itu), bedanya cuma label pencatatan. "Walk-in" untuk customer yang datang tanpa janji, "Booking Online" untuk yang Anda catatkan manual dari telepon/chat.</p>
+
+      <div class="faq-q">Kenapa customer tidak bisa pilih jam booking yang saya mau?</div>
+      <p>Untuk booking online, jam yang tersedia otomatis dihitung per 30 menit berdasarkan durasi paket + jam operasional toko. Ini untuk menghindari jadwal yang bentrok.</p>
+
+      <div class="faq-q">Bagaimana kalau saya salah ubah status booking?</div>
+      <p>Buka detail booking lewat ikon mata, lalu ubah status lagi lewat ikon pensil. Tidak ada batasan berapa kali status boleh diubah.</p>
+
+      <div class="faq-q">Apakah customer wajib bayar DP?</div>
+      <p>Tergantung pengaturan Anda di Profil Toko. Kalau persentase DP diisi 0%, customer bisa booking tanpa bayar di muka.</p>
+
+      <div class="faq-q">Bagaimana kalau lupa password?</div>
+      <p>Gunakan tombol "Lupa Password" di halaman login untuk reset lewat email.</p>
+    </section>
+
+    <section id="bantuan">
+      <h2>11. Butuh Bantuan?</h2>
+      <p>Kalau ada pertanyaan atau kendala yang tidak terjawab di panduan ini, hubungi tim CariCukur lewat kontak yang tertera di halaman utama caricukur.com.</p>
+    </section>
+
+    <div class="closing">Selamat menggunakan CariCukur — semoga bisnis Anda makin rapi dan berkembang!</div>
+  </main>
+</div>
+
+</body>
+</html>
