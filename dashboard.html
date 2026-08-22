@@ -2140,7 +2140,7 @@
             .select(`
         id, booking_code, type, status, customer_name, customer_phone,
         booking_date, start_time, end_time, total_price, dp_amount, dp_status,
-        created_at,
+        created_at, reviewed,
         barbers ( name, avatar_color ),
         packages ( name, duration_min )
       `
@@ -2307,7 +2307,7 @@
             b.id}')"><i class="ti ti-eye" style="font-size:14px;"></i></button>
             <button class="act-btn" title="Ubah status" onclick="openStatusModal('${b.id}')"><i class="ti ti-edit" style="font-size:14px;"></i></button>
             <button class="act-btn" title="Kirim WA" onclick="kirimWA('${b.id}')" style="background:rgba(74,222,128,.08);border-color:rgba(74,222,128,.25);color:#4ade80;"><i class="ti ti-brand-whatsapp" style="font-size:14px;"></i></button>
-            ${b.status === 'done' ? `<button class="act-btn" title="Kirim Link Ulasan" onclick="kirimReviewWA('${b.id}')" style="background:rgba(184,117,46,.08);border-color:rgba(184,117,46,.25);color:#B8752E;"><i class="ti ti-star" style="font-size:14px;"></i></button>` : ''}
+            ${b.status === 'done' && !b.reviewed ? `<button class="act-btn" title="Kirim Link Ulasan" onclick="kirimReviewWA('${b.id}')" style="background:rgba(184,117,46,.08);border-color:rgba(184,117,46,.25);color:#B8752E;"><i class="ti ti-star" style="font-size:14px;"></i></button>` : ''}
           </div>
         </td>
       </tr>`
