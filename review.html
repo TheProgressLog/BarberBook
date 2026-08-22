@@ -187,6 +187,7 @@ async function submitReview() {
   });
 
   if (error) {
+    alert('DEBUG ERROR:\n' + JSON.stringify(error, null, 2));
     btn.disabled = false;
     btn.textContent = 'Kirim Ulasan';
     if (error.code === '23505') {
